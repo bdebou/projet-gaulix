@@ -58,7 +58,7 @@ class DebatDeClan{
 					<form method="post">
 						<input type="hidden" name="id" value="'.$id.'" />
 						<input type="hidden" name="chat" value="remove" />
-						<button type="submit">'.AfficheIcone('trash').'</button>
+						<button type="submit">'.AfficheIcone('Trash').'</button>
 					</form>
 				</th>';
 	}
