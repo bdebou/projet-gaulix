@@ -23,12 +23,12 @@ class DebatDeClan{
 		return '<form method="post">
 					<input type="hidden" name="clan" value="'.$Joueur->GetClan().'" />
 					<input type="hidden" name="member" value="'.$Joueur->GetLogin().'" />
-					<input type="hidden" name="chat" value="addreccord" />
+					<input type="hidden" name="action" value="chataddreccord" />
 					<table>
 						<tr><td>
 							<textarea style="width:750px; max-width:750px; height:100px; max-height:100px;" name="text" required="required" placeholder="Introduisez votre texte ici"></textarea>
 						</td></tr>
-						<tr><td style="text-align:center;"><input type="submit" value="Valider" /></td></tr>
+						<tr><td style="text-align:center;"><input type="submit" value="Envoyer" /></td></tr>
 					</table>
 				</form>';
 	}
@@ -57,7 +57,7 @@ class DebatDeClan{
 		return '<th>
 					<form method="post">
 						<input type="hidden" name="id" value="'.$id.'" />
-						<input type="hidden" name="chat" value="remove" />
+						<input type="hidden" name="action" value="chatremovereccord" />
 						<button type="submit">'.AfficheIcone('Trash').'</button>
 					</form>
 				</th>';

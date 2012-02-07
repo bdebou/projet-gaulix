@@ -25,7 +25,7 @@ function CountDown(time){
 			if (btime==0){check=true;}
 		}
 		setTimeout("CountDown(btime)", 1000);
-	}else if(check){window.location="./fct/main.php?action=deplacement";}
+	}else if(check){window.location="index.php?page=common&action=deplacement";}
 }
 /*
 +---------------------------------------------------------------------------------------+
@@ -41,7 +41,7 @@ function CountDownRessource(timeRessource){
 			if (btimeRessource==0){checkRessource=true;}
 		}
 		setTimeout("CountDownRessource(btimeRessource)", 1000);
-	}else if(checkRessource){window.location="./fct/main.php?action=ressource";}
+	}else if(checkRessource){window.location="index.php?page=common&action=ressource";}
 }
 /*
 +---------------------------------------------------------------------------------------+

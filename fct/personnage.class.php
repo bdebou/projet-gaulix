@@ -83,13 +83,13 @@ class personnage{
 			
 			$this->AddExperience(5);
 			$this->UpdateScores(1,0);
-			$this->UpdatePoints($lstPoints['CombatGagné']);
+			$this->UpdatePoints($lstPoints['CombatGagné'][0]);
 			
 			$persoCible->UpdateScores(0,1);
-			$persoCible->UpdatePoints($lstPoints['CombatPerdu']);
+			$persoCible->UpdatePoints($lstPoints['CombatPerdu'][0]);
 			
-			return array('Vous avez gagné le combat (+'.$lstPoints['CombatGagné'].' points, +5pts d\'expérience et volé '.$montant.' '.AfficheIcone('or').').',
-			'Vous avez perdu un combat ('.$lstPoints['CombatPerdu'].' points, -'.(intval($Valeur-$ValeurCible)).'pts '.AfficheIcone('vie').', -'.$montant.' '.AfficheIcone('or').' mais +1pt d\'expérience).');
+			return array('Vous avez gagné le combat (+'.$lstPoints['CombatGagné'][0].' points, +5pts d\'expérience et volé '.$montant.' '.AfficheIcone('or').').',
+			'Vous avez perdu un combat ('.$lstPoints['CombatPerdu'][0].' points, -'.(intval($Valeur-$ValeurCible)).'pts '.AfficheIcone('vie').', -'.$montant.' '.AfficheIcone('or').' mais +1pt d\'expérience).');
 		}elseif($Valeur == $ValeurCible){
 				//Match Null
 			$persoCible->AddExperience(5);
@@ -110,13 +110,13 @@ class personnage{
 			
 			$persoCible->AddExperience(5);
 			$persoCible->UpdateScores(1,0);
-			$persoCible->UpdatePoints($lstPoints['CombatGagné']);
+			$persoCible->UpdatePoints($lstPoints['CombatGagné'][0]);
 			
 			$this->UpdateScores(0,1);
-			$this->UpdatePoints($lstPoints['CombatPerdu']);
+			$this->UpdatePoints($lstPoints['CombatPerdu'][0]);
 			
-			return array('Vous avez perdu le combat ('.$lstPoints['CombatPerdu'].' points, -'.intval($ValeurCible-$Valeur).'pts '.AfficheIcone('vie').' et -'.$montant.' '.AfficheIcone('or').').',
-			'Vous avez gagné un combat (+'.$lstPoints['CombatGagné'].' points, +5pts d\'expérience et volé '.$montant.' '.AfficheIcone('or').').');
+			return array('Vous avez perdu le combat ('.$lstPoints['CombatPerdu'][0].' points, -'.intval($ValeurCible-$Valeur).'pts '.AfficheIcone('vie').' et -'.$montant.' '.AfficheIcone('or').').',
+			'Vous avez gagné un combat (+'.$lstPoints['CombatGagné'][0].' points, +5pts d\'expérience et volé '.$montant.' '.AfficheIcone('or').').');
 		}
 	}
 	
@@ -147,7 +147,7 @@ class personnage{
 		}
 		$this->GagnerVie($tmp);
 		$this->niveau++;
-		$this->UpdatePoints($lstPoints['NivTerminé']);
+		$this->UpdatePoints($lstPoints['NivTerminé'][0]);
 	}
 	public function PerdreVie($nb, $type){
 		switch($type){
@@ -561,7 +561,7 @@ class personnage{
 		$this->tmp_perf_attaque = null;
 		$this->date_perf_defense = null;
 		$this->tmp_perf_defense = null;
-		$this->UpdatePoints($lstPoints['PersoTué']);
+		$this->UpdatePoints($lstPoints['PersoTué'][0]);
 		
 		ResetListeQuetes($this->GetLogin());
 		
@@ -790,6 +790,7 @@ class personnage{
 	public function GetClan(){				return $this->clan;}
 	public function GetPosition(){			return array($this->position['1'], $this->position['2']);}
 	public function GetCarte(){				return $this->position['0'];}
+	public function GetCoordonnee(){		return implode(',', $this->position);}
 	public function GetMaxExperience(){		return (($this->niveau + 1) * 100);}
 	public function GetNotifCombat(){		return $this->NotCombat;}
 	public function GetNotifAttaque(){		return $this->NotAttaque;}

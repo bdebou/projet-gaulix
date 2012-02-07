@@ -163,7 +163,7 @@ class maison extends batiment{
 					<td>
 						<button 
 							type="button" 
-							onclick="window.location=\'./fct/main.php?action=druide&amp;id='.$Key.'\'" 
+							onclick="window.location=\'index.php?page=village&action=druide&amp;id='.$Key.'\'" 
 							style="width:40px;" '
 							.($chkSort?'':'disabled="disabled"')
 							.' >'
