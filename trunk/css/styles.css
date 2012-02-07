@@ -13,21 +13,38 @@ div.container{
 	background: url('../img/bcg/parchemin02.gif') repeat-y center;
 	padding: 0px 20px 0px 20px;
 }
+div.version,
+div.actions,
+div.menu{
+	clear: both;
+}
+div.loginstatus,
+div.module_social,
+div.menu,
+div.mouvements,
+div.main,
+div.pub,
+div.carte{
+	float: left;
+}
+div.module_social{
+	float: right;
+}
 div.login,
 div.loginstatus, div.loginstatus table,
 div.mouvements,
 div.actions,
 div.pub,
 div.menu,
-div.main,
-div.module_social{
+div.main{
 	border-collapse: collapse;
 	border: 2px solid black;
 }
-div.loginstatus, div.loginstatus table,
+div.main,
+div.loginstatus,
 div.pub,
 div.module_social{
-	padding: 2px;
+	padding: 3px;
 }
 div.loginstatus,
 div.mouvements,
@@ -35,43 +52,38 @@ div.actions,
 div.pub,
 div.menu,
 div.main,
-div.module_social{
+div.module_social,
+div.carte{
 	margin: 2px;
 }
 div.history,
 div.village,
 div.login,
 div.main,
+div.mouvements,
 div.loginstatus{
 	height: auto;
 }
-
+div.mouvements,
+div.actions{
+	width: auto;
+}
 div.login{
 	width: 180px;
 	margin: 0px 5px 5px 0px;
 	background: green;
 }
+div.loginstatus,
+div.menu,
+div.main{
+	width: 788px;
+}
 div.loginstatus{
-	width: 300px;
 	background: red;
 }
-div.loginstatus table{
-	width: 100%;
-}
-div.loginstatus table td,
 div.carte{
-	border: 1px solid black;
-}
-div.carte{
-	margin: 2px 2px 10px 2px;
-	float: right;
-}
-div.mouvements,
-div.actions{
-	height: 170px;
-}
-div.mouvements{
-	width: 205px;
+	width: 465px;
+	text-align: center;
 }
 div.pion{
 	margin: auto;
@@ -79,7 +91,7 @@ div.pion{
 	height: 15px;
 }
 div.actions{
-	width: 579px;
+	height: 170px;
 	overflow: auto;
 }
 div.pub{
@@ -88,41 +100,25 @@ div.pub{
 	text-align: center;
 }
 div.menu{
-	width: 645px;
-	height: 102px;
-}
-div.main{
-	display: block;
-	width: 772px;
-	padding: 3px 10px 3px 10px;
+	padding-left: 3px;
+	padding-right: 3px;
 }
 div.equipement{
 	margin-left: auto;
 	margin-right: auto;
 }
-div.module_social{
+/*div.module_social{
 	display: inline;
 	width: 135px;
 	height: 98px;
+}*/
+div.loginstatus table{
+	width: 100%;
 }
-div.g-plusone{
+div.loginstatus table td{
+	border: 1px solid black;
 }
-div.fb-like{
-}
-div.version,
-div.main,
-div.menu,
-div.mouvements{
-	clear: both;
-}
-div.loginstatus,
-div.module_social,
-div.menu,
-div.pub,
-div.actions,
-div.mouvements{
-	float: left;
-}
+
 /*  Les Onglets */
 .onglet{
 	display:inline-block;
@@ -159,7 +155,8 @@ table.InfoBulle{
 	width: 190px;
 }
 table.mouvements{
-	width: 195px;
+	width: 220px;
+	height: 185px;
 }
 table.equipement, 
 table.village, 
@@ -303,13 +300,27 @@ table.competence{
 form.production{
 	display: inline;
 }
+form.nouveau_troc fieldset{
+	width:600px;
+	display:inline
+}
+form.nouveau_troc fieldset input{
+	width:40px;
+	margin-right:20px;
+}
+form.nouveau_troc fieldset.donner{
+	background:lightgreen;
+}
+form.nouveau_troc fieldset.recevoir{
+	background:lightcoral;
+}
 
 /* Les BUTTON */
 button.bt-menu{
 	float: left;
 	width: 125px;
 	height: 30px;
-	margin: 2px;
+	margin: 3px;
 	display: block;
 	font-size: 1em;
 	font-weight: bold;
@@ -327,4 +338,7 @@ button.mouvements{
 }
 button.bricollage{
 	width: 150px;
+}
+button.quete{
+	width: 200px;
 }

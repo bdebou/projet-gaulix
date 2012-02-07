@@ -96,8 +96,8 @@ abstract class batiment{
 			//on déduit les dégats
 		$this->Etat -= $degat;
 			//on gère les points gagnés ou perdus
-		$persoC->UpdatePoints($lstPoints['BatAbimé']);
-		$persoA->UpdatePoints($lstPoints['AttBatAdvers']);
+		$persoC->UpdatePoints($lstPoints['BatAbimé'][0]);
+		$persoA->UpdatePoints($lstPoints['AttBatAdvers'][0]);
 			//on vérifie si le batiment est détruit
 		if($this->Etat <= 0){$this->BatimentDetruit($persoC, $persoA);}
 	}
@@ -110,7 +110,7 @@ abstract class batiment{
 		$this->Detruit = true;
 			//on gère les points gagnés et perdus
 		$persoCible->UpdatePoints(-$this->NbPoints);
-		$persoAttaquant->UpdatePoints($lstPoints['BatDetruit']);
+		$persoAttaquant->UpdatePoints($lstPoints['BatDetruit'][0]);
 			//Différente actions pour certain type de batiment quand détruit.
 		switch($this->Type){
 				//Quand la maison est détruite, le joueur va devoir reconstruire sa maison quelque part sur la carte
@@ -150,7 +150,7 @@ abstract class batiment{
 		if($this->Etat == $this->GetEtatMax()){
 			global $lstPoints;
 				//on gère les points gagnés ou perdus
-			$Perso->UpdatePoints($lstPoints['BatRéparé']);
+			$Perso->UpdatePoints($lstPoints['BatRéparé'][0]);
 		}
 	}
 	
@@ -239,11 +239,11 @@ abstract class batiment{
 			if((strtotime('now') - $this->DateAmelioration) < $this->TmpAmelioration){
 				
 				return '<br />Amélioration en cours : <div style="display:inline;" id="TimeToWaitAmelioration_'.$id.'"></div>'
-				.AfficheCompteurTemp('Amelioration_'.$id, './fct/main.php?action=ameliorer&id='.$id, ($this->GetTmpAmelioration()-(strtotime('now')-$this->GetDateAmelioration())));
+				.AfficheCompteurTemp('Amelioration_'.$id, 'index.php?page=village&action=ameliorer&id='.$id, ($this->GetTmpAmelioration()-(strtotime('now')-$this->GetDateAmelioration())));
 				
 			}else{
 				
-				return '<script language="javascript">window.location=\'./fct/main.php?action=ameliorer&id='.$id.'\';</script>';
+				return '<script language="javascript">window.location=\'index.php?page=village&action=ameliorer&id='.$id.'\';</script>';
 				
 			}
 			
@@ -266,7 +266,7 @@ abstract class batiment{
 				return '<p>Prix de l\'amélioration : <br />'.AfficheListePrix($prixAmelioration, array('Bois'=>$maison->GetRessourceBois(), 'Pierre'=>$maison->GetRessourcePierre(), 'Or'=>$oJoueur->GetArgent(), 'Nourriture'=>$maison->GetRessourceNourriture())).'</p>';
 			}
 			
-			return '<br /><a href="./fct/main.php?action=ameliorer&id='.$id.'" title="Or = '.$prixAmelioration['Or'].'&#13;Bois = '.$prixAmelioration['Bois'].'&#13;Pierre = '.$prixAmelioration['Pierre'].'&#13;Nourriture = '.$prixAmelioration['Nourriture'].'&#13;'.AfficheTempPhrase(DecoupeTemp(intval(3600*exp($this->Niveau)))).'">Améliorer</a> pour '.AfficheListePrix($prixAmelioration, array('Bois'=>$maison->GetRessourceBois(), 'Pierre'=>$maison->GetRessourcePierre(), 'Or'=>$oJoueur->GetArgent(), 'Nourriture'=>$maison->GetRessourceNourriture()));
+			return '<br /><a href="index.php?page=village&action=ameliorer&id='.$id.'" title="Or = '.$prixAmelioration['Or'].'&#13;Bois = '.$prixAmelioration['Bois'].'&#13;Pierre = '.$prixAmelioration['Pierre'].'&#13;Nourriture = '.$prixAmelioration['Nourriture'].'&#13;'.AfficheTempPhrase(DecoupeTemp(intval(3600*exp($this->Niveau)))).'">Améliorer</a> pour '.AfficheListePrix($prixAmelioration, array('Bois'=>$maison->GetRessourceBois(), 'Pierre'=>$maison->GetRessourcePierre(), 'Or'=>$oJoueur->GetArgent(), 'Nourriture'=>$maison->GetRessourceNourriture()));
 		}
 	}
 	public function AfficheOptionReparer(&$oJoueur, &$PageVillage){
@@ -321,7 +321,8 @@ abstract class batiment{
 				return 'Pas assez d\'argent';
 			}
 			return '
-		<form method="get" action="./fct/main.php">
+		<form method="get" action="index.php">
+			<input type="hidden" name="page" value="village" />
 			<input type="hidden" name="action" value="reparer" />
 			<input type="hidden" name="num" value="'./*$nbReparer*/'1'.'" />
 			<select name="id">

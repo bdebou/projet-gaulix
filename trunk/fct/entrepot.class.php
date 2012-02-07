@@ -207,7 +207,7 @@ class entrepot extends batiment{
 					.($chkReprise?'':'disabled="disabled" ')
 					.'onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulleReprise).'\');" '
 					.'onmouseout="cache();" '
-					.'onclick="window.location=\'./fct/main.php?action=reprendre&amp;id='.$id.'&amp;qte='.$StepReprise.'\'">'
+					.'onclick="window.location=\'index.php?page=village&action=reprendre&amp;id='.$id.'&amp;qte='.$StepReprise.'\'">'
 						.'Reprendre '.$StepReprise.'x'
 				.'</button>' ;
 		}

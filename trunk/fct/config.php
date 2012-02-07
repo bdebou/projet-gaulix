@@ -1,14 +1,14 @@
 <?php 
 global 	$NumVersion, $nbLigneCarte, $nbColonneCarte, $db, $temp_attente, $nbDeplacement, $temp_combat, $nbQueteMax, $NiveauMaxBatiment, 
 		$TempMaxTransaction, $VieMaximum, $arCouleurs, $lstBatimentConstructionUnique, $DeplacementMax, $MAX_essai, $lstPoints,
-		$objManager, $CodeCouleurQuete, $lstNonBatiment;
+		$objManager, $CodeCouleurQuete, $lstNonBatiment, $chkDebug;
 
 $DB_serveur			= 'localhost'; 			// Nom du serveur
 $DB_utilisateur		= 'gaulix_be'; 			// Nom de l'utilisateur de la base
 $DB_motdepasse		= 'A3hwDpwdVTPpC3B9'; 	// Mot de passe pour accèder à la base
 $DB_base			= 'gaulix_be'; 			// Nom de la base
 
-$NumVersion			= '3.3';				// Num Version
+$NumVersion			= '3.4';				// Num Version
 $MAX_essai			= 3;					// Nombre maximum d'essai de connection
 $nbLigneCarte		= 13;					// Nombre de ligne de la carte
 $nbColonneCarte		= 13;					// Nombre de colonne de la carte
@@ -23,16 +23,18 @@ $TempMaxTransaction	= 3600 * 24 * 7;		// Temp maximum pour une transaction. Pass
 $VieMaximum			= 300;					// Limite de vie maximum
 $DeplacementMax		= 300;					// Limite le nombre déplacement maximum
 
+$chkDebug			= false;
+
 //les couleurs
-$arCouleurs			= array('Attaque'		=> 'FF0000',					// Red 
-							'Defense'		=> '32CD32',					// LimeGreen
-							'Nourriture'	=> '808000',					// Olive
-							'Pierre'		=> '708090',					// SlateGray
-							'Bois'			=> '8B4513',					// SaddleBrown
-							'Hydromel'		=> 'F0E68C',					// Khaki
-							'Vie'			=> 'FFA07A',					// LightSalmon
-							'Experience'	=> '6495ED',					// CornflowerBlue
-							'Or'			=> 'FFD700');					// Gold
+$arCouleurs			= array('Attaque'		=> '#FF0000',					// Red 
+							'Defense'		=> '#32CD32',					// LimeGreen
+							'Nourriture'	=> '#808000',					// Olive
+							'Pierre'		=> '#708090',					// SlateGray
+							'Bois'			=> '#8B4513',					// SaddleBrown
+							'Hydromel'		=> '#F0E68C',					// Khaki
+							'Vie'			=> '#FFA07A',					// LightSalmon
+							'Experience'	=> '#6495ED',					// CornflowerBlue
+							'Or'			=> '#FFD700');					// Gold
 
 //Listes des batiments que l'on ne peut construire que 1 seule fois
 $lstBatimentConstructionUnique	= array(4,		//Entrepot
@@ -54,17 +56,17 @@ $CodeCouleurQuete	= array('monstre'	=> '#ff6464',
 							'romains'	=> '#ff6464');
 
 //Liste des Points
-$lstPoints	= array('CombatGagné'	=>10,
-					'CombatPerdu'	=>-10,
-					'AttBatAdvers'	=>3,
-					'BatAbimé'		=>-3,
-					'AttTour'		=>-2,
-					'CmpTerminé'	=>5,
-					'NivTerminé'	=>15,
-					'BatRéparé'		=>8,
-					'ObjFabriqué'	=>1,
-					'BatDetruit'	=>20,
-					'PersoTué'		=>-150);
+$lstPoints	= array('CombatGagné'	=>	array(10,	'Combat gagné'),
+					'CombatPerdu'	=> array(-10,	'Combat perdu'),
+					'AttBatAdvers'	=> array(3,		'Attaque de batiment adverse'),
+					'BatAbimé'		=> array(-3,	'Un de vos batiment a été attaqué'),
+					'AttTour'		=> array(-2,	'Attaque d\'une tour'),
+					'CmpTerminé'	=> array(5,		'1 Niveau de compétence terminé'),
+					'NivTerminé'	=> array(15,	'Passé 1 niveau'),
+					'BatRéparé'		=> array(8,		'Batiment réparé à 100%'),
+					'ObjFabriqué'	=> array(1,		'Objet fabriqué'),
+					'BatDetruit'	=> array(20,	''),
+					'PersoTué'		=> array(-150,	'Personnage tué'));
 
 
 // On se connecte au serveur MySQL

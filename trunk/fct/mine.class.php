@@ -146,12 +146,12 @@ class mine extends batiment{
 		if($stock[1] < $this->GetStockMax()){
 			if((strtotime('now') - parent::GetDateAction()) > $this->GetTempExtraction($stock[0])){
 				$_SESSION['main'][self::TYPE]['stock'] = intval((strtotime('now') - parent::GetDateAction()) / $this->GetTempExtraction($stock[0]));
-				return '<script language="javascript">window.location=\'./fct/main.php?action=stocker'.strtolower(self::TYPE).'\';</script>';
+				return '<script language="javascript">window.location=\'index.php?page=village&action=stocker'.strtolower(self::TYPE).'\';</script>';
 			}else{
 				$_SESSION['main'][self::TYPE]['stock'] = 1;
 				$status = '
 								<div style="display:inline;" id="TimeToWait'.ucfirst(strtolower(self::TYPE)).'"></div>'
-								.AfficheCompteurTemp(ucfirst(strtolower(self::TYPE)), './fct/main.php?action=stocker'.strtolower(self::TYPE), ($this->GetTempExtraction($stock[0]) - (strtotime('now') - parent::GetDateAction())));
+								.AfficheCompteurTemp(ucfirst(strtolower(self::TYPE)), 'index.php?page=village&action=stocker'.strtolower(self::TYPE), ($this->GetTempExtraction($stock[0]) - (strtotime('now') - parent::GetDateAction())));
 			}
 		}else{
 			$status = '<p>Votre stock est plein.</p>';
@@ -166,10 +166,11 @@ class mine extends batiment{
 		if($PositionBatiment == $PositionJoueur){
 			$txtAction = '
 				<td>
-					<a href="./fct/main.php?action=viderstock'.strtolower(self::TYPE).'">Vider votre stock</a>
+					<a href="index.php?page=village&amp;action=viderstock'.strtolower(self::TYPE).'">Vider votre stock</a>
 				</td>
 				<td>'
-					.'<form method="get" action="./fct/main.php" class="production">'
+					.'<form method="get" action="index.php" class="production">'
+						.'<input type="hidden" name="page" value="village" />'
 						.'<input type="hidden" name="action" value="production'.strtolower(self::TYPE).'" />'
 						.'<select name="type" onclick="document.getElementById(\'BtSubmit\').disabled=false;">'
 							.'<option value="'.self::CODE_PRODUCTION_PIERRE.'"'.(($stock[0] == self::CODE_PRODUCTION_PIERRE)?' disabled="disabled"':'').'>Trouver des Pierres</option>'
