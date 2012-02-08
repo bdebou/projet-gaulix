@@ -990,9 +990,10 @@ function ActionMove(&$check, personnage &$oJoueur, &$objManager){
 
 	unset($_SESSION['retour_combat']);
 	unset($_SESSION['retour_attaque']);
+	unset($_GET['move']);
 }
 function ActionChasser(&$check, personnage &$oJoueur, &$objManager){
-	if(!is_null($_SESSION['main']['chasser'])){
+	if(isset($_SESSION['main']['chasser'])){
 		$maison = FoundBatiment(1);
 		$maison->AddNourriture($_SESSION['main']['chasser']['nourriture']);
 		if(!is_null($_SESSION['main']['chasser']['cuir'])){
@@ -1003,14 +1004,14 @@ function ActionChasser(&$check, personnage &$oJoueur, &$objManager){
 		$objManager->UpdateBatiment($maison);
 		unset($maison);
 
-		$_SESSION['main']['chasser'] = null;
+		unset($_SESSION['main']['chasser']);
 	}else{
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionChasser';
 	}
 }
 function ActionFrapper(&$check, $id, personnage &$oJoueur, &$objManager){
-	if(!is_null($_SESSION['main']['frapper'][$id])){
+	if(isset($_SESSION['main']['frapper'][$id])){
 		$PersoAFrapper = $objManager->get(intval($_SESSION['main']['frapper'][$id]));
 		$_SESSION['retour_combat'][] = $PersoAFrapper->GetLogin();
 		$_SESSION['retour_combat'][] = $oJoueur->frapper($PersoAFrapper);
@@ -1023,14 +1024,14 @@ function ActionFrapper(&$check, $id, personnage &$oJoueur, &$objManager){
 		//on ajoute un historique
 		AddHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'combat', $PersoAFrapper->GetLogin(), NULL, $info['0']);
 		AddHistory($PersoAFrapper->GetLogin(), $PersoAFrapper->GetCarte(), $PersoAFrapper->GetPosition(), 'combat', $oJoueur->GetLogin(), NULL, $info['1']);
-		$_SESSION['main']['frapper'][$id] = null;
+		unset($_SESSION['main']['frapper'][$id]);
 	}else{
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionFrapper';
 	}
 }
 function ActionAttaquer(&$check, $id, personnage &$oJoueur, &$objManager){
-	if(!is_null($_SESSION['main']['attaquer'][$id])){
+	if(isset($_SESSION['main']['attaquer'][$id])){
 		$BatimentAAttaquer = $objManager->GetBatiment(strval($_SESSION['main']['attaquer'][$id]));
 		//$BatimentAAttaquer = FoundBatiment(NULL, NULL, strval($_SESSION['main']['attaquer'][$id]));
 
@@ -1050,7 +1051,7 @@ function ActionAttaquer(&$check, $id, personnage &$oJoueur, &$objManager){
 
 		unset($BatimentAAttaquer);
 		unset($PersoAttaque);
-		$_SESSION['main']['attaquer'][$id] = null;
+		unset($_SESSION['main']['attaquer'][$id]);
 	}else{
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionAttaquer';

@@ -6,7 +6,9 @@ global $objManager, $chkDebug;
 
 $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
-if($chkDebug){
+$ChkDebugVar = false;
+
+if($chkDebug AND $ChkDebugVar){
 	echo '$_SESSION[\'main\']<br />';print_r($_SESSION['main']);echo '<br />';
 	echo '$_GET<br />';print_r($_GET);echo '<br />';
 	echo '$_POST<br />';print_r($_POST);echo '<br />';
@@ -18,7 +20,6 @@ $CheckRetour = false;
 
 if(isset($_GET['move']) AND $oJoueur->GetDepDispo() > 0){
 	ActionMove($chkErr, $oJoueur, $objManager);
-	unset($_GET['move']);
 	$CheckRetour = true;
 }elseif(isset($_GET['action'])){
 	switch($_GET['action']){
@@ -38,11 +39,12 @@ if(isset($_GET['move']) AND $oJoueur->GetDepDispo() > 0){
 			break;
 		case 'laisser':				ActionLaisser($chkErr, $oJoueur); break;
 	}
-	unset($_GET['action']);
+	if(isset($_GET['action'])){unset($_GET['action']);}
+	
 	$CheckRetour = true;
 }
 
-if($chkDebug){
+if($chkDebug AND $ChkDebugVar){
 	print_r($_SESSION['main']);
 }
 
@@ -52,7 +54,7 @@ unset($oJoueur);
 if($chkDebug){
 	echo '<br /><a href="index.php?page=main">Retour</a>';
 }
-if($CheckRetour){
+if($CheckRetour AND !$chkDebug){
 	header('location: index.php?page=main');
 }
 ?>
