@@ -5,23 +5,25 @@ global $objManager, $chkDebug;
 
 $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
-if($chkDebug){	echo '$_SESSION[\'main\']<br />';print_r($_SESSION['main']);echo '<br />';}
-if($chkDebug){	echo '$_GET<br />';print_r($_GET);echo '<br />';}
-if($chkDebug){	echo '$_POST<br />';print_r($_POST);echo '<br />';}
-if($chkDebug){	echo '<hr />';}
+$ChkDebugVar = false;
+
+if($chkDebug AND $ChkDebugVar){	echo '$_SESSION[\'main\']<br />';print_r($_SESSION['main']);echo '<br />';}
+if($chkDebug AND $ChkDebugVar){	echo '$_GET<br />';print_r($_GET);echo '<br />';}
+if($chkDebug AND $ChkDebugVar){	echo '$_POST<br />';print_r($_POST);echo '<br />';}
+if($chkDebug AND $ChkDebugVar){	echo '<hr />';}
 
 $chkErr = true;
 $CheckRetour = false;
 
 if(isset($_POST['depot'])){
 	ActionDepot($chkErr, $oJoueur, $objManager);
-	unset($_POST['depot']);
+	$CheckRetour = true;
 }elseif(isset($_POST['retrait'])){
 	ActionRetrait($chkErr, $oJoueur, $objManager);
-	unset($_POST['retrait']);
+	$CheckRetour = true;
 }elseif(isset($_POST['transaction'])){
 	ActionTransactionMarcher($chkErr, $oJoueur, $objManager);
-	unset($_POST['transaction']);
+	$CheckRetour = true;
 }elseif(isset($_GET['action'])){
 	switch($_GET['action']){
 		case 'ameliorer':				ActionAmeliorerBatiment($chkErr, $oJoueur, $objManager, $_GET['id']); break;
@@ -38,22 +40,21 @@ if(isset($_POST['depot'])){
 		case 'annulertransaction':		ActionAnnulerTransaction($chkErr, $_GET['id'], $oJoueur, $objManager); break;
 		case 'acceptertransaction':		ActionAccepterTransaction($chkErr, $_GET['id'], $oJoueur, $objManager); break;
 	}
-	unset($_GET['action']);
 	$CheckRetour = true;
 }
 
-if($chkDebug){print_r($_SESSION['main']);}
+if($chkDebug AND $ChkDebugVar){print_r($_SESSION['main']);}
 
 $objManager->update($oJoueur);
 unset($oJoueur);
 
+$lstBatiment = CreateListBatiment();
+
 if($chkDebug){
 	echo '<br /><a href="index.php?page=village">Retour</a>';
-}else{
-	$lstBatiment = CreateListBatiment();
 }
 
-if($CheckRetour){
+if($CheckRetour AND !$chkDebug){
 	header('location: index.php?page=village');
 }
 
