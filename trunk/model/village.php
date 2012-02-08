@@ -220,7 +220,7 @@ function ActionReparer(&$check, $id, $num, &$oJoueur, &$objManager){
 	}
 }
 function ActionDepot(&$check, &$oJoueur, &$objManager){
-	if(!is_null($_POST['depot'])){
+	if(isset($_POST['depot'])){
 		if($_POST['depot'] <= $oJoueur->GetArgent()){
 			$banque = FoundBatiment(5);
 			if(!is_null($banque)){
@@ -231,7 +231,7 @@ function ActionDepot(&$check, &$oJoueur, &$objManager){
 				$check = false;
 				echo 'Erreur GLX0003: Fonction ActionDepot - Banque Introuvable';
 			}
-			$_POST['depot'] = null;
+			unset($_POST['depot']);
 		}
 	}else{
 		$check = false;
@@ -239,7 +239,7 @@ function ActionDepot(&$check, &$oJoueur, &$objManager){
 	}
 }
 function ActionRetrait(&$check, &$oJoueur, &$objManager){
-	if(!is_null($_POST['retrait'])){
+	if(isset($_POST['retrait'])){
 		$banque = FoundBatiment(5);
 		if(!is_null($banque)){
 			if($banque->GetContenu() >= $_POST['retrait']){
@@ -251,7 +251,7 @@ function ActionRetrait(&$check, &$oJoueur, &$objManager){
 			$check = false;
 			echo 'Erreur GLX0003: Fonction ActionRetrait - Banque Introuvable';
 		}
-		$_POST['retrait'] = null;
+		unset($_POST['retrait']);
 	}else{
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionRetrait';
@@ -291,7 +291,7 @@ function ActionReprendre(&$check, $id, &$oJoueur, &$objManager){
 	}
 }
 function ActionViderStock(&$check, $id, $type, &$oJoueur, &$objManager){
-	if(!is_null($_SESSION['main'][$type]['vider'])){
+	if(isset($_SESSION['main'][$type]['vider'])){
 		$maison = FoundBatiment(1);
 		if(!is_null($maison)){
 			$batiment = FoundBatiment($id, null, $oJoueur->GetCoordonnee());
@@ -309,7 +309,7 @@ function ActionViderStock(&$check, $id, $type, &$oJoueur, &$objManager){
 			$check = false;
 			echo 'Erreur GLX0003: Fonction ActionViderStock - Maison Introuvable';
 		}
-		$_SESSION['main'][$type]['vider'] = null;
+		unset($_SESSION['main'][$type]['vider']);
 	}else{
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionViderStock';
@@ -336,7 +336,7 @@ function ActionProduction(&$check, $id, $NomBatiment, $type, &$oJoueur, &$objMan
 	}
 }
 function ActionStocker(&$check, $id, $type, &$objManager, &$oJoueur){
-	if(!is_null($_SESSION['main'][$type]['stock'])){
+	if(isset($_SESSION['main'][$type]['stock'])){
 		$batiment = FoundBatiment($id);
 		if(!is_null($batiment)){
 			$batiment->AddStock($oJoueur);
@@ -346,7 +346,7 @@ function ActionStocker(&$check, $id, $type, &$objManager, &$oJoueur){
 			$check = false;
 			echo 'Erreur GLX0003: Fonction ActionStocker - '.ucfirst(strtolower($type)).' introuvable';
 		}
-		$_SESSION['main'][$type]['stock'] = null;
+		unset($_SESSION['main'][$type]['stock']);
 	}else{
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionStocker';
@@ -470,7 +470,7 @@ function ActionAnnulerTransaction(&$chkErr, $id, &$oJoueur, &$objManager){
 		$objManager->UpdateBatiment($maison);
 
 		unset($maison);
-		unset($_GET);
+		unset($_GET['action']);
 	}else{
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionAnnulerTransaction';
@@ -503,7 +503,7 @@ function ActionAccepterTransaction(&$chkErr, $id, &$oJoueur, &$objManager){
 		}else{$checke = false;
 		}
 
-		if($checka AND $checkb AND $checkc AND $checkd AND $checke){
+		if($checka AND $checkb AND $checkc AND $checke){
 			UpdateTransaction($_SESSION['main']['transaction'][$id]['accepter']);
 			//l'acheteur recoit son dû
 			$maisonA->AddNourriture($row['vente_nourriture']);
@@ -527,7 +527,7 @@ function ActionAccepterTransaction(&$chkErr, $id, &$oJoueur, &$objManager){
 		}
 
 		unset($maison);
-		unset($_GET);
+		unset($_GET['action']);
 	}else{
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionAccepterTransaction';
@@ -553,9 +553,10 @@ function ActionTransactionMarcher(&$chkErr, &$oJoueur, &$objManager){
 		}
 
 		if(is_null($_SESSION['transaction']['acceptation'])){
-			AddTransaction($oJoueur->GetLogin(),
-			array('nourriture'=>$_POST['ANourriture'], 'pierre'=>$_POST['APierre'], 'bois'=>$_POST['ABois'], 'or'=>$_POST['AOr']),
-			array('nourriture'=>$_POST['VNourriture'], 'pierre'=>$_POST['VPierre'], 'bois'=>$_POST['VBois'], 'or'=>$_POST['VOr']));
+			AddTransaction(	$oJoueur->GetLogin(),
+							array('nourriture'=>$_POST['ANourriture'], 'pierre'=>$_POST['APierre'], 'bois'=>$_POST['ABois'], 'or'=>$_POST['AOr']),
+							array('nourriture'=>$_POST['VNourriture'], 'pierre'=>$_POST['VPierre'], 'bois'=>$_POST['VBois'], 'or'=>$_POST['VOr']));
+			
 			$maison->MindNourriture($_POST['VNourriture']);
 			$maison->MindPierre($_POST['VPierre']);
 			$maison->MindBois($_POST['VBois']);
@@ -564,7 +565,7 @@ function ActionTransactionMarcher(&$chkErr, &$oJoueur, &$objManager){
 		}
 
 		unset($maison);
-		unset($_POST);
+		unset($_POST['transaction']);
 	}else{
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionTransactionMarcher';
