@@ -249,7 +249,7 @@ class marcher extends batiment{
 		$txt .= '
 			<tr>
 				<td colspan="4" style="text-align:center;">
-					<form method="post" action="index.php" class="nouveau_troc">
+					<form method="post" class="nouveau_troc">
 						<input type="hidden" name="page" value="village" />
 						<fieldset class="donner">
 							<legend style="background:lightgreen;">Donner</legend>'
