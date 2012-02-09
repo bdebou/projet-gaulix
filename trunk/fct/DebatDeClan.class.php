@@ -25,8 +25,20 @@ class DebatDeClan{
 					<input type="hidden" name="member" value="'.$Joueur->GetLogin().'" />
 					<input type="hidden" name="action" value="chataddreccord" />
 					<table>
+						<tr><td rowspan="3">'
+							.str_ireplace('="Attaque"', '="code = '.ReccordChat::CODE_IC_ATTAQUE.'"', ReccordChat::ICONE_ATTAQUE)
+							.str_ireplace('="Défense"', '="code = '.ReccordChat::CODE_IC_DEFENSE.'"', ReccordChat::ICONE_DEFENSE)
+							.str_ireplace('="Distance"', '="code = '.ReccordChat::CODE_IC_DISTANCE.'"', ReccordChat::ICONE_DISTANCE)
+							.str_ireplace('="Ressource Nourriture"', '="code = '.ReccordChat::CODE_IC_NOURRITURE.'"', ReccordChat::ICONE_NOURRITURE)
+							.str_ireplace('="Ressource Pierre"', '="code = '.ReccordChat::CODE_IC_PIERRE.'"', ReccordChat::ICONE_PIERRE)
+							.str_ireplace('="Ressource Bois"', '="code = '.ReccordChat::CODE_IC_BOIS.'"', ReccordChat::ICONE_BOIS)
+							.str_ireplace('="Ressource OR"', '="code = '.ReccordChat::CODE_IC_OR.'"', ReccordChat::ICONE_OR)
+							.str_ireplace('="clin d\'oeil"', '="code = '.ReccordChat::CODE_EMO_WINK.'"', ReccordChat::EMOTICON_WINK)
+							.str_ireplace('="content"', '="code = '.ReccordChat::CODE_EMO_HAPPY.'"', ReccordChat::EMOTICON_HAPPY)
+							.str_ireplace('="pas content"', '="code = '.ReccordChat::CODE_EMO_UNHAPPY.'"', ReccordChat::EMOTICON_UNHAPPY)
+						.'</td></tr>
 						<tr><td>
-							<textarea style="width:750px; max-width:750px; height:100px; max-height:100px;" name="text" required="required" placeholder="Introduisez votre texte ici"></textarea>
+							<textarea style="width:700px; max-width:700px; height:100px; max-height:100px;" name="text" required="required" placeholder="Introduisez votre texte ici"></textarea>
 						</td></tr>
 						<tr><td style="text-align:center;"><input type="submit" value="Envoyer" /></td></tr>
 					</table>
