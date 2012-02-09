@@ -6,6 +6,8 @@ global $objManager, $chkDebug;
 
 $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
+FinishAllCompetenceEnCours($oJoueur);
+
 $ChkDebugVar = false;
 
 if($chkDebug AND $ChkDebugVar){
