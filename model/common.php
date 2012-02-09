@@ -492,13 +492,34 @@ function ListeMembreClan($Clan){
 			if (is_null($row['date_inscription'])){
 				$lstMembre[] = $row['membre_clan'];
 			}elseif($row['chef_clan'] == $_SESSION['joueur']){
-				$_SESSION['message']['alliance'] = '<p>Vous avez une ou des demande(s) d\'adhésion à votre alliance. Allez vite voir sur la page "<a href="./alliance.php">Alliance</a>".</p>';
+				$_SESSION['message']['alliance'] = '<p>Vous avez une ou des demande(s) d\'adhésion à votre alliance. Allez vite voir sur la page "<a href="index.php?page=alliance">Alliance</a>".</p>';
 			}
 		}
 	}else{
 		$lstMembre[] = $_SESSION['joueur'];
 	}
 	return $lstMembre;
+}
+function AddHistory($Login, $Carte, $Position, $Type, $Adversaire, $Date, $Info) {
+	if(is_null($Date)){
+		$Date = strtotime('now');
+	}
+	$sql = "INSERT INTO `table_history` (`history_id`, `history_login`, `history_position`, `history_type`, `history_adversaire`, `history_date`, `history_info`)
+			VALUES (NULL, '$Login', '" . implode(',', array_merge(array($Carte), $Position)) . "', '$Type', '$Adversaire', '".date('Y-m-d H:i:s', $Date)."', '" . htmlentities($Info, ENT_QUOTES) . "');";
+	mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
+}
+function FinishAllCompetenceEnCours(personnage &$oJoueur) {
+	global $lstPoints;
+	$sqlCmp = "SELECT * FROM table_competence WHERE cmp_login='" . $_SESSION['joueur'] . "' AND cmp_finish IS NULL";
+	$rqtCmp = mysql_query($sqlCmp) or die(mysql_error() . '<br />' . $sqlCmp);
+	while ($cmp = mysql_fetch_array($rqtCmp, MYSQL_ASSOC)) {
+		if ((strtotime('now') - strtotime($cmp['cmp_date'])) >= $cmp['cmp_temp']) {
+			$sql = "UPDATE  `table_competence` SET  `cmp_finish` =  TRUE WHERE `table_competence`.`cmp_id` =" . $cmp['cmp_id'] . ";";
+			mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
+			$oJoueur->UpdatePoints($lstPoints['CmpTerminé'][0]);
+			AddHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'Competence', NULL, NULL, 'Compétence terminée : '.$cmp['cmp_nom'].' de niveau '.$cmp['cmp_niveau']);
+		}
+	}
 }
 
 //+---------------------------------+

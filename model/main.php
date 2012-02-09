@@ -482,7 +482,7 @@ function AfficheListeBatimentAttaquable($sql, &$chkConstruction) {
 
 					$_SESSION['main']['attaquer'][$nbBatiment] = $row['coordonnee'];
 					$txt .= '
-				<li><a href="./fct/main.php?action=attaquer&amp;id=' . $nbBatiment . '">Attaquer ' . $rstBatiment['batiment_nom'] . ' de ' . $row['login'] . ' (' . $row['etat_batiment'] . ')</a></li>';
+				<li><a href="index.php?page=main&amp;action=attaquer&amp;id=' . $nbBatiment . '">Attaquer ' . $rstBatiment['batiment_nom'] . ' de ' . $row['login'] . ' (' . $row['etat_batiment'] . ')</a></li>';
 					$chkBatimentsEnd = true;
 					$nbBatiment++;
 				}
@@ -559,7 +559,7 @@ function AfficheMenuConstruction(personnage &$oJoueur, &$chkConstruction) {
 						$_SESSION['main'][$nbBatiment]['prix_pierre'] = $row['prix_pierre'];
 						$_SESSION['main'][$nbBatiment]['prix_nourriture'] = $row['prix_nourriture'];
 						$txt .= '
-				<li>"<a href="./fct/main.php?action=construire&amp;id=' . $nbBatiment . '">' . $row['batiment_nom'] . '</a>" au prix de : ' . AfficheListePrix(array('Bois' => $row['prix_bois'], 'Pierre' => $row['prix_pierre'], 'Or' => $row['prix_or'], 'Nourriture' => $row['prix_nourriture']), array('Bois' => $maison->GetRessourceBois(), 'Pierre' => $maison->GetRessourcePierre(), 'Or' => $oJoueur->GetArgent(), 'Nourriture' => $maison->GetRessourceNourriture())) . '</li>';
+				<li>"<a href="index.php?page=main&amp;action=construire&amp;id=' . $nbBatiment . '">' . $row['batiment_nom'] . '</a>" au prix de : ' . AfficheListePrix(array('Bois' => $row['prix_bois'], 'Pierre' => $row['prix_pierre'], 'Or' => $row['prix_or'], 'Nourriture' => $row['prix_nourriture']), array('Bois' => $maison->GetRessourceBois(), 'Pierre' => $maison->GetRessourcePierre(), 'Or' => $oJoueur->GetArgent(), 'Nourriture' => $maison->GetRessourceNourriture())) . '</li>';
 					} else {
 						$txt .= '
 				<li>"' . $row['batiment_nom'] . '" au prix de : ' . AfficheListePrix(array('Bois' => $row['prix_bois'], 'Pierre' => $row['prix_pierre'], 'Or' => $row['prix_or'], 'Nourriture' => $row['prix_nourriture']), array('Bois' => $maison->GetRessourceBois(), 'Pierre' => $maison->GetRessourcePierre(), 'Or' => $oJoueur->GetArgent(), 'Nourriture' => $maison->GetRessourceNourriture())) . '</li>';
@@ -869,14 +869,6 @@ function NotificationMail($To, $type, $nom, $info) {
 
 	//echo $Message;
 	mail($To, $Sujet, $Message, $headers);
-}
-function AddHistory($Login, $Carte, $Position, $Type, $Adversaire, $Date, $Info) {
-	if(is_null($Date)){
-		$Date = strtotime('now');
-	}
-	$sql = "INSERT INTO `table_history` (`history_id`, `history_login`, `history_position`, `history_type`, `history_adversaire`, `history_date`, `history_info`)
-			VALUES (NULL, '$Login', '" . implode(',', array_merge(array($Carte), $Position)) . "', '$Type', '$Adversaire', '".date('Y-m-d H:i:s', $Date)."', '" . htmlentities($Info, ENT_QUOTES) . "');";
-	mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
 }
 function CheckQueteAccessible(&$lstMonster, $Position) {
 	global $temp_combat;
