@@ -55,29 +55,33 @@ function AfficheListeDesClans(personnage &$oJoueur){
 			$ChefClan = $row['chef_clan'];
 			$txtM .= '
 			<td>'.$row['membre_clan'].''.AfficheRecompenses($row['membre_clan']).'</td>';
-			if($row['membre_clan'] == $row['chef_clan'] AND $row['chef_clan'] == $oJoueur->GetLogin()){
-				$txtM .= '<td>'
-							.FormSupprimerClan($row['nom_clan'])
-						.'</td>';
-			}elseif($row['membre_clan'] == $oJoueur->GetLogin() AND $row['chef_clan']!=$oJoueur->GetLogin()){
-				if(!is_null($oJoueur->GetClan()) AND $oJoueur->GetClan() != '1'){
-					$txtM .= '<td>'
-								.FormDesinscriptionClan($row['nom_clan'])
-							.'</td>';
-				}else{
+			if(htmlspecialchars_decode($row['nom_clan'], ENT_QUOTES) == $oJoueur->GetClan()){
+				if($row['chef_clan'] == $oJoueur->GetLogin()){
+					if($row['membre_clan'] == $oJoueur->GetLogin()){
+						$txtM .= '<td>'.FormSupprimerClan($row['nom_clan']).'</td>';
+					}else{
+						if(is_null($row['date_inscription'])){
+							$txtM .= '<td>'.FormRemoveMembre($row['nom_clan'], $row['membre_clan']).'</td>';
+						}else{
+							$txtM .= '<td>'.FormAccepteInscription($row['nom_clan'], $row['membre_clan']).'</td>';
+						}
+					}
+				}elseif ($row['membre_clan'] == $oJoueur->GetLogin()){
+					if(!is_null($oJoueur->GetClan()) AND $oJoueur->GetClan() != 1){
+						$txtM .= '<td>'.FormDesinscriptionClan($row['nom_clan']).'</td>';
+					}else{
+						$txtM .= '<td>En Cours d\'acceptation</td>';
+					}
+				}elseif(!is_null($row['date_inscription'])){
 					$txtM .= '<td>En Cours d\'acceptation</td>';
-				}
-			}elseif($row['chef_clan']==$oJoueur->GetLogin() AND $row['membre_clan'] != $oJoueur->GetLogin()){
-				if(is_null($row['date_inscription'])){
-					$txtM .= '<td>'
-								.FormRemoveMembre($row['nom_clan'], $row['membre_clan'])
-							.'</td>';
 				}else{
-					$txtM .= '<td>'
-								.FormAccepteInscription($row['nom_clan'], $row['membre_clan'])
-							.'</td>';
+					$txtM .= '<td>&nbsp;</td>';
 				}
-			}else{$txtM .= '<td>&nbsp;</td>';}
+			}elseif($oJoueur->GetClan() == 1 AND $row['membre_clan'] == $oJoueur->GetLogin()){
+				$txtM .= '<td>En Cours d\'acceptation</td>';
+			}else{
+				$txtM .= '<td>&nbsp;</td>';
+			}
 			$txtM .= '</tr>';
 		
 			$precedentNom = $row['nom_clan'];
@@ -160,6 +164,7 @@ function AfficheLigneCouleur($Color, $IDLigne){
 
 	return NULL;
 }
+
 //=====================
 //Gestion des Alliances
 //=====================
@@ -252,8 +257,9 @@ function ActionAccpeterInscriptionClan(&$objManager, $NomClan, $Membre){
 function ActionAddReccordChat($arReccord){
 	if(isset($arReccord)){
 		$sql = "INSERT INTO `table_chat` (`id_chat`, `clan_chat`, `member_chat`, `date_chat`, `text_chat`)
-					VALUES (NULL, '".htmlspecialchars($arReccord['clan'], ENT_QUOTES)."', '".$arReccord['membre']."', '".date('Y-m-d H:i:s')."', '".htmlspecialchars($arReccord['text'], ENT_QUOTES)."');";
+				VALUES (NULL, '".htmlspecialchars($arReccord['clan'], ENT_QUOTES)."', '".$arReccord['membre']."', '".date('Y-m-d H:i:s')."', '".htmlspecialchars($arReccord['text'], ENT_QUOTES)."');";
 		mysql_query($sql) or die ( mysql_error() .'<br />'.$sql);
+		
 	}
 }
 function ActionRemoveReccordChat($id){
