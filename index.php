@@ -24,12 +24,14 @@ if(!isset($_SESSION['joueur'])){
 			include('model/login.php');
 			$ResultCode = CheckIfLoginMPCorrect($_POST['login'], $_POST['motdepasse']);
 			
-			if (!empty($ResultCode)){
+			if (!is_null($ResultCode)){
 				if(is_file('view/error/'.$ResultCode.'.php')){
 					include('view/error/'.$ResultCode.'.php');
 				}else{
 					include('view/error/inconnu.php');
 				}
+			}else{
+				header('Location: ./');
 			}
 		}else{
 			include('view/forms/login.php');
