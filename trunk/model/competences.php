@@ -311,19 +311,6 @@ function AddEnregistrementCompetence($nom, $niveau, $duree){
 		(NULL, '".$_SESSION['joueur']."', '$nom', $niveau, $duree, '".date('Y-m-d H:i:s')."', NULL);";
 	mysql_query($sql) or die ( mysql_error() .'<br />'.$sql);
 }
-function FinishAllCompetenceEnCours(personnage &$oJoueur) {
-	global $lstPoints;
-	$sqlCmp = "SELECT * FROM table_competence WHERE cmp_login='" . $_SESSION['joueur'] . "' AND cmp_finish IS NULL";
-	$rqtCmp = mysql_query($sqlCmp) or die(mysql_error() . '<br />' . $sqlCmp);
-	while ($cmp = mysql_fetch_array($rqtCmp, MYSQL_ASSOC)) {
-		if ((strtotime('now') - strtotime($cmp['cmp_date'])) >= $cmp['cmp_temp']) {
-			$sql = "UPDATE  `table_competence` SET  `cmp_finish` =  TRUE WHERE `table_competence`.`cmp_id` =" . $cmp['cmp_id'] . ";";
-			mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
-			$oJoueur->UpdatePoints($lstPoints['CmpTerminé'][0]);
-			AddHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'Competence', NULL, NULL, 'Compétence terminée : '.$cmp['cmp_nom'].' de niveau '.$cmp['cmp_niveau']);
-		}
-	}
-}
 
 //+---------------------------------+
 //|				ACTIONS				|
