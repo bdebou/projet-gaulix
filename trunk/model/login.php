@@ -36,8 +36,6 @@ function CheckIfLoginMPCorrect($Login, $Password){
 				$update = "UPDATE table_joueurs SET nbr_connect='".$nbr_essai."', dates=NOW() WHERE id='".$result["id"]."'";
 				mysql_query($update) or die ( mysql_error() );
 				$_SESSION['joueur'] = $result['login'];
-					//On redirige vers la partie membre
-				header('Location: ./');
 				return null;
 			}
 		}
