@@ -68,6 +68,7 @@ class PersonnagesManager{
 				nb_combats = :nb_combats, 
 				nb_victoire = :nb_victoire, 
 				clan = :clan, 
+				date_last_msg_lu = :date_last_msg_lu, 
 				nb_points = :nb_points, 
 				not_attaque = :not_attaque, 
 				not_combat = :not_combat, 
@@ -109,6 +110,7 @@ class PersonnagesManager{
 		$q->bindValue(':tmp_perf_defense', ($perso->GetTmpPerfDefense()?$perso->GetTmpPerfDefense():NULL), PDO::PARAM_INT);
 		$q->bindValue(':maison_installe', (is_null($perso->GetMaisonInstalle())?NULL:implode(',', $perso->GetMaisonInstalle())), PDO::PARAM_STR);
 		$q->bindValue(':clan', (is_null($perso->GetClan())?NULL:htmlspecialchars($perso->GetClan(), ENT_QUOTES)), PDO::PARAM_STR);
+		$q->bindvalue(':date_last_msg_lu', date('Y-m-d H:i:s', $perso->GetDateLasMessageLu()), PDO::PARAM_INT);
 		$q->bindValue(':not_attaque', ($perso->GetNotifAttaque()?'1':NULL), PDO::PARAM_STR);
 		$q->bindValue(':not_combat', ($perso->GetNotifCombat()?'1':NULL), PDO::PARAM_STR);
 		$q->bindValue(':nb_points', $perso->GetNbPoints(), PDO::PARAM_INT);

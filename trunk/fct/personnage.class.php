@@ -26,6 +26,7 @@ class personnage{
 			$date_perf_defense, $tmp_perf_defense,
 			$maison_installe,
 			$clan,
+			$DateLastMessageLu,
 			$lstCompetences,
 			$NotAttaque, $NotCombat,
 			$NbPoints;
@@ -620,6 +621,9 @@ class personnage{
 			case 'attaque':	$this->NotAttaque = $value;	break;
 		}
 	}
+	public function SetLastMessageLu(){
+		$this->DateLastMessageLu = strtotime('now');
+	}
 	
 	//Remplir l'objet joueur
 	public function hydrate(array $donnees){
@@ -660,6 +664,7 @@ class personnage{
 				case 'tmp_perf_defense':	$this->$key = (is_null($value)?NULL:intval($value)); break;
 				case 'maison_installe':		$this->$key = (is_null($value)?NULL:explode(',', $value)); break;
 				case 'clan':				$this->$key = (is_null($value)?NULL:htmlspecialchars_decode($value, ENT_QUOTES)); break;
+				case 'date_last_msg_lu':	$this->DateLastMessageLu = strtotime($value); break;
 				case 'not_attaque':			$this->NotAttaque = (is_null($value)?false:true); break;
 				case 'not_combat':			$this->NotCombat = (is_null($value)?false:true); break;
 				case 'nb_points':			$this->NbPoints = intval($value); break;
@@ -799,7 +804,7 @@ class personnage{
 	public function GetNiveauCompetence($competence){
 		return $this->lstCompetences[ucfirst($competence)];
 	}
-	
+	public function GetDateLasMessageLu(){	return $this->DateLastMessageLu;}
 
 }
 ?>
