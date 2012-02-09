@@ -67,7 +67,7 @@ function AfficheBatiment(&$batiment, &$oJoueur, $PageVillage = false){
 			<td rowspan="'.($batiment->GetType() == 'entrepot'?'5':'6').'" style="width:400px;">
 				<img alt="'.$batiment->GetType().'" src="./img/batiments/'.$batiment->GetType().'-'.$batiment->GetNiveau().'.png" width="400px" />
 			</td>
-			<th colspan="4">'.$batiment->GetNom().' ('.$batiment->GetNiveau().' / '.$NiveauMaxBatiment.')</th>
+			<th colspan="4"><a name="'.str_replace(',', '_', $PositionBatiment).'">'.$batiment->GetNom().' ('.$batiment->GetNiveau().' / '.$NiveauMaxBatiment.')</a></th>
 		</tr>
 		<tr>
 			<td colspan="4">'.$batiment->AfficheOptionAmeliorer($oJoueur, $PageVillage).'</td>

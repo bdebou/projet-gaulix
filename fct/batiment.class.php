@@ -266,7 +266,7 @@ abstract class batiment{
 				return '<p>Prix de l\'amélioration : <br />'.AfficheListePrix($prixAmelioration, array('Bois'=>$maison->GetRessourceBois(), 'Pierre'=>$maison->GetRessourcePierre(), 'Or'=>$oJoueur->GetArgent(), 'Nourriture'=>$maison->GetRessourceNourriture())).'</p>';
 			}
 			
-			return '<br /><a href="index.php?page=village&action=ameliorer&id='.$id.'" title="Or = '.$prixAmelioration['Or'].'&#13;Bois = '.$prixAmelioration['Bois'].'&#13;Pierre = '.$prixAmelioration['Pierre'].'&#13;Nourriture = '.$prixAmelioration['Nourriture'].'&#13;'.AfficheTempPhrase(DecoupeTemp(intval(3600*exp($this->Niveau)))).'">Améliorer</a> pour '.AfficheListePrix($prixAmelioration, array('Bois'=>$maison->GetRessourceBois(), 'Pierre'=>$maison->GetRessourcePierre(), 'Or'=>$oJoueur->GetArgent(), 'Nourriture'=>$maison->GetRessourceNourriture()));
+			return '<br /><a href="index.php?page=village&action=ameliorer&id='.$id.'&anchor='.str_replace(',', '_', $this->Coordonnee).'" title="Or = '.$prixAmelioration['Or'].'&#13;Bois = '.$prixAmelioration['Bois'].'&#13;Pierre = '.$prixAmelioration['Pierre'].'&#13;Nourriture = '.$prixAmelioration['Nourriture'].'&#13;'.AfficheTempPhrase(DecoupeTemp(intval(3600*exp($this->Niveau)))).'">Améliorer</a> pour '.AfficheListePrix($prixAmelioration, array('Bois'=>$maison->GetRessourceBois(), 'Pierre'=>$maison->GetRessourcePierre(), 'Or'=>$oJoueur->GetArgent(), 'Nourriture'=>$maison->GetRessourceNourriture()));
 		}
 	}
 	public function AfficheOptionReparer(&$oJoueur, &$PageVillage){
@@ -323,6 +323,7 @@ abstract class batiment{
 			return '
 		<form method="get" action="index.php">
 			<input type="hidden" name="page" value="village" />
+			<input type="hidden" name="anchor" value="'.str_replace(',', '_', $this->Coordonnee).'" />
 			<input type="hidden" name="action" value="reparer" />
 			<input type="hidden" name="num" value="'./*$nbReparer*/'1'.'" />
 			<select name="id">

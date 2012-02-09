@@ -55,7 +55,7 @@ if($chkDebug){
 }
 
 if($CheckRetour AND !$chkDebug){
-	header('location: index.php?page=village');
+	header('location: index.php?page=village'.(isset($_GET['anchor'])?'#'.$_GET['anchor']:''));
 }
 
 ?>

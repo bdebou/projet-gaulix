@@ -163,7 +163,7 @@ class maison extends batiment{
 					<td>
 						<button 
 							type="button" 
-							onclick="window.location=\'index.php?page=village&action=druide&amp;id='.$Key.'\'" 
+							onclick="window.location=\'index.php?page=village&action=druide&id='.$Key.'&anchor='.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'\'" 
 							style="width:40px;" '
 							.($chkSort?'':'disabled="disabled"')
 							.' >'
