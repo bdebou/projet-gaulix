@@ -521,6 +521,13 @@ function FinishAllCompetenceEnCours(personnage &$oJoueur) {
 		}
 	}
 }
+function AfficheNbMessageAlliance($clan, $date){
+	$sql = "SELECT id_chat FROM table_chat
+			WHERE (clan_chat='".htmlspecialchars($clan, ENT_QUOTES)."' AND date_chat > '".$date."') 
+			ORDER BY date_chat DESC;";
+	$requete = mysql_query($sql) or die (mysql_error());
+	return mysql_num_rows($requete);
+}
 
 //+---------------------------------+
 //|				ACTIONS				|
