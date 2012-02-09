@@ -566,7 +566,7 @@ CREATE TABLE IF NOT EXISTS `table_joueurs` (
   `nb_vaincu` int(3) NOT NULL DEFAULT '0',
   `inventaire` text COLLATE latin1_general_ci,
   `clan` varchar(20) COLLATE latin1_general_ci DEFAULT NULL,
-  `nb_msg_non_lu` int(4) NOT NULL DEFAULT '0',
+  `date_last_msg_lu` datetime DEFAULT NULL,
   `not_attaque` tinyint(1) DEFAULT NULL,
   `not_combat` tinyint(1) DEFAULT NULL,
   `nb_points` int(6) NOT NULL DEFAULT '0',
