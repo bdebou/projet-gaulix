@@ -4,6 +4,10 @@ include('model/alliance.php');
 global $objManager;
 $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
+if (!is_null($oJoueur->GetClan()) AND $oJoueur->GetClan() != 1){
+	$oJoueur->SetLastMessageLu();
+}
+
 $CheckRetour = false;
 
 if(isset($_POST['action'])){
