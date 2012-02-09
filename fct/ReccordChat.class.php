@@ -12,10 +12,27 @@ class ReccordChat{
 	Private $MONTH_EN			= array('January', 'February', 'March', 'April', 'May', 'June', 'Jully', 'Augustus', 'September', 'October', 'November', 'December');
 	Private $MONTH_FR			= array('Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Décembre');
 	
-	const EMOTICON_HAPPY		= '<img src="./img/emoticons/happy.png" alt="Happy" title="Content" />';
-	const EMOTICON_UNHAPPY		= '<img src="./img/emoticons/unhappy.png" alt="Unhappy" title="Pas content" />';
-	const EMOTICON_WINK			= '<img src="./img/emoticons/wink.png" alt="Wink" title="clin d\'oeil" />';
+	const CODE_EMO_HAPPY		= ':-)';
+	const EMOTICON_HAPPY		= '<img src="./img/emoticons/happy.png" height="15px" alt="Content" title="Content" />';
+	const CODE_EMO_UNHAPPY		= ':-(';
+	const EMOTICON_UNHAPPY		= '<img src="./img/emoticons/unhappy.png" height="15px" alt="Pas content" title="Pas content" />';
+	const CODE_EMO_WINK			= ';-)';
+	const EMOTICON_WINK			= '<img src="./img/emoticons/wink.png" height="15px" alt="clin d\'oeil" title="clin d\'oeil" />';
 	
+	const CODE_IC_PIERRE		= '+respierre+';
+	const ICONE_PIERRE			= '<img src="./img/icones/ic_ResPie.png" height="15px" alt="Ressource Pierre" title="Ressource Pierre" />';
+	const CODE_IC_BOIS			= '+resbois+';
+	const ICONE_BOIS			= '<img src="./img/icones/ic_ResBoi.png" height="15px" alt="Ressource Bois" title="Ressource Bois" />';
+	const CODE_IC_OR			= '+resor+';
+	const ICONE_OR				= '<img src="./img/icones/ic_ResOr.png" height="15px" alt="Ressource Or" title="Ressource Or" />';
+	const CODE_IC_NOURRITURE	= '+resnourriture+';
+	const ICONE_NOURRITURE		= '<img src="./img/icones/ic_ResNou.png" height="15px" alt="Ressource Nourriture" title="Ressource Nourriture" />';
+	const CODE_IC_ATTAQUE		= '+att+';
+	const ICONE_ATTAQUE			= '<img src="./img/icones/ic_attaque.png" height="15px" alt="Attaque" title="Attaque" />';
+	const CODE_IC_DEFENSE		= '+def+';
+	const ICONE_DEFENSE			= '<img src="./img/icones/ic_defense.png" height="15px" alt="Défense" title="Défense" />';
+	const CODE_IC_DISTANCE		= '+dis+';
+	const ICONE_DISTANCE		= '<img src="./img/icones/ic_distance.png" height="15px" alt="Distance" title="Distance" />';
 	
 	Public function __construct(array $data){
 		Foreach($data as $key=>$value){
@@ -40,9 +57,19 @@ class ReccordChat{
 	}
 	Public function GetText(){
 		$this->text_chat = str_replace(array("\r\n", "\n", "\r"), '<br />', $this->text_chat);
-		$this->text_chat = str_replace(array(';-)', ';)'), self::EMOTICON_WINK, $this->text_chat);
-		$this->text_chat = str_replace(array(':-)', ':)'), self::EMOTICON_HAPPY, $this->text_chat);
-		$this->text_chat = str_replace(array(':-(', ':('), self::EMOTICON_UNHAPPY, $this->text_chat);
+		$this->text_chat = str_replace(array(self::CODE_EMO_WINK, ';)'), self::EMOTICON_WINK, $this->text_chat);
+		$this->text_chat = str_replace(array(self::CODE_EMO_HAPPY, ':)'), self::EMOTICON_HAPPY, $this->text_chat);
+		$this->text_chat = str_replace(array(self::CODE_EMO_UNHAPPY, ':('), self::EMOTICON_UNHAPPY, $this->text_chat);
+		
+		$this->text_chat = str_ireplace(self::CODE_IC_PIERRE, self::ICONE_PIERRE, $this->text_chat);
+		$this->text_chat = str_ireplace(self::CODE_IC_BOIS, self::ICONE_BOIS, $this->text_chat);
+		$this->text_chat = str_ireplace(self::CODE_IC_OR, self::ICONE_OR, $this->text_chat);
+		$this->text_chat = str_ireplace(self::CODE_IC_NOURRITURE, self::ICONE_NOURRITURE, $this->text_chat);
+		
+		$this->text_chat = str_ireplace(self::CODE_IC_ATTAQUE, self::ICONE_ATTAQUE, $this->text_chat);
+		$this->text_chat = str_ireplace(self::CODE_IC_DEFENSE, self::ICONE_DEFENSE, $this->text_chat);
+		$this->text_chat = str_ireplace(self::CODE_IC_DISTANCE, self::ICONE_DISTANCE, $this->text_chat);
+		
 		return $this->text_chat;
 	}
 }
