@@ -43,11 +43,13 @@ class bank extends batiment{
 		return '
 		<form action="index.php?page=village" method="post">
 			<input type="hidden" name="page" value="village" />
+			<input type="hidden" name="anchor" value="'.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'" />
 			Montant du <b>dépot</b>: <input type="text" name="depot" value="'.$oJoueur->GetArgent().'" />
 			<input type="submit" value="Exécuter"'.($PositionBatiment != $PositionJoueur?' disabled="disabled"':'').' />
 		</form>
 		<form action="index.php?page=village" method="post">
 			<input type="hidden" name="page" value="village" />
+			<input type="hidden" name="anchor" value="'.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'" />
 			Montant du <b>retrait</b>: <input type="text" name="retrait" value="'.(is_null($this->GetContenu())?'0':$this->GetContenu()).'" />
 			<input type="submit" value="Exécuter"'.((is_null($this->GetContenu()) OR $PositionBatiment != $PositionJoueur)?'disabled="disabled"':'').' />
 		</form>';

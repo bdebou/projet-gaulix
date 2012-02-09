@@ -166,11 +166,12 @@ class mine extends batiment{
 		if($PositionBatiment == $PositionJoueur){
 			$txtAction = '
 				<td>
-					<a href="index.php?page=village&amp;action=viderstock'.strtolower(self::TYPE).'">Vider votre stock</a>
+					<a href="index.php?page=village&amp;action=viderstock'.strtolower(self::TYPE).'&amp;anchor='.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'">Vider votre stock</a>
 				</td>
 				<td>'
 					.'<form method="get" action="index.php" class="production">'
 						.'<input type="hidden" name="page" value="village" />'
+						.'<input type="hidden" name="anchor" value="'.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'" />'
 						.'<input type="hidden" name="action" value="production'.strtolower(self::TYPE).'" />'
 						.'<select name="type" onclick="document.getElementById(\'BtSubmit\').disabled=false;">'
 							.'<option value="'.self::CODE_PRODUCTION_PIERRE.'"'.(($stock[0] == self::CODE_PRODUCTION_PIERRE)?' disabled="disabled"':'').'>Trouver des Pierres</option>'

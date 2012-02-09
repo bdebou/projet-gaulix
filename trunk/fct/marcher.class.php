@@ -132,7 +132,7 @@ class marcher extends batiment{
 				.($chkAchat?'':'disabled="disabled" ')
 				.'onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulleAchat).'\');" '
 				.'onmouseout="cache();" '
-				.'onclick="window.location=\'index.php?page=village&action=VenteMarcher&amp;id='.$id.'&amp;qte='.$StepAchat.'\'">'
+				.'onclick="window.location=\'index.php?page=village&action=VenteMarcher&amp;id='.$id.'&amp;qte='.$StepAchat.'&amp;anchor='.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'\'">'
 					.'Acheter '.$StepAchat.'x'
 			.'</button>' ;
 		}
@@ -206,7 +206,7 @@ class marcher extends batiment{
 							.'<td>'
 								.($oJoueur->GetLogin() == $row['vendeur']?
 									'<button type="button" 
-										onclick="window.location=\'index.php?page=village&action=annulertransaction&amp;id='.$numTransaction.'\'" 
+										onclick="window.location=\'index.php?page=village&action=annulertransaction&id='.$numTransaction.'&anchor='.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'\'" 
 										style="width:40px;">'
 										.AfficheIcone('marcher_cancel')
 									.'</button>'
@@ -214,7 +214,7 @@ class marcher extends batiment{
 								.($oJoueur->GetLogin() != $row['vendeur']?
 									'<button 
 										type="button" 
-										onclick="window.location=\'index.php?page=village&action=acceptertransaction&amp;id='.$numTransaction.'\'" 
+										onclick="window.location=\'index.php?page=village&action=acceptertransaction&id='.$numTransaction.'&anchor='.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'\'" 
 										style="width:40px;" '
 										.(!$checkValid?'disabled="disabled"':'').'>'
 										.AfficheIcone((!$checkValid?'marcher_attention':'marcher_accept'))
@@ -250,6 +250,7 @@ class marcher extends batiment{
 			<tr>
 				<td colspan="4" style="text-align:center;">
 					<form method="post" class="nouveau_troc">
+						<input type="hidden" name="anchor" value="'.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'" />
 						<input type="hidden" name="page" value="village" />
 						<fieldset class="donner">
 							<legend style="background:lightgreen;">Donner</legend>'

@@ -207,7 +207,7 @@ class entrepot extends batiment{
 					.($chkReprise?'':'disabled="disabled" ')
 					.'onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulleReprise).'\');" '
 					.'onmouseout="cache();" '
-					.'onclick="window.location=\'index.php?page=village&action=reprendre&amp;id='.$id.'&amp;qte='.$StepReprise.'\'">'
+					.'onclick="window.location=\'index.php?page=village&action=reprendre&amp;id='.$id.'&amp;qte='.$StepReprise.'&amp;anchor='.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'\'">'
 						.'Reprendre '.$StepReprise.'x'
 				.'</button>' ;
 		}
