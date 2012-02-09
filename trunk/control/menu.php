@@ -1,17 +1,29 @@
 <?php
-$arBtMenu =	array(  array('name' => 'Principale',								'link' => './'),
-					array('name' => 'Bolga',									'link' => './index.php?page=inventaire'),
-					array('name' => 'Equipements',								'link' => './index.php?page=equipement'),
-					array('name' => 'Compétences',								'link' => './index.php?page=competences'),
-					array('name' => 'Bricolage',								'link' => './index.php?page=bricolage'),
-					array('name' => 'Quêtes',									'link' => './index.php?page=quete'),
-					array('name' => 'Scores',									'link' => './index.php?page=scores'),
-					array('name' => 'Oppidum',									'link' => './index.php?page=village'),
-					array('name' => 'Alliances',								'link' => './index.php?page=alliance'),
-					array('name' => 'Carte',									'link' => './index.php?page=cartes'),
-					array('name' => 'Règles',									'link' => './index.php?page=regles'),
-					array('name' => AfficheIcone('options', 15) . ' Options',	'link' => './index.php?page=options')
-				);
+global $objManager, $chkDebug;
+$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
-include('view/menu.php');    
+$arBtMenu[0] = array('link' => './',								'name' => 'Principale');
+$arBtMenu[1] = array('link' => './index.php?page=inventaire',	'name' => 'Bolga');
+$arBtMenu[2] = array('link' => './index.php?page=equipement',	'name' => 'Equipements');
+$arBtMenu[3] = array('link' => './index.php?page=competences',	'name' => 'Compétences');
+$arBtMenu[4] = array('link' => './index.php?page=bricolage',		'name' => 'Bricolage');
+$arBtMenu[5] = array('link' => './index.php?page=quete',			'name' => 'Quêtes');
+$arBtMenu[6] = array('link' => './index.php?page=scores',		'name' => 'Scores');
+$arBtMenu[7] = array('link' => './index.php?page=village',		'name' => 'Oppidum');
+$arBtMenu[8] = array('link' => './index.php?page=alliance',		'name' => 'Alliances');
+if(AfficheNbMessageAlliance($oJoueur->GetClan(), date('Y-m-d H:i:s', $oJoueur->GetDateLasMessageLu())) > 0){
+	$arBtMenu[8]['name'] .= ' <span style="color:red;font-size:12px;">'
+								.AfficheNbMessageAlliance($oJoueur->GetClan(), date('Y-m-d H:i:s', $oJoueur->GetDateLasMessageLu()))
+								.' '.AfficheIcone('Message', 12)
+							.'</span>';
+}
+$arBtMenu[9] = array('link' => './index.php?page=cartes',		'name' => 'Carte');
+$arBtMenu[10] = array('link' => './index.php?page=regles',		'name' => 'Règles');
+$arBtMenu[11] = array('link' => './index.php?page=options',		'name' => AfficheIcone('options', 15) . ' Options');
+
+include('view/menu.php');
+
+$objManager->update($oJoueur);
+unset($oJoueur);
+
 ?>
