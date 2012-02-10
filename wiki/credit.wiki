@@ -1,5 +1,5 @@
-=Crédits=
-Ce petit jeu est complètement gratuit.
-Un tout grand merci aux personnes ayant participées à ce projet personnel et toujours gratuitement.
- * Programmation : [https://plus.google.com/u/0/107937906218732922871 http://www.google.com/images/icons/ui/gprofile_button-16.png]+Bruno Deboubers
+=CrÃ©dits=
+Ce petit jeu est complÃ¨tement gratuit.
+Un tout grand merci aux personnes ayant participÃ©es Ã  ce projet et toujours gratuitement.
+ * Programmation : [https://plus.google.com/u/0/107937906218732922871 http://www.google.com/images/icons/ui/gprofile_button-16.png] [https://plus.google.com/u/0/107937906218732922871 +Bruno Deboubers]
  * Illustrations : Raphael Lopez Perez
