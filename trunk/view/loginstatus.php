@@ -8,6 +8,7 @@ $arDef = $oJoueur->GetDefPerso();
 ?>
 
 <div class="loginstatus">
+	<a name="TopPage"></a>
 	<table class="loginstatus">
 		<tr>
 			<td style="background-color: Brown; font-weight:bold; text-transform:uppercase; text-align:center; width:200px;">
