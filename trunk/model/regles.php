@@ -1,6 +1,8 @@
 <?php
 function Affiche_Credits(){
-	return '
+	return utf8_decode(file_get_contents('http://code.google.com/p/projet-gaulix/wiki/credit?show=content'));
+	/*
+	 return '
 			<h1>Crédits</h1>
 			<p>Ce petit jeu est complètement gratuit.</p>
 			<p>Un tout grand merci aux personnes ayant participées à ce projet personnel et toujours gratuitement.</p>
@@ -13,6 +15,7 @@ function Affiche_Credits(){
 				</li>
 				<li>Illustrations : Raphael Lopez Perez</li>
 			</ul>';
+	*/
 }
 function Affiche_General(){
 	global $temp_attente, $nbDeplacement, $temp_combat;

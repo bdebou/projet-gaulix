@@ -13,7 +13,6 @@
 		</span>';
 	}
 ?>
-
 	</div>
 	<div class="contenu_onglets">
 <?php
