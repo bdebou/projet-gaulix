@@ -1,12 +1,12 @@
 <?php
-function AfficheListeElementBricolage(){
+function AfficheListeElementBricolage($Onglet = null){
 	$txt = '
 	<div class="systeme_onglets">';
 	$TypePrecedent = null;
 	$arOnglets['Contenu'] = '
 		<div class="contenu_onglets">';
 	$arOnglets['Span'] = '
-		<div class="onglets">';;
+		<div class="onglets">';
 	$nbBricolage = 0;
 	
 	$chkFirst = false;
@@ -17,6 +17,7 @@ function AfficheListeElementBricolage(){
 			ORDER BY objet_type, objet_competence, objet_niveau, objet_attaque, objet_defense, objet_distance ASC;";
 	
 	$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
+	
 	while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
 		if($row['objet_type'] != $TypePrecedent){
 			$arOnglets['Span'] .= '
@@ -26,19 +27,29 @@ function AfficheListeElementBricolage(){
 				onclick="javascript:change_onglet(\''.$row['objet_type'].'\');">'.ucfirst($row['objet_type']).'
 			</span>
 			';
+			
 			if($chkFirst){
 				$arOnglets['Contenu'] .= '
 				</table>
 			</div>';
-			}else{$FirstOnglet = $row['objet_type'];}
+			}else{
+				$FirstOnglet = $row['objet_type'];
+			}
+			
+			if(!is_null($Onglet) AND $row['objet_type'] == $Onglet){
+				$FirstOnglet = $row['objet_type'];
+			}
+			
 			$arOnglets['Contenu'] .= '
 			<div class="contenu_onglet" id="contenu_onglet_'.$row['objet_type'].'">
 				<table class="bricolage">';
+			
 			$chkFirst = true;
 			
 			$TypePrecedent = $row['objet_type'];
 			//$nbBricolage = 0;
 		}
+		
 		$arOnglets['Contenu'] .= AfficheInfoObjetBricolage($row, $nbBricolage);
 		$nbBricolage++;
 	}
@@ -78,7 +89,7 @@ function AfficheInfoObjetBricolage($Objet, &$numObjet){
 	$txt =  '
 					<tr>
 						<td rowspan="5" style="width:120px; text-align:center;">'.AfficheInfoObjet($Objet['objet_code'], 120).'</td>
-						<th colspan="5">'.$Objet['objet_nom'].' '.($Objet['objet_type'] == 'objet'?AfficheIcone($Objet['objet_code']):'').'</th>
+						<th colspan="5"><a name="'.$Objet['objet_code'].'">'.$Objet['objet_nom'].'</a> '.($Objet['objet_type'] == 'objet'?AfficheIcone($Objet['objet_code']):'').'</th>
 					</tr>'
 					.'<tr>'
 						.(($Objet['objet_type'] != 'sac' AND $chkAttaque)?'<td>'.AfficheIcone('attaque').' : '.(!is_null($Objet['objet_attaque'])?$Objet['objet_attaque']:'0').'</td>':'')
@@ -164,7 +175,7 @@ function AfficheInfoObjetBricolage($Objet, &$numObjet){
 							.$txtAction
 						.'</td>
 					</tr>
-					<tr style="background:lightgrey; line-height:5px;"><td colspan="6">&nbsp;</td></tr>';
+					<tr style="background:lightgrey; line-height:10px;"><td colspan="6" style="font-size:8px; text-align:right"><a href="#TopPage">Top</a></td></tr>';
 	
 	$objManager->update($oJoueur);
 	unset($oJoueur);
