@@ -103,16 +103,18 @@ function Affiche_Equipement(){
 	.ReglesAfficheTableauEquipements('cuirasse');
 }
 function Affiche_Competences(){
-	return '
+	return utf8_decode(file_get_contents('http://code.google.com/p/projet-gaulix/wiki/competences?show=content'));
+	/* return '
 			<h1>Compétences</h1>
 			<p>Dans cette partie, vous pourrez améliorer votre attaque et votre défense pour un prix modeste et un temps de travail correct.</p>
-			<p>Mais aussi apprendre des compétences diverses et variées qui vous permettront de fabriquer des armes, objets, boucliers, ...</p>';
+			<p>Mais aussi apprendre des compétences diverses et variées qui vous permettront de fabriquer des armes, objets, boucliers, ...</p>'; */
 }
 function Affiche_Scores(){
-	return '
+	return utf8_decode(file_get_contents('http://code.google.com/p/projet-gaulix/wiki/scores?show=content'));
+	/* return '
 			<h1>Scores</h1>
 			<p>Vous trouverez la liste des joueurs avec le nombre de combats gagnés et perdus. Les combats dont les résultats sont nuls ne sont pas comptabilisés.</p>
-			<p>Vous y trouverez également un aperçu complet des autres joueurs excepté leurs équipements.</p>';
+			<p>Vous y trouverez également un aperçu complet des autres joueurs excepté leurs équipements.</p>'; */
 }
 function Affiche_Quetes(){
 	global $nbQueteMax;
