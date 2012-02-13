@@ -1,6 +1,6 @@
 <?php
 function AfficheCarte($numCarte, $AllCartes = false){
-	global $nbLigneCarte, $nbColonneCarte, $VieMaximum;
+	global $nbLigneCarte, $nbColonneCarte;
 
 	$txt = null;
 
@@ -80,7 +80,7 @@ function AfficheCarte($numCarte, $AllCartes = false){
 		for($j=0;$j<=$nbColonneCarte;$j++){
 			$txt .= '<td'.(isset($grille[$i][$j]['batiment'])?$grille[$i][$j]['batiment']:'').'>';
 			if(isset($grille[$i][$j]['login'])){
-				$txt .= '<img alt="Perso '.$grille[$i][$j]['login'].'" src="./img/homme-'.($_SESSION['joueur']==$grille[$i][$j]['login']?'green':'grey').'.png" height="'.$size.'px" width="'.$size.'px" onmouseover="montre(\''.CorrectDataInfoBulle('<b>'.$grille[$i][$j]['login'].'</b><br /><img alt="Barre de Vie" src="./fct/fct_image.php?type=VieCarte&amp;value='.$grille[$i][$j]['vie'].'&amp;max='.$VieMaximum.'" />').'\');" onmouseout="cache();" />';
+				$txt .= '<img alt="Perso '.$grille[$i][$j]['login'].'" src="./img/homme-'.($_SESSION['joueur']==$grille[$i][$j]['login']?'green':'grey').'.png" height="'.$size.'px" width="'.$size.'px" onmouseover="montre(\''.CorrectDataInfoBulle('<b>'.$grille[$i][$j]['login'].'</b><br /><img alt="Barre de Vie" src="./fct/fct_image.php?type=VieCarte&amp;value='.$grille[$i][$j]['vie'].'&amp;max='.personnage::VIE_MAX.'" />').'\');" onmouseout="cache();" />';
 			}
 			$txt .= '</td>';
 		}

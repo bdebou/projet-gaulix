@@ -13,14 +13,13 @@
 			<th>Combats<br />Perdus</th>
 		</tr>
 <?php
-global $VieMaximum;
 foreach($lignes as $ligne){
 	echo '
 		<tr>'
 			.'<td>'.$ligne['nb_points'].'</td>'
 			.'<td style="background:#c8c8c8; text-align:left;">'.$ligne['login'].' ('.$ligne['niveau'].')'.AfficheRecompenses($ligne['login'], $ligne['clan']).'</td>'
 			.'<td><img alt="Barre d\'expérience" src="./fct/fct_image.php?type=experience&amp;value='.$ligne['experience'].'&amp;max='.(($ligne['niveau'] + 1) * 100).'" /></td>'
-			.'<td><img alt="Barre de Vie" src="./fct/fct_image.php?type=vie&amp;value='.$ligne['vie'].'&amp;max='.$VieMaximum.'" /></td>'
+			.'<td><img alt="Barre de Vie" src="./fct/fct_image.php?type=vie&amp;value='.$ligne['vie'].'&amp;max='.personnage::VIE_MAX.'" /></td>'
 			.'<td>'.$ligne['val_attaque'].'</td>'
 			.'<td>'.$ligne['val_defense'].'</td>'
 			.'<td>'.$ligne['nb_victoire'].'</td>'
