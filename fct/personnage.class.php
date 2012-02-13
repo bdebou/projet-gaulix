@@ -36,6 +36,7 @@ class personnage{
 	Const DEPLACEMENT_MAX		= 300;			// Limite le nombre déplacement maximum
 	Const TEMP_DEPLACEMENT_SUP	= 3600;			// Temp d'attente pour avoir de nouveau du déplacement
 	Const NB_DEPLACEMENT_SUP	= 1;			// Nombre de point de déplacement gagné tout les x temp
+	Const VIE_MAX				= 300;			// Limite de vie maximum
 	
 	//Initialisation de l'objet
 	public function __construct(array $donnees){
@@ -141,11 +142,11 @@ class personnage{
 		}
 	}
 	private function UpNiveau(){
-		global $VieMaximum, $lstPoints;
-		if(($VieMaximum - $this->vie) >= 10){
+		global $lstPoints;
+		if((self::VIE_MAX - $this->vie) >= 10){
 			$tmp = 10;
 		}else{
-			$tmp = $VieMaximum - $this->vie;
+			$tmp = self::VIE_MAX - $this->vie;
 		}
 		$this->GagnerVie($tmp);
 		$this->niveau++;
@@ -173,9 +174,8 @@ class personnage{
 		}
 	}
 	public function GagnerVie($nb){
-		global $VieMaximum;
 		$this->vie += $nb;
-		if($this->vie > $VieMaximum){$this->vie = $VieMaximum;}
+		if($this->vie > self::VIE_MAX){$this->vie = self::VIE_MAX;}
 	}
 
 	Public function DesequiperPerso($typeObject){

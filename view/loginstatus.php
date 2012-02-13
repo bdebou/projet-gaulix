@@ -1,5 +1,5 @@
 <?php
-global $VieMaximum, $arCouleurs, $objManager;
+global $arCouleurs, $objManager;
 
 $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
@@ -16,7 +16,7 @@ $arDef = $oJoueur->GetDefPerso();
 				<?php echo AfficheRecompenses($oJoueur->GetLogin(), $oJoueur->GetClan());?>
 			</td>
 			<td style="width:150px;">
-				<img alt="Barre de Vie" src="./fct/fct_image.php?type=vie&amp;value=<?php echo $oJoueur->GetVie();?>&amp;max=<?php echo $VieMaximum;?>" />
+				<img alt="Barre de Vie" src="./fct/fct_image.php?type=vie&amp;value=<?php echo $oJoueur->GetVie();?>&amp;max=<?php echo personnage::VIE_MAX;?>" />
 			</td>
 			<td style="background-color:<?php echo $arCouleurs['Attaque'];?>; width:120px;">
 				<?php echo AfficheIcone('attaque');?> : <?php echo $arAtt['0'];?> (<?php echo $arAtt['1'];?>)

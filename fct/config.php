@@ -1,5 +1,5 @@
 <?php 
-global 	$NumVersion, $nbLigneCarte, $nbColonneCarte, $db, $temp_combat, $VieMaximum, $arCouleurs, $lstBatimentConstructionUnique, $MAX_essai, $lstPoints,
+global 	$NumVersion, $nbLigneCarte, $nbColonneCarte, $db, $temp_combat, $arCouleurs, $lstBatimentConstructionUnique, $MAX_essai, $lstPoints,
 		$objManager, $CodeCouleurQuete, $lstNonBatiment, $chkDebug;
 
 $DB_serveur			= 'localhost'; 			// Nom du serveur
@@ -14,7 +14,6 @@ $nbColonneCarte		= 13;					// Nombre de colonne de la carte
 $nbCarteH			= 5;					// Nombre de carte horizontale
 $nbCarteV			= 5;					// Nombre de carte Verticale
 $temp_combat		= 3600 * 1;				// Temp entre chaque combat
-$VieMaximum			= 300;					// Limite de vie maximum
 
 $chkDebug			= false;
 

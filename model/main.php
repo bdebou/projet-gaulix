@@ -677,7 +677,6 @@ function ObjetTrouve(personnage &$oJoueur) {
 	return null;
 }
 function AfficheActionPossible(personnage &$oJoueur, $arData) {
-	global $VieMaximum;
 
 	$_SESSION['main']['objet']['code'] = $arData['objet_code'];
 	$_SESSION['main']['objet']['type'] = QuelTypeRessource($arData['objet_code']);
@@ -702,8 +701,8 @@ function AfficheActionPossible(personnage &$oJoueur, $arData) {
 	}
 	//on vérifie le type d'objet
 	if (in_array($_SESSION['main']['objet']['type'], array('deplacement', 'argent', 'nourriture', 'bois', 'pierre', 'vie', 'divers'))) {
-		if ($_SESSION['main']['objet']['type'] == 'vie' and ($oJoueur->GetVie() + $arData['objet_nb']) > $VieMaximum) {
-			$txt .= '<li style="display:inline; margin-left:20px;">Limite de ' . $VieMaximum . ' vie atteinte</li>';
+		if ($_SESSION['main']['objet']['type'] == 'vie' and ($oJoueur->GetVie() + $arData['objet_nb']) > personnage::VIE_MAX) {
+			$txt .= '<li style="display:inline; margin-left:20px;">Limite de ' . personnage::VIE_MAX . ' vie atteinte</li>';
 		} elseif ($_SESSION['main']['objet']['type'] == 'deplacement' and ($oJoueur->GetDepDispo() + $arData['objet_nb']) > personnage::DEPLACEMENT_MAX) {
 			$txt .= '<li style="display:inline; margin-left:20px;">Limite de ' . personnage::DEPLACEMENT_MAX . ' déplacements atteint</li>';
 		} else {
