@@ -22,7 +22,7 @@ function AffichePlaceVide(){
 </table>';
 }
 function AfficheObjetInventaire($CodeObject, $arInfoObject, $id, $nbObjet, &$oJoueur){
-	global $VieMaximum, $DeplacementMax;
+	global $VieMaximum;
 
 	$_SESSION['main'][$id]['action'] = false;
 
@@ -72,7 +72,7 @@ function AfficheObjetInventaire($CodeObject, $arInfoObject, $id, $nbObjet, &$oJo
 			){
 				//Cas si l'objet est de la vie ou déplacement
 				if(	(in_array(substr($CodeObject, 0, 6), array('ResVie', 'PotVie')) AND ($oJoueur->GetVie() + $_SESSION['main'][$id]['value']) <= $VieMaximum)
-				OR (in_array(substr($CodeObject, 0, 6), array('ResDep','PotDep')) AND ($oJoueur->GetDepDispo() + $_SESSION['main'][$id]['value']) <= $DeplacementMax)){
+				OR (in_array(substr($CodeObject, 0, 6), array('ResDep','PotDep')) AND ($oJoueur->GetDepDispo() + $_SESSION['main'][$id]['value']) <= personnage::DEPLACEMENT_MAX)){
 					$txtType = '<button class="inventaire" type="button" onclick="window.location=\'index.php?page=inventaire&amp;action=utiliser&amp;id='.$id.'\'">Utiliser</button>';
 				}else{
 					$txtType = 'Max atteint';

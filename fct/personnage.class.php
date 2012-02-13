@@ -33,16 +33,17 @@ class personnage{
 			
 	Const TAILLE_MINIMUM_BOLGA	= 20;			//La taille minimum du bolga
 	Const DUREE_SORT			= 432000;		// Limite de temp pour l'utilisation d'un sort (3600 * 24 *5).
+	Const DEPLACEMENT_MAX		= 300;				// Limite le nombre déplacement maximum
 	
 	//Initialisation de l'objet
 	public function __construct(array $donnees){
-		global $DeplacementMax, $temp_attente, $nbDeplacement;
+		global $temp_attente, $nbDeplacement;
 		
 		$this->hydrate($donnees);
 		
 		//on vérifie si il a droit à des déplacements
 		if(	intval((strtotime('now') - $this->last_action) / $temp_attente) >= 1
-			AND $this->deplacement < $DeplacementMax){
+			AND $this->deplacement < self::DEPLACEMENT_MAX){
 			$this->AddDeplacement($nbDeplacement * intval((strtotime('now') - $this->last_action) / $temp_attente),'new');
 		}
 		
@@ -410,14 +411,13 @@ class personnage{
 		$this->tmp_perf_defense=$tmp;
 	}
 	public function AddDeplacement($nbDep, $type){
-		global $DeplacementMax;
 		
 		if($nbDep > 1){
 			for($i=1; $i<=$nbDep; $i++){
-				if($this->deplacement == $DeplacementMax){break;}
+				if($this->deplacement == self::DEPLACEMENT_MAX){break;}
 				$this->deplacement++;
 			}
-		}elseif($nbDep == 1 AND $this->deplacement < $DeplacementMax){
+		}elseif($nbDep == 1 AND $this->deplacement < self::DEPLACEMENT_MAX){
 			$this->deplacement++;
 		}
 		
