@@ -20,6 +20,8 @@ class quete{
 			$Duree,
 			$DateCombat;
 	
+	const NB_QUETE_MAX			= 3;					// Nombre maximum de quete autorisée en  meme temp
+	
 	public function __construct(array $a, array $b){
 		$this->hydrate($a, $b);
 		if(in_array($this->Type, array('romains'))){$this->UpdateQueteRomains();}
