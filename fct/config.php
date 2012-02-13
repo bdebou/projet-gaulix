@@ -1,5 +1,5 @@
 <?php 
-global 	$NumVersion, $nbLigneCarte, $nbColonneCarte, $db, $temp_attente, $nbDeplacement, $temp_combat, $NiveauMaxBatiment, 
+global 	$NumVersion, $nbLigneCarte, $nbColonneCarte, $db, $nbDeplacement, $temp_combat, $NiveauMaxBatiment, 
 		$TempMaxTransaction, $VieMaximum, $arCouleurs, $lstBatimentConstructionUnique, $MAX_essai, $lstPoints,
 		$objManager, $CodeCouleurQuete, $lstNonBatiment, $chkDebug;
 
@@ -14,7 +14,6 @@ $nbLigneCarte		= 13;					// Nombre de ligne de la carte
 $nbColonneCarte		= 13;					// Nombre de colonne de la carte
 $nbCarteH			= 5;					//nombre de carte horizontale
 $nbCarteV			= 5;					//nombre de carte Verticale
-$temp_attente		= 3600 * 1;				// Temp d'attente pour avoir de nouveau du déplacement
 $nbDeplacement		= 1;					// Nombre de point de déplacement gagné tout les x temp
 $temp_combat		= 3600 * 1;				// temp entre chaque combat
 $NiveauMaxBatiment	= 5;					// Niveau Maximum pour chaque batiment.

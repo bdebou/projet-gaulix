@@ -18,10 +18,10 @@ function Affiche_Credits(){
 	*/
 }
 function Affiche_General(){
-	global $temp_attente, $nbDeplacement, $temp_combat;
+	global $nbDeplacement, $temp_combat;
 	return '
 			<h1>Fonctionnement général</h1>
-			<p>Toutes les '.($temp_attente / 3600).'h, vous recevez '.$nbDeplacement.'pt de déplacement. Pour chaque déplacement, vous augmentez votre expérience de 1pt.</p>
+			<p>Toutes les '.(personnage::TEMP_DEPLACEMENT_SUP / 3600).'h, vous recevez '.$nbDeplacement.'pt de déplacement. Pour chaque déplacement, vous augmentez votre expérience de 1pt.</p>
 			<div style="float:left; width:500px;">
 				<p>Pour passer au niveau suivant, vous devez atteindre un niveau X d\'expérience. Pour exemple, voir tableau ci-contre.</p>
 				<p>Plus votre niveau est élevé, plus vous trouverez des objets intéressants, vous aurez des quêtes intéressantes.</p>

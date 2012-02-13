@@ -1,7 +1,5 @@
 <?php
 function AfficheMouvements(personnage &$oJoueur) {
-	global $temp_attente;
-
 	if ($oJoueur->GetDepDispo() < personnage::DEPLACEMENT_MAX) {
 		$txtDep = '
 		<tr>
@@ -12,7 +10,7 @@ function AfficheMouvements(personnage &$oJoueur) {
 		<tr>
 			<td colspan="3">
 				<div style="display:inline;" id="TimeToWait"></div>
-				<script type="text/JavaScript">CountDown(' . abs($temp_attente - (strtotime('now') - $oJoueur->GetLastAction())) . ');</script>
+				<script type="text/JavaScript">CountDown(' . abs(personnage::TEMP_DEPLACEMENT_SUP - (strtotime('now') - $oJoueur->GetLastAction())) . ');</script>
 			</td>
 		</tr>';
 	} else {
