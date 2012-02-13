@@ -117,10 +117,9 @@ function Affiche_Scores(){
 			<p>Vous y trouverez également un aperçu complet des autres joueurs excepté leurs équipements.</p>'; */
 }
 function Affiche_Quetes(){
-	global $nbQueteMax;
 	return '
 			<h1>Les Quêtes</h1>
-			<p>En vous inscrivant à une quête, vous avez la possibilité de gagner de l\'argent, beaucoup d\'argent. Vous ne pouvez vous s\'inscrire qu\'à '.$nbQueteMax.' quêtes maximum.</p>
+			<p>En vous inscrivant à une quête, vous avez la possibilité de gagner de l\'argent, beaucoup d\'argent. Vous ne pouvez vous s\'inscrire qu\'à '.quete::NB_QUETE_MAX.' quêtes maximum.</p>
 			<p>Les quêtes sont dispersées sur toutes les cartes uniquement quand vous serez passé au niveau 4. Avant ce niveau, les quêtes seront créées sur la carte où votre village est installé. Bonne recherche !</p>
 			<p>Vous trouverez la liste des quêtes possible en fonction de votre niveau. Il existe 4 types de quêtes.</p>
 			<ol>

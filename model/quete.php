@@ -1,7 +1,5 @@
 <?php
 function SelectQuete(&$QueteEnCours){
-	global $nbQueteMax;
-	
 	global $objManager;
 	$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
@@ -29,8 +27,7 @@ function SelectQuete(&$QueteEnCours){
 			$rowBis = mysql_fetch_array($requeteBis, MYSQL_ASSOC);
 			//si le nombre de quete ne dépasse pas le max
 			if(is_null($rowBis['quete_reussi'])){
-				//if($numQueteEnCours <= ($nbQueteMax - 1)){
-				if(count($QueteEnCours) <= $nbQueteMax){
+				if(count($QueteEnCours) <= quete::NB_QUETE_MAX){
 					$txt .= '
 			<td>'
 					.AfficheAvancementQuete($QueteEnCours[$numQueteEnCours])
@@ -58,7 +55,7 @@ function SelectQuete(&$QueteEnCours){
 	return $txt;
 }
 function AfficheDescriptifQuete($quete, &$QueteEnCours){
-	global $nbQueteMax, $CodeCouleurQuete;
+	global $CodeCouleurQuete;
 
 	$nbInfo=0;
 	if(!is_null($quete['gain_or'])){
@@ -112,7 +109,7 @@ function AfficheDescriptifQuete($quete, &$QueteEnCours){
 							<button 
 								type="button" 
 								onclick="window.location=\'index.php?page=quete&amp;action=inscription&amp;num_quete='.$quete['id_quete'].'\'"' 
-								.(count($QueteEnCours) >= $nbQueteMax?'disabled=disabled ':'')
+								.(count($QueteEnCours) >= quete::NB_QUETE_MAX?'disabled=disabled ':'')
 								.'class="quete" >
 									Accepter
 							</button>

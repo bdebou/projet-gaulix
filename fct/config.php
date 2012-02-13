@@ -1,5 +1,5 @@
 <?php 
-global 	$NumVersion, $nbLigneCarte, $nbColonneCarte, $db, $temp_attente, $nbDeplacement, $temp_combat, $nbQueteMax, $NiveauMaxBatiment, 
+global 	$NumVersion, $nbLigneCarte, $nbColonneCarte, $db, $temp_attente, $nbDeplacement, $temp_combat, $NiveauMaxBatiment, 
 		$TempMaxTransaction, $VieMaximum, $arCouleurs, $lstBatimentConstructionUnique, $DeplacementMax, $MAX_essai, $lstPoints,
 		$objManager, $CodeCouleurQuete, $lstNonBatiment, $chkDebug;
 
@@ -17,7 +17,6 @@ $nbCarteV			= 5;					//nombre de carte Verticale
 $temp_attente		= 3600 * 1;				// Temp d'attente pour avoir de nouveau du déplacement
 $nbDeplacement		= 1;					// Nombre de point de déplacement gagné tout les x temp
 $temp_combat		= 3600 * 1;				// temp entre chaque combat
-$nbQueteMax			= 3;					// Nombre maximum de quete autorisée en  meme temp
 $NiveauMaxBatiment	= 5;					// Niveau Maximum pour chaque batiment.
 $TempMaxTransaction	= 3600 * 24 * 7;		// Temp maximum pour une transaction. Passé ce délai, la transactionj est annulée.
 $VieMaximum			= 300;					// Limite de vie maximum
