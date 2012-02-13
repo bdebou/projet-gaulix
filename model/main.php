@@ -429,7 +429,7 @@ function AfficheListeEnnemisAFrapper(personnage &$oJoueur, $sql) {
 			<ul>';
 							$chkEnnemis = false;
 						}
-						$_SESSION['main']['frapper'][] = $row['id'];
+						$_SESSION['main']['frapper'][$nbEnnemis] = $row['id'];
 						$txt .= '
 				<li><a href="index.php?page=main&amp;action=frapper&amp;id=' . $nbEnnemis . '">Attaquer ' . $row['login'] . '(' . $row['niveau'] . ')' . $row['val_attaque'] . '-' . $row['val_defense'] . '</a></li>';
 						$chkEnnemisEnd = true;
