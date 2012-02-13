@@ -1,8 +1,8 @@
 <?php
 function AfficheMouvements(personnage &$oJoueur) {
-	global $temp_attente, $DeplacementMax;
+	global $temp_attente;
 
-	if ($oJoueur->GetDepDispo() < $DeplacementMax) {
+	if ($oJoueur->GetDepDispo() < personnage::DEPLACEMENT_MAX) {
 		$txtDep = '
 		<tr>
 			<td colspan="3">
@@ -19,7 +19,7 @@ function AfficheMouvements(personnage &$oJoueur) {
 		$txtDep = '
 		<tr>
 			<td colspan="3">
-				Maximum de ' . $DeplacementMax . ' déplacements atteint
+				Maximum de ' . personnage::DEPLACEMENT_MAX . ' déplacements atteint
 			</td>
 		</tr>';
 	}
@@ -679,7 +679,7 @@ function ObjetTrouve(personnage &$oJoueur) {
 	return null;
 }
 function AfficheActionPossible(personnage &$oJoueur, $arData) {
-	global $VieMaximum, $DeplacementMax;
+	global $VieMaximum;
 
 	$_SESSION['main']['objet']['code'] = $arData['objet_code'];
 	$_SESSION['main']['objet']['type'] = QuelTypeRessource($arData['objet_code']);
@@ -706,8 +706,8 @@ function AfficheActionPossible(personnage &$oJoueur, $arData) {
 	if (in_array($_SESSION['main']['objet']['type'], array('deplacement', 'argent', 'nourriture', 'bois', 'pierre', 'vie', 'divers'))) {
 		if ($_SESSION['main']['objet']['type'] == 'vie' and ($oJoueur->GetVie() + $arData['objet_nb']) > $VieMaximum) {
 			$txt .= '<li style="display:inline; margin-left:20px;">Limite de ' . $VieMaximum . ' vie atteinte</li>';
-		} elseif ($_SESSION['main']['objet']['type'] == 'deplacement' and ($oJoueur->GetDepDispo() + $arData['objet_nb']) > $DeplacementMax) {
-			$txt .= '<li style="display:inline; margin-left:20px;">Limite de ' . $DeplacementMax . ' déplacements atteint</li>';
+		} elseif ($_SESSION['main']['objet']['type'] == 'deplacement' and ($oJoueur->GetDepDispo() + $arData['objet_nb']) > personnage::DEPLACEMENT_MAX) {
+			$txt .= '<li style="display:inline; margin-left:20px;">Limite de ' . personnage::DEPLACEMENT_MAX . ' déplacements atteint</li>';
 		} else {
 			//on vérifie si on a déja une maison ou pas
 			if (in_array($_SESSION['main']['objet']['type'], array('nourriture', 'bois', 'pierre'))
