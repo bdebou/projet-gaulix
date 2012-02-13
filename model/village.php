@@ -23,8 +23,6 @@ function CreateListBatiment(){
 	return $lstBatiment;
 }
 function AfficheBatiment(&$batiment, &$oJoueur, $PageVillage = false){
-	global $NiveauMaxBatiment;
-	//$nbReparer = 0;
 	$ImgSize = 'height';
 	$txt = '
 	<table class="village">';
@@ -67,7 +65,7 @@ function AfficheBatiment(&$batiment, &$oJoueur, $PageVillage = false){
 			<td rowspan="'.($batiment->GetType() == 'entrepot'?'5':'6').'" style="width:400px;">
 				<img alt="'.$batiment->GetType().'" src="./img/batiments/'.$batiment->GetType().'-'.$batiment->GetNiveau().'.png" width="400px" />
 			</td>
-			<th colspan="4"><a name="'.str_replace(',', '_', $PositionBatiment).'">'.$batiment->GetNom().' ('.$batiment->GetNiveau().' / '.$NiveauMaxBatiment.')</a></th>
+			<th colspan="4"><a name="'.str_replace(',', '_', $PositionBatiment).'">'.$batiment->GetNom().' ('.$batiment->GetNiveau().' / '.batiment::NIVEAU_MAX.')</a></th>
 		</tr>
 		<tr>
 			<td colspan="4">'.$batiment->AfficheOptionAmeliorer($oJoueur, $PageVillage).'</td>

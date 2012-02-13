@@ -26,7 +26,8 @@ abstract class batiment{
 			$ResNourriture,
 			$Contenu;
 	
-	Const PRIX_REPARATION	= 5;		//prix des réparation 5or/pts de vie
+	Const PRIX_REPARATION		= 5;		// Prix des réparation 5or/pts de vie
+	Const NIVEAU_MAX			= 5;		// Niveau Maximum pour chaque batiment.
 	
 	//--- fonction qui est lancer lors de la création de l'objet. ---
 	public function __construct(array $carte, array $batiment){
@@ -225,12 +226,10 @@ abstract class batiment{
 	//--- Les modules d'affichage ---
 	public function AfficheOptionAmeliorer(&$oJoueur, &$PageVillage){
 		
-		global $NiveauMaxBatiment;
-		
 		$id = str_replace(',', '_', $this->Coordonnee);
 		
 		
-		if($this->GetNiveau() >= $NiveauMaxBatiment){return '<p>Niveau Maximum atteint.</p>';}
+		if($this->GetNiveau() >= self::NIVEAU_MAX){return '<p>Niveau Maximum atteint.</p>';}
 		
 		if(!is_null($this->DateAmelioration) AND !is_null($this->TmpAmelioration)){
 			
