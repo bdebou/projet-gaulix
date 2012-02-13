@@ -1,5 +1,5 @@
 <?php 
-global 	$NumVersion, $nbLigneCarte, $nbColonneCarte, $db, $nbDeplacement, $temp_combat, $NiveauMaxBatiment, 
+global 	$NumVersion, $nbLigneCarte, $nbColonneCarte, $db, $temp_combat, $NiveauMaxBatiment, 
 		$TempMaxTransaction, $VieMaximum, $arCouleurs, $lstBatimentConstructionUnique, $MAX_essai, $lstPoints,
 		$objManager, $CodeCouleurQuete, $lstNonBatiment, $chkDebug;
 
@@ -12,10 +12,9 @@ $NumVersion			= '3.4';				// Num Version
 $MAX_essai			= 3;					// Nombre maximum d'essai de connection
 $nbLigneCarte		= 13;					// Nombre de ligne de la carte
 $nbColonneCarte		= 13;					// Nombre de colonne de la carte
-$nbCarteH			= 5;					//nombre de carte horizontale
-$nbCarteV			= 5;					//nombre de carte Verticale
-$nbDeplacement		= 1;					// Nombre de point de déplacement gagné tout les x temp
-$temp_combat		= 3600 * 1;				// temp entre chaque combat
+$nbCarteH			= 5;					// Nombre de carte horizontale
+$nbCarteV			= 5;					// Nombre de carte Verticale
+$temp_combat		= 3600 * 1;				// Temp entre chaque combat
 $NiveauMaxBatiment	= 5;					// Niveau Maximum pour chaque batiment.
 $TempMaxTransaction	= 3600 * 24 * 7;		// Temp maximum pour une transaction. Passé ce délai, la transactionj est annulée.
 $VieMaximum			= 300;					// Limite de vie maximum

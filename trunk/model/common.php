@@ -596,11 +596,10 @@ function ActionRessource(&$check, personnage &$oJoueur, &$objManager, $id = NULL
 }
 function ActionDeplacement(&$check, &$oJoueur){
 	if(!is_null($_SESSION['main']['deplacement'])){
-		global $nbDeplacement;
 		switch($_SESSION['main']['deplacement']){
 			case 'new':
 				if(personnage::TEMP_DEPLACEMENT_SUP - (strtotime('now')-$oJoueur->GetLastAction()) <= 0){
-					$oJoueur->AddDeplacement($nbDeplacement,'new');
+					$oJoueur->AddDeplacement(personnage::NB_DEPLACEMENT_SUP,'new');
 				}
 				break;
 		}

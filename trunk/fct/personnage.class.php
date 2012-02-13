@@ -35,17 +35,16 @@ class personnage{
 	Const DUREE_SORT			= 432000;		// Limite de temp pour l'utilisation d'un sort (3600 * 24 *5).
 	Const DEPLACEMENT_MAX		= 300;			// Limite le nombre déplacement maximum
 	Const TEMP_DEPLACEMENT_SUP	= 3600;			// Temp d'attente pour avoir de nouveau du déplacement
+	Const NB_DEPLACEMENT_SUP	= 1;			// Nombre de point de déplacement gagné tout les x temp
 	
 	//Initialisation de l'objet
 	public function __construct(array $donnees){
-		global $nbDeplacement;
-		
 		$this->hydrate($donnees);
 		
 		//on vérifie si il a droit à des déplacements
 		if(	intval((strtotime('now') - $this->last_action) / self::TEMP_DEPLACEMENT_SUP) >= 1
 			AND $this->deplacement < self::DEPLACEMENT_MAX){
-			$this->AddDeplacement($nbDeplacement * intval((strtotime('now') - $this->last_action) / self::TEMP_DEPLACEMENT_SUP),'new');
+			$this->AddDeplacement(self::NB_DEPLACEMENT_SUP * intval((strtotime('now') - $this->last_action) / self::TEMP_DEPLACEMENT_SUP),'new');
 		}
 		
 		//on vérifie si les sorts sont toujours d'actualité
