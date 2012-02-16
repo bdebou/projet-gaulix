@@ -30,7 +30,7 @@ function AfficheCarte($numCarte, $AllCartes = false){
 	}
 	//on cache les quetes par les batiments
 	//on ajoute les infos des batiments
-	$sql="SELECT etat_batiment, coordonnee, login, id_type_batiment, niveau_batiment, contenu_batiment FROM table_carte WHERE detruit IS NULL;";
+	$sql="SELECT * FROM table_carte WHERE detruit IS NULL;";
 	$requete = mysql_query($sql) or die (mysql_error().$sql);
 	while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
 		$position = explode(',', $row['coordonnee']);
@@ -39,7 +39,7 @@ function AfficheCarte($numCarte, $AllCartes = false){
 			$requeteb = mysql_query($sqlb) or die (mysql_error().$sqlb);
 			$batiment = mysql_fetch_array($requeteb, MYSQL_ASSOC);
 
-			if($batiment['batiment_type'] != 'ressource' AND $batiment['batiment_type'] != 'carte'){
+			if(!in_array($batiment['batiment_type'], array('ressource', 'carte'))){
 				$InfoBulle =
 					'<b>'.$batiment['batiment_nom'].' de '.$row['login'].'</b>'
 				.'<br />'
@@ -56,12 +56,18 @@ function AfficheCarte($numCarte, $AllCartes = false){
 				}else{
 					$grille[intval($position[1])][intval($position[2])]['batiment'] .= 'b';
 				}
-			}elseif($batiment['batiment_type'] == 'ressource'){
-				$grille[intval($position[1])][intval($position[2])]['batiment'] = ' onmouseover="montre(\''.CorrectDataInfoBulle($batiment['batiment_description']).'\');" onmouseout="cache();" style="background: url(\'./img/'.($AllCartes?'mini/':'').$batiment['batiment_nom'].'';
+			}else{
+				switch($batiment['batiment_type']){
+					case 'ressource':
+                        $InfoBulle = '<b>' . $batiment['batiment_description'] . '</b><br /><img alt="Etat Ressource" src="fct/fct_image.php?type=etatcarte&amp;value=' . $row[strval('res_' . $batiment['batiment_nom'])] . '&amp;max=5000" />';
+                        break;
+                    case 'carte':
+                        $InfoBulle = $batiment['batiment_description'];
+                        break;
+				}
+				$grille[intval($position[1])][intval($position[2])]['batiment'] = ' onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulle).'\');" onmouseout="cache();" style="background: url(\'./img/'.($AllCartes?'mini/':'').$batiment['batiment_nom'].'';
 			}
-			if($batiment['batiment_type'] != 'carte'){
-				$grille[intval($position[1])][intval($position[2])]['batiment'] .= '.png\') no-repeat center;"';
-			}
+			$grille[intval($position[1])][intval($position[2])]['batiment'] .= '.png\') no-repeat center;"';
 		}
 	}
 
