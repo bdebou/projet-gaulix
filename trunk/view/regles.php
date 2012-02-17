@@ -1,5 +1,11 @@
 <?php
 	$lstOnglets = array('général', 'inventaire', 'equipement', 'compétences', 'scores', 'quêtes', 'village', 'crédits');
+	if(!isset($_SESSION['joueur'])){
+		$lstOnglets = array_merge(array('présentation'), $lstOnglets);
+		$FirstOnglet = 'présentation';
+	}else{
+		$FirstOnglet = 'général';
+	}
 ?>
 <div class="main">
 	<div class="onglets">
@@ -17,12 +23,13 @@
 	<div class="contenu_onglets">
 <?php
 	foreach($lstOnglets as $Onglet){
-		$fctAffiche = 'Affiche_'.ucfirst(str_replace(array('é', 'è', 'ê'), 'e', $Onglet));
-		echo '
-		<div class="contenu_onglet" id="contenu_onglet_'.$Onglet.'">'
-			.$fctAffiche()
-			.'<div style="clear:both;"></div>'
-		.'</div>';
+		echo '<div class="contenu_onglet" id="contenu_onglet_'.$Onglet.'">';
+		
+		include('view/regles/'.strtolower (str_replace(array('é', 'è', 'ê'), 'e', $Onglet)).'.php');
+		
+		echo '<div style="clear:both;"></div>';
+		
+		echo '</div>';
 	}
 ?>
 	</div>
@@ -36,7 +43,7 @@
 				
 				OldName = NewName;
 			}
-			var OldName = 'général';
+			var OldName = '<?php echo $FirstOnglet;?>';
 			change_onglet(OldName);
 		//-->
 	</script>
