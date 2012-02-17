@@ -154,6 +154,9 @@ table.quetes, table.quetes td{
 table.InfoBulle{
 	width: 190px;
 }
+table.regles_competences td.regles_competences_niveau{
+	width: 100px;
+}
 table.mouvements{
 	width: 220px;
 	height: 185px;
@@ -172,7 +175,8 @@ table.module_social,
 table.regles_credit,
 table.quetes,
 table.fiche_quete,
-table.chat_clan{
+table.chat_clan,
+table.regles_competences{
 	width: 100%;
 }
 table.village, table.village td, table.village th, 
@@ -198,7 +202,8 @@ table.druide, table.druide td,
 table.mouvements, table.mouvements td,
 table.marchandise, table.marchandise td, table.marchandise th,
 table.InfoBulle, table.InfoBulle td, table.InfoBulle th,
-table.chat_clan, table.chat_clan th, table.chat_clan td{
+table.chat_clan, table.chat_clan th, table.chat_clan td,
+table.regles_competences, table.regles_competences th, table.regles_competences td{
 	border-collapse: collapse;
 	border: 1px solid black;
 }
@@ -227,6 +232,9 @@ table.fiche_quete td.description{
 table.notification td,
 table.quetes td{
 	padding: 5px;
+}
+table.regles_competences th{
+	background: grey;
 }
 table.notification th{
 	background: lightgrey;

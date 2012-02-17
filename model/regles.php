@@ -1,156 +1,4 @@
 <?php
-function Affiche_Credits(){
-	return utf8_decode(file_get_contents('http://code.google.com/p/projet-gaulix/wiki/credit?show=content'));
-	/*
-	 return '
-			<h1>Crédits</h1>
-			<p>Ce petit jeu est complètement gratuit.</p>
-			<p>Un tout grand merci aux personnes ayant participées à ce projet personnel et toujours gratuitement.</p>
-			<ul>
-				<li>Programmation :
-					<a rel="author" target="_blank" href="https://plus.google.com/u/0/107937906218732922871" style="text-decoration:none;">
-						<img src="http://www.google.com/images/icons/ui/gprofile_button-16.png" width="16" height="16" alt="Google+ profile" title="Google+ profile" style="border:0;">
-						+Bruno Deboubers
-					</a>
-				</li>
-				<li>Illustrations : Raphael Lopez Perez</li>
-			</ul>';
-	*/
-}
-function Affiche_General(){
-	global $temp_combat;
-	return '
-			<h1>Fonctionnement général</h1>
-			<p>Toutes les '.(personnage::TEMP_DEPLACEMENT_SUP / 3600).'h, vous recevez '.personnage::NB_DEPLACEMENT_SUP.'pt de déplacement. Pour chaque déplacement, vous augmentez votre expérience de 1pt.</p>
-			<div style="float:left; width:500px;">
-				<p>Pour passer au niveau suivant, vous devez atteindre un niveau X d\'expérience. Pour exemple, voir tableau ci-contre.</p>
-				<p>Plus votre niveau est élevé, plus vous trouverez des objets intéressants, vous aurez des quêtes intéressantes.</p>
-			</div>
-			<div style="float:left;">
-				<table class="experience">
-					<tr style="background:grey;"><th>Niveau</th><th>Expérience</th></tr>
-					<tr><td>0</td><td>100</td></tr>
-					<tr><td>1</td><td>200</td></tr>
-					<tr><td>2</td><td>300</td></tr>
-					<tr><td>3</td><td>400</td></tr>
-					<tr><td>...</td><td>...</td></tr>
-				</table>
-			</div>
-			<p style="clear:both;">Pour certaines actions, un nombre X de points vous sera attribué et un tableau des scores sera créé.</p>
-			<div style="float:left; width:400px;">
-				<p>Pour la liste des points attribué pour chaque action, voir tableau ci-contre.</p>
-				<p>Chaque <u>construction de batiment</u> vous rapportera un nombre spécifique de points, mais vous les predrez si il est détruit.</p>
-				<p>Chaque <u>Quête</u> vous apporte un nombre spécifique de points.</p>
-			</div>
-			<div style="float:left;">'
-	.AfficheTableauGainScores()
-	.'</div>
-			<h2 style="clear:both;">Combats</h2>
-			<p>Vous pouvez combattre d\'autres joueurs ou attaquer des bâtiments ou bien encore des monstres de quête tant que ceux-ci n\'ont pas été attaqués dans les '.($temp_combat / 3600).'hrs.</p>
-			<h3>Combats entre joueur</h3>
-			<p>Une valeur de combat sera calculée suivant la formule suivante : <i>(Attaque * 1.15) + Défense </i>.
-			Cette valeur est calculée pour votre adversaire également et une différence en est tirée. 
-			Celui qui a la valeur de combat la plus élevée gagne le combat. Le gagnant du combat augmente son expérience de 5pts et vole un peu d\'or au perdant. 
-			Le perdant, lui, perd de l\'or et des pts de vie correspondant à la différence des 2 valeurs de combats.</p>
-			<h3>Attaques de bâtiment</h3>
-			<p>C\'est le même principe que pour le combat entre joueur mais la différence se situe au niveau des conséquences.</p>
-			<p>Le bâtiment perdra des pts de vie selon la formule suivante : <i>ValeurCombatJoueur - DefenseBatiment</i>. Si la différence est négative, le bâtiment ne perdra pas de points.</p>
-			<p>Et le joueur perdra des pts de vies selon la formule suivante : <i>(AttaqueBatiment * 1.15) - DefenseJoueur</i>. Si la différence est négative, le joueur ne perdra pas de points.</p>
-			<p>Dans tous les cas, le joueur augmentera son expérience de 5pts.</p>
-			<h2>Votre Village</h2>
-			<p>Pour construire un bâtiment, vous devez avoir assez d\'argent (logique) et surtout se trouver sur une case vide collée à un autre de vos bâtiments. 
-			Donc à partir de votre maison, vous pouvez construire sur 8 cases différentes (les 4 cotés et les 4 coins) sauf si votre maison est sur un bord. 
-			Ensuite les autres bâtiments que vous construirez devront également être collé sur un des bâtiments déjà construit.</p>
-			<p>Lorsque vous vous trouvez sur un de vos bâtiment, des options supplémentaires apparaissent sur différentes pages. 
-			Par exemple, lorsque vous serez sur "Entrepôt", vous aurez sur votre page "Votre Bolga" la possibilité de transférer de votre bolga à votre Entrepôt. 
-			L\'avantage est que si vous mourez, vous réssusciterez à votre maison et pourrez directement repasser par votre entrepôt pour vous équiper. 
-			Et bien oui, car si vous mourez, vous perdez tout le contenu de votre bolga et équipement. C\'est la même chose avec votre banque mais biensur uniquement pour votre or.</p>
-			<p>'.AfficheIcone('attention').' Si votre entrepôt ou votre banque sont détruits, leur contenu est récupéré par le gagnant.</p>
-			<table>
-				<tr>
-					<td>
-						<img src="./img/druide.png" height="200px" alt="Votre druide" title="Votre Druide" />
-					</td>
-					<td>
-						<p>Dans votre Maison, vous trouverez un Druide. Ce Druide ne parle qu\'aux personnes de niveau 1 minimum. Il vous proposera plusieurs actions dont changer de la nourriture en hydromel, des sorts en tout genre, ...</p>
-					</td>
-				</tr>
-			</table>';
-}
-function Affiche_Inventaire(){
-	return '
-			<h1>Inventaire</h1>
-			<p>Liste toutes les choses que vous avez trouvés au cours de vos voyages avec les équipements aussi (voir Equipements).</p>
-			<h2 style="clear:both;">Les ressources</h2>'
-	.ReglesAfficheTableauEquipements('ressource');
-		
-}
-function Affiche_Equipement(){
-	return '
-			<h1>Equipement</h1>
-			<p>Vous présente votre équipement. Chaque équipement augmente votre pouvoir d\'attaque ou de défense.</p>
-			<p>Si vous cliquez sur un élément, il sera remis dans votre inventaire.</p>
-			<p>Voici la liste des équipements possibles avec leurs caractéristiques et valeurs.</p>
-			<h2 style="clear:both;">Armes</h2>'
-	.ReglesAfficheTableauEquipements('arme')
-	.'<h2 style="clear:both;">Boucliers</h2>'
-	.ReglesAfficheTableauEquipements('bouclier')
-	.'<h2 style="clear:both;">Casques</h2>'
-	.ReglesAfficheTableauEquipements('casque')
-	.'<h2 style="clear:both;">Jambières</h2>'
-	.ReglesAfficheTableauEquipements('jambiere')
-	.'<h2 style="clear:both;">Cuirasses</h2>'
-	.ReglesAfficheTableauEquipements('cuirasse');
-}
-function Affiche_Competences(){
-	return utf8_decode(file_get_contents('http://code.google.com/p/projet-gaulix/wiki/competences?show=content'));
-	/* return '
-			<h1>Compétences</h1>
-			<p>Dans cette partie, vous pourrez améliorer votre attaque et votre défense pour un prix modeste et un temps de travail correct.</p>
-			<p>Mais aussi apprendre des compétences diverses et variées qui vous permettront de fabriquer des armes, objets, boucliers, ...</p>'; */
-}
-function Affiche_Scores(){
-	return utf8_decode(file_get_contents('http://code.google.com/p/projet-gaulix/wiki/scores?show=content'));
-	/* return '
-			<h1>Scores</h1>
-			<p>Vous trouverez la liste des joueurs avec le nombre de combats gagnés et perdus. Les combats dont les résultats sont nuls ne sont pas comptabilisés.</p>
-			<p>Vous y trouverez également un aperçu complet des autres joueurs excepté leurs équipements.</p>'; */
-}
-function Affiche_Quetes(){
-	return '
-			<h1>Les Quêtes</h1>
-			<p>En vous inscrivant à une quête, vous avez la possibilité de gagner de l\'argent, beaucoup d\'argent. Vous ne pouvez vous s\'inscrire qu\'à '.quete::NB_QUETE_MAX.' quêtes maximum.</p>
-			<p>Les quêtes sont dispersées sur toutes les cartes uniquement quand vous serez passé au niveau 4. Avant ce niveau, les quêtes seront créées sur la carte où votre village est installé. Bonne recherche !</p>
-			<p>Vous trouverez la liste des quêtes possible en fonction de votre niveau. Il existe 4 types de quêtes.</p>
-			<ol>
-				<li>Trouvez et tuez un monstre</li>
-				<li>Trouvez un personnage</li>
-				<li>Trouvez un personnage dans un délai donné</li>
-				<li>Trouvez et gardez un objet</li>
-			</ol>
-			<h2>Les Quêtes "Tuez un Monstre"</h2>
-			<p>Pour ces quêtes, vous devrez trouver et attaquer un monstre. Après chaque attaque ce monstre fuira pour se cacher quelque part. A vous de le retrouver au plus vite pour l\'achever.</p>
-			<h2>Les Quêtes "Trouvez un personnage"</h2>
-			<p>Il y a 2 types de quête différente: celle avec un temps donnée et les autres. Dans les 2 cas, vous devrez juste vous baladez sur la carte à leur recherche. Quand vous aurez retrouvé le personnage, vous recevrez votre dû. Par contre dans le cas où vous ne le trouvez pas endéans le délai donné, vous ne recevrez pas votre dû.</p>
-			<h2>Les Quêtes "Trouvez un objet"</h2>
-			<p>Pour ces quêtes, vous devrez vous balader sur la carte à la recherche de cet objet. Une fois trouvé, Vous toucherez votre dû et le garderai. Il sera mis directement dans votre inventaire.</p>
-			<p>A vous maintenant de vous en équiper ou vendre ou jeter.</p>';
-}
-function Affiche_Village(){
-	return '
-			<h1>Le Village</h1>
-			<h2>Les bâtiments</h2>
-			<p>Vous avez plusieurs bâtiments possibles à construire. Chacun d\'eux a une utilité.</p>
-			<p>Chaque bâtiment peut être amélioré. Chaque amélioration à biensur un coût mais surtout une utilité. Son utilité est simple et est appliquée pour chaque passage de niveau :</p>
-			<ul>
-				<li>+50 pts de vie maximum</li>
-				<li>+5 pts d\'attaque</li>
-				<li>+5 pts de défense</li>
-				<li>+1 pt de distance</li>
-				<li>+100 de capacité de stock (ferme et mine)</li>
-			</ul>'
-	.ReglesAfficheTableauBatiment();
-}
 function ReglesAfficheTableauBatiment(){
 	global $arCouleurs;
 	$txt = '
@@ -229,7 +77,6 @@ function ReglesAfficheTableauEquipements($equipement){
 		}
 
 		$txt .= '
-	
 <table class="equipements">
 	<tr style="background:'.$bckColor.';">
 		<td >
@@ -258,6 +105,72 @@ function AfficheTableauGainScores(){
 	}
 	$txt .= '</table>';
 
+	return $txt;
+}
+function AfficheListeCompetences(){
+	$NomPrecedent = null;
+	$nbComp = 0;
+	$NumCol = 0;
+	$CheckA = false;
+	$CheckB = false;
+	$txt = '
+	<table>';
+	
+	$sqlLstCmp = "SELECT * FROM table_competence_lst WHERE cmp_lst_type='competence' ORDER BY cmp_lst_nom, cmp_lst_niveau ASC;";
+	$rqtLstCmp = mysql_query($sqlLstCmp) or die (mysql_error().'<br />'.$sqlLstCmp);
+	
+	while($cmp = mysql_fetch_array($rqtLstCmp, MYSQL_ASSOC)){
+		if ($NumCol == 0){
+			$txt .= '
+		<tr style="vertical-align:top;">';
+		}
+		if ($cmp['cmp_lst_nom'] != $NomPrecedent){
+			
+			if($CheckA){
+				$txt .= '
+				</table>
+			</td>';
+				$CheckA = false;
+				if($NumCol == 2){
+					$txt .= '
+		</tr>
+		<tr style="vertical-align:top;">';
+					$NumCol = 0;
+				}
+			}
+			
+			$txt .= '
+			<td>
+				<table class="regles_competences">
+					<tr><th colspan="2">'.ucfirst($cmp['cmp_lst_nom']).'</th></tr>
+					<tr>
+						<td class="regles_competences_niveau">Niveau '.$cmp['cmp_lst_niveau'].'</td>
+						<td>'.$cmp['cmp_lst_description'].'</td>
+					</tr>';
+			$CheckA = true;
+			$NomPrecedent = $cmp['cmp_lst_nom'];
+			$NumCol++;
+			
+		}else{
+			$txt .= '
+					<tr>
+						<td>Niveau '.$cmp['cmp_lst_niveau'].'</td>
+						<td>'.$cmp['cmp_lst_description'].'</td>
+					</tr>';
+		}
+		
+	}
+	if($CheckA){
+		$txt .= '
+				</table>
+			</td>
+		</tr>';
+	}
+	
+	$txt .= '	
+	</table>';
+	
+	
 	return $txt;
 }
 ?>
