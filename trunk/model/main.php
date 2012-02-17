@@ -217,6 +217,7 @@ function AfficheActions(personnage &$oJoueur) {
 		$sql = "SELECT
 		id, 
 		login, 
+		vie, 
 		val_attaque, val_defense, 
 		niveau, 
 		date_last_combat 
@@ -423,13 +424,21 @@ function AfficheListeEnnemisAFrapper(personnage &$oJoueur, $sql) {
 					if (!isset($_SESSION['retour_combat']) or !in_array($row['login'], $_SESSION['retour_combat'])) {
 						if ($chkEnnemis) {
 							$txt .= '
-		<p>Vous pouvez attaquer les joueurs suivants : <i>nom(niveau) Att-Def</i>
+		<p>Vous pouvez attaquer les joueurs suivants :
 			<ul>';
 							$chkEnnemis = false;
 						}
 						$_SESSION['main']['frapper'][$nbEnnemis] = $row['id'];
+						$InfoBulle = '<table class="InfoBulle">'
+							.'<tr><th colspan="2">'.$row['login'].' ('.$row['niveau'].')</th></tr>'
+							.'<tr><td colspan="2"><img alt="'.$row['login'].'" src="./fct/fct_image.php?type=VieCarte&amp;value='.$row['vie'].'&amp;max=300" /></td></tr>'
+							.'<tr>'
+							.'<td><img src="img/icones/ic_attaque.png" alt="Attaque" height="20px" /> : '.$row['val_attaque'].'</td>'
+							.'<td><img src="img/icones/ic_defense.png" alt="Défense" height="20px" /> : '.$row['val_defense'].'</td>'
+							.'</tr>'
+							.'</table>';
 						$txt .= '
-				<li><a href="index.php?page=main&amp;action=frapper&amp;id=' . $nbEnnemis . '">Attaquer ' . $row['login'] . '(' . $row['niveau'] . ')' . $row['val_attaque'] . '-' . $row['val_defense'] . '</a></li>';
+				<li><a href="index.php?page=main&amp;action=frapper&amp;id=' . $nbEnnemis . '">Attaquer <img src="img/homme-grey.png" alt="Ennemi" height="20px" onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulle).'\');" onmouseout="cache();" /> '.$row['login'].' ('.$row['niveau'].')</a></li>';
 						$chkEnnemisEnd = true;
 						$nbEnnemis++;
 					}
@@ -439,9 +448,9 @@ function AfficheListeEnnemisAFrapper(personnage &$oJoueur, $sql) {
 		if ($chkEnnemisEnd) {
 			$txt .= '
 			</ul>
-		</p>';
+		</p>
+		<hr />';
 		}
-		$txt .= '<hr />';
 	}
 	return $txt;
 }
@@ -465,7 +474,7 @@ function AfficheListeBatimentAttaquable($sql, &$chkConstruction) {
 		$chkConstruction = false;   //on ne peut pas construire de batiment
 		$nbBatiment = 0;
 		while ($row = mysql_fetch_array($requete, MYSQL_ASSOC)) {
-			$sqlBatiment = "SELECT batiment_nom, batiment_type FROM table_batiment WHERE id_batiment=" . $row['id_type_batiment'] . ";";
+			$sqlBatiment = "SELECT * FROM table_batiment WHERE id_batiment=" . $row['id_type_batiment'] . ";";
 			$rqtBatiment = mysql_query($sqlBatiment) or die(mysql_error() . '<br />' . $sqlBatiment);
 			$rstBatiment = mysql_fetch_array($rqtBatiment, MYSQL_ASSOC);
 
@@ -479,8 +488,12 @@ function AfficheListeBatimentAttaquable($sql, &$chkConstruction) {
 					}
 
 					$_SESSION['main']['attaquer'][$nbBatiment] = $row['coordonnee'];
+					$InfoBulle =
+						'<b>'.$rstBatiment['batiment_nom'].' de '.$row['login'].'</b>'
+						.'<br />'
+						.'<img alt="'.$rstBatiment['batiment_nom'].'" src="./fct/fct_image.php?type=VieCarte&amp;value='.$row['etat_batiment'].'&amp;max='.($rstBatiment['batiment_vie'] + (50 * $row['niveau_batiment'])).'" />';
 					$txt .= '
-				<li><a href="index.php?page=main&amp;action=attaquer&amp;id=' . $nbBatiment . '">Attaquer ' . $rstBatiment['batiment_nom'] . ' de ' . $row['login'] . ' (' . $row['etat_batiment'] . ')</a></li>';
+				<li><a href="index.php?page=main&amp;action=attaquer&amp;id=' . $nbBatiment . '">Attaquer <img src="img/'.strtolower($rstBatiment['batiment_nom']).'-b.png" alt="'.$rstBatiment['batiment_nom'].'" height="20px" onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulle).'\');" onmouseout="cache();" /></a></li>';
 					$chkBatimentsEnd = true;
 					$nbBatiment++;
 				}
