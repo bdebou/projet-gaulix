@@ -11,7 +11,7 @@ $arDef = $oJoueur->GetDefPerso();
 	<a name="TopPage"></a>
 	<table class="loginstatus">
 		<tr>
-			<td style="background-color: Brown; font-weight:bold; text-transform:uppercase; text-align:center; width:200px;">
+			<td style="background-color: Brown; font-weight:bold; text-transform:uppercase; width:200px;">
 				<?php echo $oJoueur->GetLogin();?> (<?php echo $oJoueur->GetNiveau();?>)
 				<?php echo AfficheRecompenses($oJoueur->GetLogin(), $oJoueur->GetClan());?>
 			</td>
@@ -35,7 +35,7 @@ $arDef = $oJoueur->GetDefPerso();
 			<?php }?>
 		</tr>
 		<tr>
-			<td style="text-align:center;">
+			<td>
 				<button type="button" onclick="window.location='./index.php?page=unconnect'" style="width:120px;">Se déconnecter</button>
 			</td>
 			<td style="width:150px;">

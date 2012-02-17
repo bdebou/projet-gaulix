@@ -107,17 +107,7 @@ div.equipement{
 	margin-left: auto;
 	margin-right: auto;
 }
-/*div.module_social{
-	display: inline;
-	width: 135px;
-	height: 98px;
-}*/
-div.loginstatus table{
-	width: 100%;
-}
-div.loginstatus table td{
-	border: 1px solid black;
-}
+
 
 /*  Les Onglets */
 .onglet{
@@ -176,7 +166,8 @@ table.regles_credit,
 table.quetes,
 table.fiche_quete,
 table.chat_clan,
-table.regles_competences{
+table.regles_competences,
+table.loginstatus{
 	width: 100%;
 }
 table.village, table.village td, table.village th, 
@@ -203,7 +194,8 @@ table.mouvements, table.mouvements td,
 table.marchandise, table.marchandise td, table.marchandise th,
 table.InfoBulle, table.InfoBulle td, table.InfoBulle th,
 table.chat_clan, table.chat_clan th, table.chat_clan td,
-table.regles_competences, table.regles_competences th, table.regles_competences td{
+table.regles_competences, table.regles_competences th, table.regles_competences td,
+table.loginstatus td{
 	border-collapse: collapse;
 	border: 1px solid black;
 }
@@ -223,7 +215,8 @@ table.marchandise td, table.marchandise th,
 table.module_social td,
 table.quetes td,
 table.fiche_quete td,
-table.InfoBulle th, table.InfoBulle td{
+table.InfoBulle th, table.InfoBulle td,
+table.loginstatus td{
 	text-align: center;
 }
 table.fiche_quete td.description{
