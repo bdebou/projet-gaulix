@@ -37,6 +37,7 @@ class personnage{
 	Const TEMP_DEPLACEMENT_SUP	= 3600;			// Temp d'attente pour avoir de nouveau du déplacement
 	Const NB_DEPLACEMENT_SUP	= 1;			// Nombre de point de déplacement gagné tout les x temp
 	Const VIE_MAX				= 300;			// Limite de vie maximum
+	Const TAUX_ATTAQUANT		= 1.15;			// Taux d'augmentation de l'attaquant
 	
 	//Initialisation de l'objet
 	public function __construct(array $donnees){
@@ -70,7 +71,7 @@ class personnage{
 		
 		$arAtt			= $this->GetAttPerso();
 		$arDef			= $this->GetDefPerso();
-		$Valeur			= (($arAtt['0'] + $arAtt['1']) * 1.15)+($arDef['0'] + $arDef['1']);
+		$Valeur			= (($arAtt['0'] + $arAtt['1']) * self::TAUX_ATTAQUANT)+($arDef['0'] + $arDef['1']);
 		
 		if($Valeur > $ValeurCible){
 				//La cible à perdu
