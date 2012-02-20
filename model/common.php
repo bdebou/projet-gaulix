@@ -657,5 +657,12 @@ function ActionLaisser(&$check, &$oJoueur){
 		echo 'Erreur GLX0002: Fonction ActionLaisser';
 	}
 }
-
+function ResetListeQuetes($login) {
+	$sql = "SELECT id_quete_en_cours FROM  table_quetes WHERE quete_login='" . $login . "';";
+	$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
+	while ($row = mysql_fetch_array($requete, MYSQL_ASSOC)) {
+		$sqlRemove = "DELETE FROM table_quetes WHERE id_quete_en_cours=" . intval($row['id_quete_en_cours']) . ";";
+		mysql_query($sqlRemove) or die(mysql_error() . '<br />' . $sqlRemove);
+	}
+}
 ?>
