@@ -173,4 +173,11 @@ function AfficheListeCompetences(){
 	
 	return $txt;
 }
+function NombreDeGaulois(){
+	$sql = "SELECT id FROM table_joueurs;";
+	$rqt = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
+	
+	return mysql_num_rows($rqt);
+}
+
 ?>

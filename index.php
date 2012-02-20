@@ -38,6 +38,8 @@ if(!isset($_SESSION['joueur'])){
 		}
 		include('model/regles.php');
 		
+		include('view/regles/statistiques.php');
+			
 		include('view/regles.php');
 	//}
 }else{
