@@ -57,7 +57,7 @@ $lstPoints	= array('CombatGagné'	=>	array(10,	'Combat gagné'),
 					'NivTerminé'	=> array(15,	'Passé 1 niveau'),
 					'BatRéparé'		=> array(8,		'Batiment réparé à 100%'),
 					'ObjFabriqué'	=> array(1,		'Objet fabriqué'),
-					'BatDetruit'	=> array(20,	''),
+					'BatDetruit'	=> array(20,	'Vous avez détruit un batiment adverse'),
 					'PersoTué'		=> array(-150,	'Personnage tué'));
 
 
