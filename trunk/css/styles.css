@@ -24,10 +24,12 @@ div.menu,
 div.mouvements,
 div.main,
 div.pub,
-div.carte{
+div.carte,
+div.login{
 	float: left;
 }
-div.module_social{
+div.module_social,
+div.statistiques{
 	float: right;
 }
 div.login,
@@ -36,14 +38,16 @@ div.mouvements,
 div.actions,
 div.pub,
 div.menu,
-div.main{
+div.main,
+div.statistiques{
 	border-collapse: collapse;
 	border: 2px solid black;
 }
 div.main,
 div.loginstatus,
 div.pub,
-div.module_social{
+div.module_social,
+div.statistiques{
 	padding: 3px;
 }
 div.loginstatus,
@@ -53,7 +57,8 @@ div.pub,
 div.menu,
 div.main,
 div.module_social,
-div.carte{
+div.carte,
+div.statistiques{
 	margin: 2px;
 }
 div.history,
@@ -65,7 +70,8 @@ div.loginstatus{
 	height: auto;
 }
 div.mouvements,
-div.actions{
+div.actions,
+div.login{
 	width: auto;
 }
 div.login{
@@ -107,7 +113,10 @@ div.equipement{
 	margin-left: auto;
 	margin-right: auto;
 }
-
+div.statistiques{
+	height: 100px;
+	width : 200px;
+}
 
 /*  Les Onglets */
 .onglet{
@@ -167,7 +176,8 @@ table.quetes,
 table.fiche_quete,
 table.chat_clan,
 table.regles_competences,
-table.loginstatus{
+table.loginstatus,
+table.statistiques{
 	width: 100%;
 }
 table.village, table.village td, table.village th, 
@@ -195,7 +205,8 @@ table.marchandise, table.marchandise td, table.marchandise th,
 table.InfoBulle, table.InfoBulle td, table.InfoBulle th,
 table.chat_clan, table.chat_clan th, table.chat_clan td,
 table.regles_competences, table.regles_competences th, table.regles_competences td,
-table.loginstatus td{
+table.loginstatus td,
+table.statistiques, table.statistiques td{
 	border-collapse: collapse;
 	border: 1px solid black;
 }
@@ -216,7 +227,8 @@ table.module_social td,
 table.quetes td,
 table.fiche_quete td,
 table.InfoBulle th, table.InfoBulle td,
-table.loginstatus td{
+table.loginstatus td,
+table.statistiques td{
 	text-align: center;
 }
 table.fiche_quete td.description{
