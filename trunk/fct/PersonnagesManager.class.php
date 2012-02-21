@@ -67,6 +67,7 @@ class PersonnagesManager{
 				inventaire = :strInventaire, 
 				nb_combats = :nb_combats, 
 				nb_victoire = :nb_victoire, 
+				nb_mort = :nb_mort,  
 				clan = :clan, 
 				date_last_msg_lu = :date_last_msg_lu, 
 				nb_points = :nb_points, 
@@ -101,6 +102,7 @@ class PersonnagesManager{
 		$q->bindValue(':nb_combats', $perso->GetNbCombats(), PDO::PARAM_INT);
 		$q->bindValue(':nb_victoire', $perso->GetNbVictoire(), PDO::PARAM_INT);
 		$q->bindValue(':nb_vaincu', $perso->GetNbVaincu(), PDO::PARAM_INT);
+		$q->bindValue(':nb_mort', $perso->GetNbMort(), PDO::PARAM_INT);
 		$q->bindValue(':strInventaire', (is_null($perso->GetLstInventaire())?NULL:implode(',', $perso->GetLstInventaire())), PDO::PARAM_STR);
 		$q->bindValue(':id', $perso->GetId(), PDO::PARAM_INT);
 		$q->bindValue(':argent', $perso->GetArgent(), PDO::PARAM_INT);
