@@ -35,7 +35,7 @@ class bank extends batiment{
 	
 	//Les Affichages
 	//==============
-	public function AfficheContenu(&$PageVillage, personnage &$oJoueur){
+	public function AfficheContenu(personnage &$oJoueur){
 		
 		$PositionBatiment	= implode(',', array_merge(array(parent::GetCarte()), parent::GetCoordonnee()));
 		$PositionJoueur		= implode(',', array_merge(array($oJoueur->GetCarte()), $oJoueur->GetPosition()));
