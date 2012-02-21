@@ -224,7 +224,7 @@ abstract class batiment{
 	}
 	
 	//--- Les modules d'affichage ---
-	public function AfficheOptionAmeliorer(&$oJoueur, &$PageVillage){
+	public function AfficheOptionAmeliorer(&$oJoueur){
 		
 		$id = str_replace(',', '_', $this->Coordonnee);
 		
@@ -268,7 +268,7 @@ abstract class batiment{
 			return '<br /><a href="index.php?page=village&action=ameliorer&id='.$id.'&anchor='.str_replace(',', '_', $this->Coordonnee).'" title="Or = '.$prixAmelioration['Or'].'&#13;Bois = '.$prixAmelioration['Bois'].'&#13;Pierre = '.$prixAmelioration['Pierre'].'&#13;Nourriture = '.$prixAmelioration['Nourriture'].'&#13;'.AfficheTempPhrase(DecoupeTemp(intval(3600*exp($this->Niveau)))).'">Améliorer</a> pour '.AfficheListePrix($prixAmelioration, array('Bois'=>$maison->GetRessourceBois(), 'Pierre'=>$maison->GetRessourcePierre(), 'Or'=>$oJoueur->GetArgent(), 'Nourriture'=>$maison->GetRessourceNourriture()));
 		}
 	}
-	public function AfficheOptionReparer(&$oJoueur, &$PageVillage){
+	public function AfficheOptionReparer(&$oJoueur){
 		
 		$txt = null;
 		$chkA = true;

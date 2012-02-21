@@ -133,7 +133,7 @@ class mine extends batiment{
 	
 	//Les Affichages
 	//==============
-	public function AfficheContenu(&$PageVillage, personnage &$oJoueur){//OK
+	public function AfficheContenu(personnage &$oJoueur){//OK
 		$stock = explode(',', $this->Contenu);
 		
 		switch($stock[0]){

@@ -12,7 +12,7 @@ function CreateListBatiment(){
 	
 		while($carte = mysql_fetch_array($requete, MYSQL_ASSOC)){
 			if(!in_array($carte['id_type_batiment'], $lstNonBatiment)){
-				$lstBatiment[] = AfficheBatiment(FoundBatiment(NULL, NULL, $carte['coordonnee']), $oJoueur, true);
+				$lstBatiment[] = AfficheBatiment(FoundBatiment(NULL, NULL, $carte['coordonnee']), $oJoueur);
 			}
 		}
 	}
@@ -22,7 +22,7 @@ function CreateListBatiment(){
 	
 	return $lstBatiment;
 }
-function AfficheBatiment(&$batiment, &$oJoueur, $PageVillage = false){
+function AfficheBatiment(&$batiment, &$oJoueur){
 	$ImgSize = 'height';
 	$txt = '
 	<table class="village">';
@@ -36,7 +36,7 @@ function AfficheBatiment(&$batiment, &$oJoueur, $PageVillage = false){
 	switch($batiment->GetType()){
 		case 'maison':
 			$ImgSize = 'width';
-			if(!$PageVillage OR $PositionBatiment == $PositionJoueur){
+			if($PositionBatiment == $PositionJoueur){
 				$contenu = '<p>Ne peut rien contenir.</p>';
 				$chkDruide = true;
 			}else{
@@ -44,13 +44,13 @@ function AfficheBatiment(&$batiment, &$oJoueur, $PageVillage = false){
 			}
 			break;
 		case 'bank':
-			$contenu = $batiment->AfficheContenu($PageVillage, $oJoueur);
+			$contenu = $batiment->AfficheContenu($oJoueur);
 			break;
 		case 'entrepot':
 		case 'ferme':
 		case 'mine' :
 			$ImgSize = 'width';
-			$contenu = $batiment->AfficheContenu($PageVillage, $oJoueur);
+			$contenu = $batiment->AfficheContenu($oJoueur);
 			break;
 		case 'marcher':
 			if($PositionBatiment == $PositionJoueur){
@@ -68,7 +68,7 @@ function AfficheBatiment(&$batiment, &$oJoueur, $PageVillage = false){
 			<th colspan="4"><a name="'.str_replace(',', '_', $PositionBatiment).'">'.$batiment->GetNom().' ('.$batiment->GetNiveau().' / '.batiment::NIVEAU_MAX.')</a></th>
 		</tr>
 		<tr>
-			<td colspan="4">'.$batiment->AfficheOptionAmeliorer($oJoueur, $PageVillage).'</td>
+			<td colspan="4">'.$batiment->AfficheOptionAmeliorer($oJoueur).'</td>
 		</tr>
 		<tr>
 			<td colspan="4">'.$batiment->GetDescription().'</td>
@@ -77,7 +77,7 @@ function AfficheBatiment(&$batiment, &$oJoueur, $PageVillage = false){
 			<td colspan="4">'
 	.'<img alt="Barre status" src="./fct/fct_image.php?type=statusetat&amp;value='.$batiment->GetEtat().'&amp;max='.$batiment->GetEtatMax().'" />'
 	.'<br />'
-	.$batiment->AfficheOptionReparer($oJoueur, $PageVillage)
+	.$batiment->AfficheOptionReparer($oJoueur)
 	.'</td>
 		</tr>
 		<tr>

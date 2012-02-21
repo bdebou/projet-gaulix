@@ -53,8 +53,6 @@ class maison extends batiment{
 		//Si le niveau du joueur est inférieur à 1, pas de druide
 		if($oJoueur->GetNiveau() < 1){return null;}
 		
-		global $VieMaximum, $DeplacementMax;
-		
 		$Key = 0;
 		$txtOptionsDruide = '
 			<table class="druide">';

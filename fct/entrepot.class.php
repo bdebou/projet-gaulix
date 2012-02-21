@@ -68,11 +68,11 @@ class entrepot extends batiment{
 	
 	//Les affichages
 	//==============
-	Public function AfficheContenu(&$PageVillage, personnage &$oJoueur){
+	Public function AfficheContenu(personnage &$oJoueur){
 		$PositionBatiment	= implode(',', array_merge(array(parent::GetCarte()), parent::GetCoordonnee()));
 		$PositionJoueur		= implode(',', array_merge(array($oJoueur->GetCarte()), $oJoueur->GetPosition()));
 
-		if($PageVillage OR $PositionBatiment == $PositionJoueur){
+		if($PositionBatiment == $PositionJoueur){
 			
 			//Si le contenu est vide
 			if(is_null($this->Contenu)){return '<p>Vide</p>';}
