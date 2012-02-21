@@ -3,14 +3,18 @@
 	<h2>Le Classement</h2>
 	<table class="classement">
 		<tr style="background:grey;">
-			<th style="width:60px;">Points</th>
-			<th style="width:160px;">Nom (Niveau)</th>
-			<th style="width:150px;">Expérience</th>
-			<th style="width:150px;"><?php echo AfficheIcone('vie');?></th>
-			<th><?php echo AfficheIcone('attaque');?></th>
-			<th><?php echo AfficheIcone('defense');?></th>
-			<th>Combats<br />Gagnés</th>
-			<th>Combats<br />Perdus</th>
+			<th style="width:60px;" rowspan="2">Points</th>
+			<th style="width:160px;" rowspan="2">Nom (Niveau)</th>
+			<th style="width:150px;" rowspan="2">Expérience</th>
+			<th style="width:150px;" rowspan="2"><?php echo AfficheIcone('vie');?></th>
+			<th rowspan="2"><?php echo AfficheIcone('attaque');?></th>
+			<th rowspan="2"><?php echo AfficheIcone('defense');?></th>
+			<th colspan="3">Combats</th>
+		</tr>
+		<tr style="background:grey;">
+			<th>Gagnés</th>
+			<th>Perdus</th>
+			<th>Mort</th>
 		</tr>
 <?php
 foreach($lignes as $ligne){
@@ -24,6 +28,7 @@ foreach($lignes as $ligne){
 			.'<td>'.$ligne['val_defense'].'</td>'
 			.'<td>'.$ligne['nb_victoire'].'</td>'
 			.'<td>'.$ligne['nb_vaincu'].'</td>'
+			.'<td>'.$ligne['nb_mort'].'</td>'
 		.'</tr>';
 }
 ?>

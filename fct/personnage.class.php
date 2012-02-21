@@ -20,7 +20,7 @@ class personnage{
 			$last_object, 
 			$code_casque, $code_arme, $code_bouclier, $code_jambiere, $code_cuirasse, $code_sac,
 			$LivreSorts, $LstSorts, 
-			$nb_combats, $nb_victoire, $nb_vaincu,
+			$nb_combats, $nb_victoire, $nb_vaincu, $nb_mort, 
 			$arInventaire,
 			$date_perf_attaque, $tmp_perf_attaque,
 			$date_perf_defense, $tmp_perf_defense,
@@ -564,6 +564,7 @@ class personnage{
 		$this->date_perf_defense = null;
 		$this->tmp_perf_defense = null;
 		$this->UpdatePoints($lstPoints['PersoTué'][0]);
+		$this->nb_mort++;
 		
 		ResetListeQuetes($this->GetLogin());
 		
@@ -656,6 +657,7 @@ class personnage{
 				case 'nb_combats':			$this->$key = intval($value); break;
 				case 'nb_victoire':			$this->$key = intval($value); break;
 				case 'nb_vaincu':			$this->$key = intval($value); break;
+				case 'nb_mort':				$this->$key = intval($value); break;
 				case 'inventaire':			$this->arInventaire = (is_null($value)?null:explode(',', $value)); break;
 				case 'id':					$this->$key = intval($value); break;
 				case 'argent':				$this->$key = intval($value); break;
@@ -776,6 +778,7 @@ class personnage{
 	public function GetLstSorts(){			return $this->LstSorts;}
 	public function GetNbVictoire(){		return $this->nb_victoire;}
 	public function GetNbVaincu(){			return $this->nb_vaincu;}
+	public function GetNbMort(){			return $this->nb_mort;}
 	public function GetId(){				return $this->id;}
 	public function GetArgent(){			return $this->argent;}
 	public function GetDatePerfAttaque(){	return $this->date_perf_attaque;}
