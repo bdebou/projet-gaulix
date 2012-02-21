@@ -149,7 +149,8 @@ class maison extends batiment{
 				
 				if(!is_null($SortDruide['cmp_lst_nom'])){
 					$_SESSION['main']['druide'][$Key]['type'] = $SortDruide['cmp_lst_nom'];
-					$txtInfo .= '<span class="sort_druide">'.$SortDruide['cmp_lst_description'].'</span>';
+					//$txtInfo .= '<span class="sort_druide">'.$SortDruide['cmp_lst_description'].'</span>';
+					$txtInfo .= AfficheInfoObjet($SortDruide['cmp_lst_nom'], 40);
 				}else{
 					$_SESSION['main']['druide'][$Key]['type'] = 'ressource';
 					$txtInfo .= $txtContre;
