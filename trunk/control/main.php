@@ -1,6 +1,7 @@
 <?php
 include('model/main.php');
 include('model/carte.php');
+include('model/village.php');
 
 global $objManager, $chkDebug;
 
@@ -40,6 +41,8 @@ if(isset($_GET['move']) AND $oJoueur->GetDepDispo() > 0){
 			}
 			break;
 		case 'laisser':				ActionLaisser($chkErr, $oJoueur); break;
+		case 'viderstockmine':		ActionViderStock($chkErr, 18, 'mine', $oJoueur, $objManager); break;
+		case 'viderstockferme':		ActionViderStock($chkErr, 6, 'ferme', $oJoueur, $objManager); break;
 	}
 	if(isset($_GET['action'])){unset($_GET['action']);}
 	

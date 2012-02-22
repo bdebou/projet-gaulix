@@ -1,11 +1,10 @@
 <?php
-function CreateListBatiment(){
-	global $objManager, $lstNonBatiment;
-	$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
+function CreateListBatiment(personnage &$oJoueur){
+	global $lstNonBatiment;
 	
 	$lstBatiment = null;
 	
-	$sql = "SELECT * FROM table_carte WHERE login='".$_SESSION['joueur']."' AND detruit IS NULL;";
+	$sql = "SELECT * FROM table_carte WHERE login='".$oJoueur->GetLogin()."' AND detruit IS NULL;";
 	$requete = mysql_query($sql) or die ( mysql_error() );
 	
 	if(mysql_num_rows($requete) > 0){
@@ -16,10 +15,7 @@ function CreateListBatiment(){
 			}
 		}
 	}
-	
-	$objManager->update($oJoueur);
-	unset($oJoueur);
-	
+
 	return $lstBatiment;
 }
 function AfficheBatiment(&$batiment, &$oJoueur){
@@ -29,7 +25,7 @@ function AfficheBatiment(&$batiment, &$oJoueur){
 
 	$contenu = 'Ne peut rien contenir';
 	$PositionBatiment	= implode(',', array_merge(array($batiment->GetCarte()),$batiment->GetCoordonnee()));
-	$PositionJoueur		= implode(',', array_merge(array($oJoueur->GetCarte()),$oJoueur->GetPosition()));
+	$PositionJoueur		= $oJoueur->GetCoordonnee();
 	$chkDruide = false;
 	$chkMarcher = false;
 
@@ -331,23 +327,6 @@ function ActionProduction(&$check, $id, $NomBatiment, $type, &$oJoueur, &$objMan
 	}else{
 		$check = false;
 		echo 'Erreur GLX0003: Fonction ActionProduction - Maison Introuvable';
-	}
-}
-function ActionStocker(&$check, $id, $type, &$objManager, &$oJoueur){
-	if(isset($_SESSION['main'][$type]['stock'])){
-		$batiment = FoundBatiment($id);
-		if(!is_null($batiment)){
-			$batiment->AddStock($oJoueur);
-			$objManager->UpdateBatiment($batiment);
-			unset($batiment);
-		}else{
-			$check = false;
-			echo 'Erreur GLX0003: Fonction ActionStocker - '.ucfirst(strtolower($type)).' introuvable';
-		}
-		unset($_SESSION['main'][$type]['stock']);
-	}else{
-		$check = false;
-		echo 'Erreur GLX0002: Fonction ActionStocker';
 	}
 }
 function ActionDruide(&$chkErr, $id, &$oJoueur, &$objManager){

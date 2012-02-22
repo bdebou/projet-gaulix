@@ -1,6 +1,6 @@
 <?php
 function FoundBatiment($idType = false, $login = false, $Coordonnees = false) {
-	global $lstNonBatiment;
+	global $lstNonBatiment, $objManager;
 	$sql = "SELECT * FROM table_carte WHERE
 			login='". ($login ? $login : $_SESSION['joueur']) . "'"
 	. ($idType ? " AND id_type_batiment=$idType" : "")
@@ -14,7 +14,9 @@ function FoundBatiment($idType = false, $login = false, $Coordonnees = false) {
 			$sql2 = "SELECT * FROM table_batiment WHERE id_batiment=" . $carte['id_type_batiment'] . ";";
 			$requete2 = mysql_query($sql2) or die(mysql_error() . '<br />' . $sql2);
 			$batiment = mysql_fetch_array($requete2, MYSQL_ASSOC);
-			return new $batiment['batiment_type']($carte, $batiment);
+			$objBatiment =  new $batiment['batiment_type']($carte, $batiment);
+			$objManager->UpdateBatiment($objBatiment);
+			return $objBatiment;
 			//return new batiment($carte, $batiment);
 		}
 	} else {
