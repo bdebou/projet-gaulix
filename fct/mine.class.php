@@ -3,7 +3,6 @@ class mine extends batiment{
 	private $Contenu,
 			$DateAction;
 	
-	const TYPE						= 'mine';
 	const TYPE_COMPETENCE			= 'Mineur';
 	
 	const CODE_PRODUCTION_PIERRE	= 0;
@@ -27,9 +26,6 @@ class mine extends batiment{
 	
 	//--- fonction qui est lancer lors de la création de l'objet. ---
 	public function __construct(array $carte, array $batiment){
-		$this->Hydrate($carte, $batiment);
-	}
-	public function Hydrate(array $carte, array $batiment){
 		date_default_timezone_set('Europe/Brussels');
 		
 		parent::Hydrate($carte, $batiment);
@@ -47,6 +43,18 @@ class mine extends batiment{
 					$this->DateAction = (is_null($value)?NULL:strtotime($value));
 					break;
 			}
+		}
+		
+			//on stock ce qui a été produit
+		if(	$this->GetStockContenu() < $this->GetStockMax()
+			AND (strtotime('now') - parent::GetDateAction()) > $this->GetTempExtraction($this->GetTypeContenu())){
+				
+			global $objManager;
+			$Producteur = $objManager->GetPersoLogin(parent::GetLogin());
+				
+			$this->AddStock($Producteur->GetNiveauCompetence(self::TYPE_COMPETENCE));
+				
+			unset($Producteur);
 		}
 	}
 	
@@ -109,14 +117,14 @@ class mine extends batiment{
 		$this->Contenu = $arContenu[0].','.($arContenu[1] - $stock);
 		if($this->GetStockMax() == $stock){$this->DateAction = strtotime('now');}
 	}
-	public function AddStock(personnage &$joueur){
+	public function AddStock($NiveauCompetence){
 		$arContenu = explode(',', $this->Contenu);
 		
 		$nb = intval((strtotime('now') - parent::GetDateAction()) / $this->GetTempExtraction($arContenu[0]));
 		
 		for($i=1;$i<=$nb;$i++){
 			if($this->GetStockMax() > $arContenu['1']){
-				$arContenu[1] += $this->QuelleQuantite($joueur->GetNiveauCompetence(self::TYPE_COMPETENCE), $arContenu[0]);
+				$arContenu[1] += $this->QuelleQuantite($NiveauCompetence, $arContenu[0]);
 			}else{break;}
 		}
 		
@@ -135,30 +143,18 @@ class mine extends batiment{
 	//==============
 	public function AfficheContenu(personnage &$oJoueur){//OK
 		$stock = explode(',', $this->Contenu);
-		
-		switch($stock[0]){
-			case self::CODE_PRODUCTION_PIERRE:	$IconeName = self::ICONE_NAME_PIERRE;	break;
-			case self::CODE_PRODUCTION_OR:		$IconeName = self::ICONE_NAME_OR;		break;
-			case self::CODE_PRODUCTION_FER:		$IconeName = self::ICONE_NAME_FER;		break;
-			case self::CODE_PRODUCTION_CUIVRE:	$IconeName = self::ICONE_NAME_CUIVRE;	break;
-		}
 
 		if($stock[1] < $this->GetStockMax()){
-			if((strtotime('now') - parent::GetDateAction()) > $this->GetTempExtraction($stock[0])){
-				$_SESSION['main'][self::TYPE]['stock'] = intval((strtotime('now') - parent::GetDateAction()) / $this->GetTempExtraction($stock[0]));
-				return '<script language="javascript">window.location=\'index.php?page=village&action=stocker'.strtolower(self::TYPE).'\';</script>';
-			}else{
-				$_SESSION['main'][self::TYPE]['stock'] = 1;
-				$status = '
-								<div style="display:inline;" id="TimeToWait'.ucfirst(strtolower(self::TYPE)).'"></div>'
-								.AfficheCompteurTemp(ucfirst(strtolower(self::TYPE)), 'index.php?page=village&action=stocker'.strtolower(self::TYPE), ($this->GetTempExtraction($stock[0]) - (strtotime('now') - parent::GetDateAction())));
-			}
+			$_SESSION['main'][get_class($this)]['stock'] = 1;
+			$status = '
+							<div style="display:inline;" id="TimeToWait'.ucfirst(strtolower(get_class($this))).'"></div>'
+							.AfficheCompteurTemp(ucfirst(strtolower(get_class($this))), 'index.php?page=villag', ($this->GetTempExtraction($stock[0]) - (strtotime('now') - parent::GetDateAction())));
 		}else{
 			$status = '<p>Votre stock est plein.</p>';
 		}
 		
-		$_SESSION['main'][self::TYPE]['production']	= $stock[0];
-		$_SESSION['main'][self::TYPE]['vider']		= $stock[1];
+		$_SESSION['main'][get_class($this)]['production']	= $stock[0];
+		$_SESSION['main'][get_class($this)]['vider']		= $stock[1];
 		
 		$PositionBatiment	= implode(',', array_merge(array(parent::GetCarte()),parent::GetCoordonnee()));
 		$PositionJoueur		= implode(',', array_merge(array($oJoueur->GetCarte()),$oJoueur->GetPosition()));
@@ -166,13 +162,13 @@ class mine extends batiment{
 		if($PositionBatiment == $PositionJoueur){
 			$txtAction = '
 				<td>
-					<a href="index.php?page=village&amp;action=viderstock'.strtolower(self::TYPE).'&amp;anchor='.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'">Vider votre stock</a>
+					<a href="index.php?page=village&amp;action=viderstock'.strtolower(get_class($this)).'&amp;anchor='.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'">Vider votre stock</a>
 				</td>
 				<td>'
 					.'<form method="get" action="index.php" class="production">'
 						.'<input type="hidden" name="page" value="village" />'
 						.'<input type="hidden" name="anchor" value="'.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'" />'
-						.'<input type="hidden" name="action" value="production'.strtolower(self::TYPE).'" />'
+						.'<input type="hidden" name="action" value="production'.strtolower(get_class($this)).'" />'
 						.'<select name="type" onclick="document.getElementById(\'BtSubmit\').disabled=false;">'
 							.'<option value="'.self::CODE_PRODUCTION_PIERRE.'"'.(($stock[0] == self::CODE_PRODUCTION_PIERRE)?' disabled="disabled"':'').'>Trouver des Pierres</option>'
 							.'<option value="'.self::CODE_PRODUCTION_OR.'"'.(($stock[0] == self::CODE_PRODUCTION_OR OR $oJoueur->GetNiveauCompetence(self::TYPE_COMPETENCE) < 2)?' disabled="disabled"':'').'>Trouver de l\'Or</option>'
@@ -184,18 +180,18 @@ class mine extends batiment{
 				.'</td>';
 		}else{
 			$txtAction = '
-				<td colspan="2">Vous ne pouvez rien exécuter car vous n\'êtes pas à votre '.strtolower(self::TYPE).'.</td>';
+				<td colspan="2">Vous ne pouvez rien exécuter car vous n\'êtes pas à votre '.strtolower(get_class($this)).'.</td>';
 		}
 		
 		$txt ='
 		<table border style="margin:3px;">
 			<tr>
-				<td style="width:60%;">Production de '.$this->QuelleQuantite($oJoueur->GetNiveauCompetence(self::TYPE_COMPETENCE), $stock[0]).'x '.AfficheIcone($IconeName).'</td>
+				<td style="width:60%;">Production de '.$this->QuelleQuantite($oJoueur->GetNiveauCompetence(self::TYPE_COMPETENCE), $stock[0]).'x '.AfficheIcone($this->GetIconeNameProduction($stock[0])).'</td>
 				<td>'.$status.'</td>
 			</tr>
 			<tr>
 				<td>Stock</td>
-				<td>'.$stock[1].'/'.$this->GetStockMax().' '.AfficheIcone($IconeName).'</td>
+				<td>'.$stock[1].'/'.$this->GetStockMax().' '.AfficheIcone($this->GetIconeNameProduction($stock[0])).'</td>
 			</tr>
 			<tr>
 				'.$txtAction.'
@@ -209,6 +205,22 @@ class mine extends batiment{
 	//========
 	public function GetStockMax(){				return 500 + (parent::GetNiveau() * 100);}
 	public function GetContenu(){				return $this->Contenu;}
+	Public function GetIconeNameProduction($type){
+		switch($type){
+			case self::CODE_PRODUCTION_PIERRE:	return self::ICONE_NAME_PIERRE;
+			case self::CODE_PRODUCTION_OR:		return self::ICONE_NAME_OR;
+			case self::CODE_PRODUCTION_FER:		return self::ICONE_NAME_FER;
+			case self::CODE_PRODUCTION_CUIVRE:	return self::ICONE_NAME_CUIVRE;
+		}
+	}
+	public function GetTypeContenu(){
+		$contenu = explode(',', $this->Contenu);
+		return $contenu[0];
+	}
+	public function GetStockContenu(){
+		$contenu = explode(',', $this->Contenu);
+		return $contenu[1];
+	}
 	public function GetDateAction(){			return $this->DateAction;}
 	public function GetTempExtraction($code){
 		switch($code){

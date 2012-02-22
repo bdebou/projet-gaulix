@@ -3,7 +3,6 @@ class ferme extends batiment{
 	private $Contenu,
 			$DateAction;
 	
-	const TYPE							= 'ferme';
 	const TYPE_COMPETENCE				= 'Agriculture';
 	
 	const CODE_PRODUCTION_NOURRITURE	= 0;
@@ -24,9 +23,6 @@ class ferme extends batiment{
 	
 	//--- fonction qui est lancer lors de la création de l'objet. ---
 	public function __construct(array $carte, array $batiment){
-		$this->Hydrate($carte, $batiment);
-	}
-	public function Hydrate(array $carte, array $batiment){
 		date_default_timezone_set('Europe/Brussels');
 		
 		parent::Hydrate($carte, $batiment);
@@ -44,6 +40,18 @@ class ferme extends batiment{
 					}
 					break;
 			}
+		}
+		
+			//on stock ce qui a été produit
+		if(	$this->GetStockContenu() < $this->GetStockMax()
+			AND (strtotime('now') - parent::GetDateAction()) > $this->GetTempCulture($this->GetTypeContenu())){
+			
+			global $objManager;
+			$Producteur = $objManager->GetPersoLogin(parent::GetLogin());
+			
+			$this->AddStock($Producteur->GetNiveauCompetence(self::TYPE_COMPETENCE));
+			
+			unset($Producteur);
 		}
 	}
 	
@@ -95,14 +103,14 @@ class ferme extends batiment{
 		$this->Contenu = $arContenu['0'].','.($arContenu['1'] - $stock);
 		if($this->GetStockMax() == $stock){$this->DateAction = strtotime('now');}
 	}
-	public function AddStock(personnage &$oJoueur){
+	public function AddStock($NiveauCompetence){
 		$arContenu = explode(',', $this->Contenu);
 		
 		$nb = intval((strtotime('now') - parent::GetDateAction()) / $this->GetTempCulture($arContenu[0]));
 		
 		for($i=1;$i<=$nb;$i++){
 			if($this->GetStockMax() > $arContenu[1]){
-				$arContenu[1] += $this->QuelleQuantite($oJoueur->GetNiveauCompetence(self::TYPE_COMPETENCE), $arContenu[0]);
+				$arContenu[1] += $this->QuelleQuantite($NiveauCompetence, $arContenu[0]);
 			}else{break;}
 		}
 		
@@ -122,28 +130,17 @@ class ferme extends batiment{
 	public function AfficheContenu(personnage &$oJoueur){//OK
 		$stock = explode(',', $this->Contenu);
 		
-		switch($stock[0]){
-			case self::CODE_PRODUCTION_NOURRITURE:	$IconeName = self::ICONE_NAME_NOURRITURE;	break;
-			case self::CODE_PRODUCTION_MIEL:		$IconeName = self::ICONE_NAME_MIEL;			break;
-			case self::CODE_PRODUCTION_COTTON:		$IconeName = self::ICONE_NAME_COTTON;		break;
-		}
-
 		if($stock[1] < $this->GetStockMax()){
-			if((strtotime('now') - parent::GetDateAction()) > $this->GetTempCulture($stock[0])){
-				$_SESSION['main'][self::TYPE]['stock'] = intval((strtotime('now') - parent::GetDateAction()) / $this->GetTempCulture($stock[0]));
-				return '<script language="javascript">window.location=\'index.php?page=village&action=stocker'.strtolower(self::TYPE).'\';</script>';
-			}else{
-				$_SESSION['main'][self::TYPE]['stock'] = 1;
-				$status = '
-								<div style="display:inline;" id="TimeToWait'.ucfirst(strtolower(self::TYPE)).'"></div>'
-								.AfficheCompteurTemp(ucfirst(strtolower(self::TYPE)), 'index.php?page=village&action=stocker'.strtolower(self::TYPE), ($this->GetTempCulture($stock[0]) - (strtotime('now') - parent::GetDateAction())));
-			}
+			$_SESSION['main'][get_class($this)]['stock'] = 1;
+			$status = '
+							<div style="display:inline;" id="TimeToWait'.ucfirst(strtolower(get_class($this))).'"></div>'
+							.AfficheCompteurTemp(ucfirst(strtolower(get_class($this))), 'index.php?page=village', ($this->GetTempCulture($stock[0]) - (strtotime('now') - parent::GetDateAction())));
 		}else{
 			$status = '<p>Votre stock est plein.</p>';
 		}
 		
-		$_SESSION['main'][self::TYPE]['production']	= $stock[0];
-		$_SESSION['main'][self::TYPE]['vider']		= $stock[1];
+		$_SESSION['main'][get_class($this)]['production']	= $stock[0];
+		$_SESSION['main'][get_class($this)]['vider']		= $stock[1];
 		
 		$PositionBatiment	= implode(',', array_merge(array(parent::GetCarte()), parent::GetCoordonnee()));
 		$PositionJoueur		= implode(',', array_merge(array($oJoueur->GetCarte()), $oJoueur->GetPosition()));
@@ -151,13 +148,13 @@ class ferme extends batiment{
 		if($PositionBatiment == $PositionJoueur){
 			$txtAction = '
 				<td>
-					<a href="index.php?page=village&action=viderstock'.strtolower(self::TYPE).'&amp;anchor='.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'">Vider votre stock</a>
+					<a href="index.php?page=village&action=viderstock'.strtolower(get_class($this)).'&amp;anchor='.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'">Vider votre stock</a>
 				</td>
 				<td>'
 					.'<form method="get" action="index.php" class="production">'
 						.'<input type="hidden" name="page" value="village" />'
 						.'<input type="hidden" name="anchor" value="'.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'" />'
-						.'<input type="hidden" name="action" value="production'.strtolower(self::TYPE).'" />'
+						.'<input type="hidden" name="action" value="production'.strtolower(get_class($this)).'" />'
 						.'<select name="type" onclick="document.getElementById(\'BtSubmit\').disabled=false;">'
 							.'<option value="'.self::CODE_PRODUCTION_NOURRITURE.'"'.(($stock[0] == self::CODE_PRODUCTION_NOURRITURE)?' disabled="disabled"':'').'>Produire de la Nourriture</option>'
 							.'<option value="'.self::CODE_PRODUCTION_COTTON.'"'.(($stock[0] == self::CODE_PRODUCTION_COTTON OR $oJoueur->GetNiveauCompetence(self::TYPE_COMPETENCE) < self::NIVEAU_COMPETENCE_COTTON)?' disabled="disabled"':'').'>Produire du Cotton</option>'
@@ -168,7 +165,7 @@ class ferme extends batiment{
 				.'</td>';
 		}else{
 			$txtAction = '
-				<td colspan="2">Vous ne pouvez rien exécuter car vous n\'êtes pas à votre '.strtolower(self::TYPE).'.</td>';
+				<td colspan="2">Vous ne pouvez rien exécuter car vous n\'êtes pas à votre '.strtolower(get_class($this)).'.</td>';
 		}
 		
 		
@@ -176,12 +173,12 @@ class ferme extends batiment{
 		$txt ='
 		<table border style="margin:3px;">
 			<tr>
-				<td style="width:60%;">Production de '.$this->QuelleQuantite($oJoueur->GetNiveauCompetence(self::TYPE_COMPETENCE), $stock[0]).'x '.AfficheIcone($IconeName).'</td>
+				<td style="width:60%;">Production de '.$this->QuelleQuantite($oJoueur->GetNiveauCompetence(self::TYPE_COMPETENCE), $stock[0]).'x '.AfficheIcone($this->GetIconeNameProduction($stock[0])).'</td>
 				<td>'.$status.'</td>
 			</tr>
 			<tr>
 				<td>Stock</td>
-				<td>'.$stock[1].'/'.$this->GetStockMax().' '.AfficheIcone($IconeName).'</td>
+				<td>'.$stock[1].'/'.$this->GetStockMax().' '.AfficheIcone($this->GetIconeNameProduction($stock[0])).'</td>
 			</tr>
 			<tr>
 				'.$txtAction.'
@@ -195,6 +192,21 @@ class ferme extends batiment{
 	public function GetStockMax(){				return 500 + (parent::GetNiveau() * 100);}
 	public function GetContenu(){				return $this->Contenu;}
 	public function GetDateAction(){			return $this->DateAction;}
+	Public function GetIconeNameProduction($type){
+		switch($type){
+			case self::CODE_PRODUCTION_NOURRITURE:	return self::ICONE_NAME_NOURRITURE;
+			case self::CODE_PRODUCTION_MIEL:		return self::ICONE_NAME_MIEL;
+			case self::CODE_PRODUCTION_COTTON:		return self::ICONE_NAME_COTTON;
+		}
+	}
+	public function GetTypeContenu(){
+		$contenu = explode(',', $this->Contenu);
+		return $contenu[0];
+	}
+	public function GetStockContenu(){
+		$contenu = explode(',', $this->Contenu);
+		return $contenu[1];
+	}
 	public function GetTempCulture($code){
 		switch($code){
 			case self::CODE_PRODUCTION_NOURRITURE:	return self::TEMP_CULTURE_NOURRITURE;

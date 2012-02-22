@@ -45,16 +45,17 @@ if(isset($_POST['depot'])){
 
 if($chkDebug AND $ChkDebugVar){print_r($_SESSION['main']);}
 
+$lstBatiment = CreateListBatiment($oJoueur);
+
 $objManager->update($oJoueur);
 unset($oJoueur);
-
-$lstBatiment = CreateListBatiment();
 
 if($chkDebug){
 	echo '<br /><a href="index.php?page=village">Retour</a>';
 }
 
-if($CheckRetour AND !$chkDebug){
+if(	($CheckRetour AND !$chkDebug)
+	OR isset($_GET['anchor'])){
 	header('location: index.php?page=village'.(isset($_GET['anchor'])?'#'.$_GET['anchor']:''));
 }
 

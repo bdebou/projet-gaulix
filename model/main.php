@@ -95,6 +95,10 @@ function AfficheActions(personnage &$oJoueur) {
 
 	//===  Affichage du gibier apportée de tir  ===
 	echo AfficheGibierAChasser($oJoueur);
+	
+	//=== Affichage de l'action "Vider stock" si plein et sur la case
+	echo AfficheActionViderStock($oJoueur);
+	
 
 	//===  On crée la liste des choses dans les environs  ===
 	if ($oJoueur->GetMaisonInstalle()) {
@@ -240,13 +244,27 @@ function AfficheActions(personnage &$oJoueur) {
 		echo AfficheCombatLegionnaire($oJoueur);
 	} else {   //la Maison n'est pas encore installé
 		echo '
-		<p>Votre Maison n\'est pas encore installée. Installez le où vous voulez et ensuite vous pourrez attaquer d\'autre joueur.</p>
+		<p>Votre Maison n\'est pas encore installée. Installez la où vous voulez et ensuite vous pourrez attaquer d\'autre gaulois.</p>
 		<hr />';
 	}
 	//===  Partie pour afficher La possibilité de construction  ===
 	echo AfficheMenuConstruction($oJoueur, $chkConstruction);
 	//===  Partie pour afficher les monstres des quetes  ===
 	echo AfficheQueteAPorteeDeTire($LstQueteAccessible);
+}
+function AfficheActionViderStock(personnage &$oJoueur){
+	$batiment = FoundBatiment(false, false, $oJoueur->GetCoordonnee());
+	if(	!is_null($batiment)
+		AND in_array(get_class($batiment), array('mine', 'ferme'))
+		AND $batiment->GetStockContenu() == $batiment->GetStockMax()){
+		return '<p>Votre stock de la '.strtolower(get_class($batiment))
+				.'<img src="img/'.strtolower(get_class($batiment)).'-a.png" alt="'.strtolower(get_class($batiment)).'" title="Votre '.strtolower(get_class($batiment)).'" height="20px" />'
+				.' est plein ('.$batiment->GetStockContenu().'x '.AfficheIcone($batiment->GetIconeNameProduction($batiment->GetTypeContenu())).'): 
+				<a href="index.php?page=main&amp;action=viderstock'.strtolower(get_class($batiment)).'">Vider</a> ou 
+				<a href="index.php?page=village&amp;anchor='.implode('_', array_merge(array($batiment->GetCarte()), $batiment->GetCoordonnee())).'">Changer de production</a></p>';
+	}else{
+		return null;
+	}
 }
 function AfficheObjetTrouveDansMenuAction(personnage &$oJoueur) {
 	$DebugMode = false;
