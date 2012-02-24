@@ -14,12 +14,11 @@ include('model/common.php');
 include('view/header.php');
 
 if(!isset($_SESSION['joueur'])){
-	//include('view/forms/inscription.php');
-/*
-	if (!empty($_GET['page']) && is_file('control/'.$_GET['page'].'.php')){
+
+	if (isset($_GET['page']) && in_array($_GET['page'], array('inscription', 'mp_oublie', 'unconnect'))){
 		include('control/'.$_GET['page'].'.php');
 	}else{
-	*/
+
 		if(isset($_POST['login']) and !empty($_POST['login']) and isset($_POST['motdepasse']) and !empty($_POST['motdepasse'])){
 			include('model/login.php');
 			$ResultCode = CheckIfLoginMPCorrect($_POST['login'], $_POST['motdepasse']);
@@ -41,8 +40,9 @@ if(!isset($_SESSION['joueur'])){
 		include('view/regles/statistiques.php');
 			
 		include('view/regles.php');
-	//}
+	}
 }else{
+	
 	//$_SESSION['main']['uri']			= $codeUri;
 	$_SESSION['main']['deplacement']	= 'new';
 	
