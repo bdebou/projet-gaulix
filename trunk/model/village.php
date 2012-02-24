@@ -90,7 +90,7 @@ function AfficheBatiment(&$batiment, &$oJoueur){
 		</tr>'
 	.($chkDruide?$batiment->AfficheDruide($oJoueur):'')
 	.($chkMarcher?$batiment->AfficheTransactions($oJoueur):'')
-	.'<tr style="background:lightgrey;"><td colspan="5">&nbsp;</td></tr>'
+	.'<tr style="background:lightgrey;"><td colspan="5" style="text-align:right;"><a href="#TopPage" alt="TopPage">Top</a></td></tr>'
 	.'</table>';
 	return $txt;
 }
