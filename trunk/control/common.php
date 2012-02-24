@@ -11,6 +11,7 @@ if($chkDebug){
 }
 
 $chkErr = true;
+$CheckRetour = false;
 
 if(isset($_GET['action'])){
 	switch($_GET['action']){
@@ -18,6 +19,7 @@ if(isset($_GET['action'])){
 		case 'deplacement':			ActionDeplacement($chkErr, $oJoueur); break;
 	}
 	unset($_GET['action']);
+	$CheckRetour = true;
 }
 
 if($chkDebug){
@@ -27,5 +29,9 @@ if($chkDebug){
 $objManager->update($oJoueur);
 unset($oJoueur);
 
-header('Location: ./index.php?page='.$_GET['retour']);
+if($chkDebug OR !$chkErr){
+	echo '<br /><a href="index.php?page='.$_GET['retour'].'">Retour</a>';
+}elseif($CheckRetour){
+	header('location: index.php?page='.$_GET['retour']));
+}
 ?>

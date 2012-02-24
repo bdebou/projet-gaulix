@@ -1,9 +1,12 @@
 <?php
-include('model/main.php');
-include('model/carte.php');
-include('model/village.php');
+include_once('model/main.php');
+include_once('model/carte.php');
+include_once('model/village.php');
+include_once('model/quete.php');
 
 global $objManager, $chkDebug;
+
+$_SESSION['QueteEnCours'] = FoundQueteEnCours();
 
 $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
@@ -56,10 +59,9 @@ if($chkDebug AND $ChkDebugVar){
 $objManager->update($oJoueur);
 unset($oJoueur);
 
-if($chkDebug){
+if($chkDebug OR !$chkErr){
 	echo '<br /><a href="index.php?page=main">Retour</a>';
-}
-if($CheckRetour AND !$chkDebug){
+}elseif($CheckRetour AND !$chkDebug){
 	header('location: index.php?page=main');
 }
 ?>

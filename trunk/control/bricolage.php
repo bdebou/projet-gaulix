@@ -1,5 +1,5 @@
 <?php
-include('model/bricolage.php');
+include_once('model/bricolage.php');
 
 global $objManager, $chkDebug;
 
@@ -30,13 +30,9 @@ if($chkDebug AND $ChkDebugVar){print_r($_SESSION['main']['bricolage']);}
 $objManager->update($oJoueur);
 unset($oJoueur);
 
-if($chkDebug){
+if($chkDebug OR !$chkErr){
 	echo '<br /><a href="index.php?page=bricolage'.(isset($strAnchor)?'&onglet='.$RetourOnglet.'#'.$strAnchor:'').'">Retour</a>';
-}
-
-
-
-if($CheckRetour AND !$chkDebug){
+}elseif($CheckRetour){
 	header('location: index.php?page=bricolage'.(isset($strAnchor)?'&onglet='.$RetourOnglet.'#'.$strAnchor:''));
 }
 

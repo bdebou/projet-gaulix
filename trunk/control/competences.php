@@ -1,5 +1,5 @@
 <?php
-include('model/competences.php');
+include_once('model/competences.php');
 
 global $objManager, $chkDebug;
 
@@ -30,11 +30,9 @@ if($chkDebug){print_r($_SESSION['main']);}
 $objManager->update($oJoueur);
 unset($oJoueur);
 
-if($chkDebug){
+if($chkDebug OR !$chkErr){
 	echo '<br /><a href="index.php?page=competences">Retour</a>';
-}
-
-if($CheckRetour){
+}elseif($CheckRetour){
 	header('location: index.php?page=competences');
 }
 
