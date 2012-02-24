@@ -557,7 +557,8 @@ class personnage{
 		$this->code_jambiere = null;
 		$this->code_cuirasse = null;
 		$this->code_sac = null;
-		$this->code_divers = null;
+		$this->LivreSorts = null;
+		$this->LstSorts = null;
 		$this->arInventaire = null;
 		$this->date_perf_attaque = null;
 		$this->tmp_perf_attaque = null;
