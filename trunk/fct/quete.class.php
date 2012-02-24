@@ -10,6 +10,7 @@ class quete{
 			$date_start,
 			$date_end,
 			$Type,
+			$IDTypeQuete,
 			$Groupe,
 			$Nom,
 			$Description,
@@ -21,6 +22,7 @@ class quete{
 			$DateCombat;
 	
 	const NB_QUETE_MAX			= 3;					// Nombre maximum de quete autorisée en  meme temp
+	Const MAX_DEPLACEMENT		= 20;					// Nombre maximum de déplacement pour les quetes ROMAIN
 	
 	public function __construct(array $a, array $b){
 		$this->hydrate($a, $b);
@@ -105,10 +107,16 @@ class quete{
 	}
 	//on update la quete romain en la déplacant
 	private function UpdateQueteRomains(){
-		if(intval((strtotime('now') - $this->date_start) / 3600) > 0){
-			for($i = 0; $i <= intval((strtotime('now') - $this->date_start) / 3600); $i++){
+		$nbDep = intval((strtotime('now') - $this->date_start) / 3600);
+		
+		if($nbDep > 0){
+			
+			if($nbDep > self::MAX_DEPLACEMENT){		$nbDep = self::MAX_DEPLACEMENT;}
+			
+			for($i = 0; $i <= $nbDep; $i++){
 				$this->QueteSeDeplaceUneCase();
 			}
+			
 			$this->date_start = strtotime('now');
 		}
 	}
@@ -241,36 +249,38 @@ class quete{
 		date_default_timezone_set('Europe/Brussels');
 		foreach ($Quete as $key => $value){
 			switch ($key){
-				case 'id_quete_en_cours':	$this->ID_quete = intval($value); break;
-				case 'quete_login':			$this->Login = strval($value); break;
-				case 'quete_position':		$this->Position = explode(',', $value); break;
-				case 'quete_vie':			$this->Vie = intval($value); break;
-				case 'quete_reussi':		$this->Reussi = (is_null($value)?NULL:$value); break;
-				case 'date_start':			$this->$key = (is_null($value)?NULL:strtotime($value)); break;
-				case 'date_end':			$this->$key = (is_null($value)?NULL:strtotime($value)); break;
-				case 'last_combat':			$this->DateCombat = (is_null($value)?NULL:strtotime($value)); break;
+				case 'id_quete_en_cours':	$this->ID_quete		= intval($value);								break;
+				case 'quete_login':			$this->Login		= strval($value);								break;
+				case 'quete_position':		$this->Position		= explode(',', $value);							break;
+				case 'quete_vie':			$this->Vie			= intval($value);								break;
+				case 'quete_reussi':		$this->Reussi		= (is_null($value)?NULL:$value);				break;
+				case 'date_start':			$this->$key			= (is_null($value)?NULL:strtotime($value));		break;
+				case 'date_end':			$this->$key			= (is_null($value)?NULL:strtotime($value));		break;
+				case 'last_combat':			$this->DateCombat	= (is_null($value)?NULL:strtotime($value));		break;
 			}
 		}
 		foreach ($InfoQuete as $key => $value){
 			switch ($key){
-				case 'quete_type':			$this->Type = strval($value); break;
-				case 'quete_groupe':		$this->Groupe = (is_null($value)?NULL:strval($value)); break;
-				case 'nom':					$this->Nom = strval($value); break;
-				case 'description':			$this->Description = (is_null($value)?NULL:strval($value)); break;
-				case 'niveau':				$this->Niveau = intval($value); break;
-				case 'gain_or':				$this->GainOr = (is_null($value)?NULL:intval($value)); break;
-				case 'gain_experience':		$this->GainExperience = (is_null($value)?NULL:intval($value)); break;
-				case 'gain_points':			$this->GainPoints = (is_null($value)?NULL:intval($value)); break;
-				case 'id_objet':			$this->CodeObjet = (is_null($value)?NULL:strval($value)); break;
-				case 'quete_force':			$this->Force = (is_null($value)?NULL:intval($value)); break;
-				case 'quete_duree':			$this->Duree = (is_null($value)?NULL:intval($value)); break;
-				case 'quete_vie':			$this->VieMax = intval($value); break;
+				case 'id_quete':			$this->IDTypeQuete		= intval($value);							break;
+				case 'quete_type':			$this->Type				= strval($value);							break;
+				case 'quete_groupe':		$this->Groupe			= (is_null($value)?NULL:strval($value));	break;
+				case 'nom':					$this->Nom				= strval($value);							break;
+				case 'description':			$this->Description		= (is_null($value)?NULL:strval($value));	break;
+				case 'niveau':				$this->Niveau			= intval($value);							break;
+				case 'gain_or':				$this->GainOr			= (is_null($value)?NULL:intval($value));	break;
+				case 'gain_experience':		$this->GainExperience	= (is_null($value)?NULL:intval($value));	break;
+				case 'gain_points':			$this->GainPoints		= (is_null($value)?NULL:intval($value));	break;
+				case 'id_objet':			$this->CodeObjet		= (is_null($value)?NULL:strval($value));	break;
+				case 'quete_force':			$this->Force			= (is_null($value)?NULL:intval($value));	break;
+				case 'quete_duree':			$this->Duree			= (is_null($value)?NULL:intval($value));	break;
+				case 'quete_vie':			$this->VieMax			= intval($value);							break;
 			}
 		}
 	}
 	
 	//renvoie les valeurs
 	public function GetIDQuete(){			return $this->ID_quete;}
+	public function GetIDTypeQuete(){		return $this->IDTypeQuete;}
 	public function GetVie(){				return $this->Vie;}
 	public function GetVieMax(){			return $this->VieMax;}
 	public function GetDateStart(){			return $this->date_start;}
