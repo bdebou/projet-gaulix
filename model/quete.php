@@ -1,60 +1,89 @@
 <?php
-function SelectQuete(&$QueteEnCours){
-	global $objManager;
-	$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
+function CombienQueteDisponible($login, $niveau){
+	$sql = "SELECT * FROM table_quete_lst WHERE niveau<=$niveau;";
+	$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
 
+	if(mysql_num_rows($requete) > 0){
+		$NbQueteDisponible = 0;
+
+		while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
+			if(!CheckIfQueteEnCours($row['id_quete']) AND !CheckIfQueteDejaTermine($row['id_quete'], $login)){
+				$NbQueteDisponible++;
+			}
+		}
+		
+		return $NbQueteDisponible;
+	}
+
+	return 0;
+}
+function CheckIfQueteEnCours($NumQuete){
+	foreach($_SESSION['QueteEnCours'] as $quete){
+		if($quete->GetIDTypeQuete() == $NumQuete){
+			return true;
+		}
+	}
+	return false;
+}
+function CheckIfQueteDejaTermine($NumQuete, $login){
+	$sql = "SELECT id_quete_en_cours FROM table_quetes WHERE quete_login = '$login' AND quete_reussi IS NOT NULL AND quete_id = $NumQuete;";
+	$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
+	
+	if(mysql_num_rows($requete) > 0){
+		return true;
+	}
+	return false;
+}
+function SelectQuete(personnage &$oJoueur){
 	$txt = null;
 	$sql = "SELECT * FROM table_quete_lst WHERE niveau<=".$oJoueur->GetNiveau().";";
 	$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
-	$nbCol=0; $numQueteEnCours=0;
-	$txt .= '
-	<table class="quetes">';
-	while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
-		$sqlBis = "SELECT id_quete_en_cours, quete_reussi FROM table_quetes WHERE quete_login='".$_SESSION['joueur']."' AND quete_id=".$row['id_quete']."";
-		$requeteBis = mysql_query($sqlBis) or die (mysql_error().'<br />'.$sqlBis);
-		if($nbCol==0){
-			$txt .= '
-		<tr>';
-		}
-		if(mysql_num_rows($requeteBis) == 0){
-			$txt .= '
-			<td>'
-			.AfficheDescriptifQuete($row, $QueteEnCours)
-			.'</td>';
-			$nbCol++;
-				
-		}else{
-			$rowBis = mysql_fetch_array($requeteBis, MYSQL_ASSOC);
-			//si le nombre de quete ne dépasse pas le max
-			if(is_null($rowBis['quete_reussi'])){
-				if(count($QueteEnCours) <= quete::NB_QUETE_MAX){
+	
+	if(mysql_num_rows($requete) > 0){
+		$nbCol = 0;
+		$NbQueteDisponible = 0;
+		
+		$txt .= '
+		<table class="quetes">';
+		
+		while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
+			if(!CheckIfQueteEnCours($row['id_quete']) AND !CheckIfQueteDejaTermine($row['id_quete'], $oJoueur->GetLogin())){
+				$NbQueteDisponible++;
+				if($nbCol == 0){
 					$txt .= '
-			<td>'
-					.AfficheAvancementQuete($QueteEnCours[$numQueteEnCours])
-					.'</td>';
-					$numQueteEnCours++;
-					$nbCol++;
+				<tr>';
+				}
+				
+				$txt .= '
+					<td>'.AfficheDescriptifQuete($row).'</td>';
+					
+				$nbCol++;
+				
+				if($nbCol == 3){
+					$txt .= '
+				</tr>';
+					$nbCol=0;
 				}
 			}
 		}
-		if($nbCol==2){
+	
+		if($nbCol < 3 AND $nbCol > 0){
 			$txt .= '
-		</tr>'; $nbCol=0;
+			</tr>';
 		}
-	}
-
-	if($nbCol<3 and $nbCol > 0){
 		$txt .= '
-		</tr>';
+		</table>';
+	
+		if($NbQueteDisponible > 0){
+			return $txt;
+		}else{
+			return '<p>Vous êtes inscrit à toutes les quêtes disponibles pour le moment.</p>';
+		}
+	}else{
+		return '<p>Pas de nouvelle quête disponible. Passez au niveau suivant pour avoir de nouvelles quêtes.</p>';
 	}
-	$txt .= '
-	</table>';
-
-	$objManager->update($oJoueur);
-	unset($oJoueur);
-	return $txt;
 }
-function AfficheDescriptifQuete($quete, &$QueteEnCours){
+function AfficheDescriptifQuete($quete){
 	global $CodeCouleurQuete;
 
 	$nbInfo=0;
@@ -109,7 +138,7 @@ function AfficheDescriptifQuete($quete, &$QueteEnCours){
 							<button 
 								type="button" 
 								onclick="window.location=\'index.php?page=quete&amp;action=inscription&amp;num_quete='.$quete['id_quete'].'\'"' 
-								.(count($QueteEnCours) >= quete::NB_QUETE_MAX?'disabled=disabled ':'')
+								.(count($_SESSION['QueteEnCours']) >= quete::NB_QUETE_MAX?'disabled=disabled ':'')
 								.'class="quete" >
 									Accepter
 							</button>
