@@ -5,6 +5,6 @@ if(isset($_POST['captchaResult'])){
 	if($_POST['captchaResult'] === $_SESSION['captchaResult']){$send = $contact->sendCheck;}
 }
 if(empty($send)){
-	include('view/forms/mp_oublie.php');
+	include_once('view/forms/mp_oublie.php');
 }
 ?>

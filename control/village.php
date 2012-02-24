@@ -50,12 +50,9 @@ $lstBatiment = CreateListBatiment($oJoueur);
 $objManager->update($oJoueur);
 unset($oJoueur);
 
-if($chkDebug){
+if($chkDebug OR !$chkErr){
 	echo '<br /><a href="index.php?page=village">Retour</a>';
-}
-
-if(	($CheckRetour AND !$chkDebug)
-	OR isset($_GET['anchor'])){
+}elseif(($CheckRetour AND !$chkDebug) OR isset($_GET['anchor'])){
 	header('location: index.php?page=village'.(isset($_GET['anchor'])?'#'.$_GET['anchor']:''));
 }
 

@@ -1,5 +1,5 @@
 <?php
-include('model/inventaire.php');
+include_once('model/inventaire.php');
 
 global $objManager, $chkDebug;
 
@@ -41,10 +41,9 @@ if($chkDebug){
 $objManager->update($oJoueur);
 unset($oJoueur);
 
-if($chkDebug){
+if($chkDebug OR !$chkErr){
 	echo '<br /><a href="index.php?page=inventaire">Retour</a>';
-}
-if($CheckRetour){
+}elseif($CheckRetour){
 	header('location: index.php?page=inventaire');
 }
 ?>

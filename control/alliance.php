@@ -1,5 +1,5 @@
 <?php
-include('model/alliance.php');
+include_once('model/alliance.php');
 
 global $objManager;
 $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
