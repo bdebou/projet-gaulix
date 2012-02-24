@@ -257,6 +257,9 @@ function AfficheActionViderStock(personnage &$oJoueur){
 	if(	!is_null($batiment)
 		AND in_array(get_class($batiment), array('mine', 'ferme'))
 		AND $batiment->GetStockContenu() == $batiment->GetStockMax()){
+		
+		$_SESSION['main'][get_class($batiment)]['vider'] = $batiment->GetStockContenu();
+		
 		return '<p>Votre stock de la '.strtolower(get_class($batiment))
 				.'<img src="img/'.strtolower(get_class($batiment)).'-a.png" alt="'.strtolower(get_class($batiment)).'" title="Votre '.strtolower(get_class($batiment)).'" height="20px" />'
 				.' est plein ('.$batiment->GetStockContenu().'x '.AfficheIcone($batiment->GetIconeNameProduction($batiment->GetTypeContenu())).'): 
