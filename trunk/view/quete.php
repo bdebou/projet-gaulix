@@ -8,6 +8,7 @@ $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 	<p>Voici la liste des quêtes qui vous sont proposées. Acceptez une ou plusieurs quêtes et bonne chance!</p>
 	<p><?php echo AfficheIcone('attention');?> Les quêtes ne peuvent s'accomplir que une seule fois. Si vous l'annulée, elle sera perdue.</p>
 	<h2>Quêtes en cours</h2>
+	<?php if(isset($_SESSION['QueteEnCours'])){?>
 		<table class="quetes">
 			<tr>
 			<?php
@@ -17,6 +18,9 @@ $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 			?>
 			</tr>
 		</table>
+	<?php }else{?>
+		<p>Vous n'avez aucune Quête en cours.</p>
+	<?php }?>
 	<h2>Et les quêtes disponibles</h2>
 	<?php 
 	echo SelectQuete($oJoueur);

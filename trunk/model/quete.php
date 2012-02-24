@@ -18,9 +18,11 @@ function CombienQueteDisponible($login, $niveau){
 	return 0;
 }
 function CheckIfQueteEnCours($NumQuete){
-	foreach($_SESSION['QueteEnCours'] as $quete){
-		if($quete->GetIDTypeQuete() == $NumQuete){
-			return true;
+	if(isset($_SESSION['QueteEnCours'])){
+		foreach($_SESSION['QueteEnCours'] as $quete){
+			if($quete->GetIDTypeQuete() == $NumQuete){
+				return true;
+			}
 		}
 	}
 	return false;
