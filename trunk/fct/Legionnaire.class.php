@@ -8,8 +8,8 @@ class Legionnaire{
 	//Const ;
 	
 	public function __construct($Niveau){
-		$this->Attaque = 10 + (mt_rand(1,10) * $Niveau);
-		$this->Defense = 10 + (mt_rand(1,10) * $Niveau);
+		$this->Attaque = (10 * $Niveau) + mt_rand(1,15);
+		$this->Defense = (10 * $Niveau) + mt_rand(1,15);
 		
 		$this->ValeurCombat = intval($this->Attaque * 1.35) + $this->Defense;
 	}
