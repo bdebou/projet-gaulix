@@ -100,7 +100,9 @@ function AfficheActions(personnage &$oJoueur) {
 	//=== Affichage de l'action "Vider stock" si plein et sur la case
 	echo AfficheActionViderStock($oJoueur);
 	
-
+	//=== Affiche la redirection vers son batiment
+	echo AfficheRedirectionBatiment($oJoueur);
+	
 	//===  On crée la liste des choses dans les environs  ===
 	if ($oJoueur->GetMaisonInstalle()) {
 		if (!is_null($oJoueur->GetArme())) {
@@ -255,6 +257,19 @@ function AfficheActions(personnage &$oJoueur) {
 	echo AfficheMenuConstruction($oJoueur, $chkConstruction);
 	//===  Partie pour afficher les monstres des quetes  ===
 	echo AfficheQueteAPorteeDeTire($LstQueteAccessible);
+}
+function AfficheRedirectionBatiment(personnage &$oJoueur){
+	$batiment = FoundBatiment(false, false, $oJoueur->GetCoordonnee());
+	if(!is_null($batiment)){
+		return '<p>Allez à votre '
+					.'<a href="index.php?page=village&amp;anchor='.implode('_', array_merge(array($batiment->GetCarte()), $batiment->GetCoordonnee())).'">'
+						.strtolower(get_class($batiment))
+						.' <img src="img/'.strtolower(get_class($batiment)).'-a.png" alt="'.strtolower(get_class($batiment)).'" title="Votre '.strtolower(get_class($batiment)).'" height="20px" />'
+					.'</a>'
+				.' pour voir les options possibles</p>';
+	}else{
+		return null;
+	}
 }
 function AfficheActionViderStock(personnage &$oJoueur){
 	$batiment = FoundBatiment(false, false, $oJoueur->GetCoordonnee());
