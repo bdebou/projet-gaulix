@@ -78,6 +78,7 @@ function AfficheMouvements(personnage &$oJoueur) {
 function AfficheActions(personnage &$oJoueur) {
 	global $retour_combat, $nbLigneCarte, $nbColonneCarte;
 
+	$LstQueteAccessible = null;
 	$position = $oJoueur->GetPosition();
 
 	//===  Partie pour afficher les combats possible  ===
@@ -108,9 +109,12 @@ function AfficheActions(personnage &$oJoueur) {
 			$requete = mysql_query($sql_arme) or die(mysql_error() . '<br />' . $sql_arme);
 			$result = mysql_fetch_array($requete, MYSQL_ASSOC);
 			if ($result['objet_distance'] != 0) {
-				//$strSQLPosition = "(position='".implode(',', array($oJoueur->GetCarte(), $position['0'], $position['1']))."' ";
-
-				$arSQLPosition[] = implode(',', array($oJoueur->GetCarte(), $position['0'], $position['1']));
+				
+					//La position active
+				$arSQLPosition[] = $oJoueur->GetCoordonnee();
+				if (isset($_SESSION['QueteEnCours'])) {
+					CheckQueteAccessible($LstQueteAccessible, $oJoueur->GetCoordonnee());
+				}
 
 				$chkDirection = array('VH' => true, 'VB' => true, 'HG' => true, 'HD' => true, 'OHG' => true, 'OHD' => true, 'OBG' => true, 'OBD' => true);
 
@@ -205,15 +209,15 @@ function AfficheActions(personnage &$oJoueur) {
 					}
 				}
 			} else {
-				$arSQLPosition[] = implode(',', array_merge(array($oJoueur->GetCarte()), $position));
+				$arSQLPosition[] = $oJoueur->GetCoordonnee();
 				if (isset($_SESSION['QueteEnCours'])) {
-					CheckQueteAccessible($LstQueteAccessible, implode(',', array_merge(array($oJoueur->GetCarte()), $position)));
+					CheckQueteAccessible($LstQueteAccessible, $oJoueur->GetCoordonnee());
 				}
 			}
 		} else {
-			$arSQLPosition[] = implode(',', array_merge(array($oJoueur->GetCarte()), $position));
+			$arSQLPosition[] = $oJoueur->GetCoordonnee();
 			if (isset($_SESSION['QueteEnCours'])) {
-				CheckQueteAccessible($LstQueteAccessible, implode(',', array_merge(array($oJoueur->GetCarte()), $position)));
+				CheckQueteAccessible($LstQueteAccessible, $oJoueur->GetCoordonnee());
 			}
 		}
 

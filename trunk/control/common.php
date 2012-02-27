@@ -32,6 +32,6 @@ unset($oJoueur);
 if($chkDebug OR !$chkErr){
 	echo '<br /><a href="index.php?page='.$_GET['retour'].'">Retour</a>';
 }elseif($CheckRetour){
-	header('location: index.php?page='.$_GET['retour']));
+	header('location: index.php?page='.$_GET['retour']);
 }
 ?>
