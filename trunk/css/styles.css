@@ -104,6 +104,7 @@ div.pub{
 	width: 300px;
 	height: 250px;
 	text-align: center;
+	
 }
 div.menu{
 	padding-left: 3px;
@@ -307,6 +308,7 @@ table.competence{
 	font-family: Verdana, Arial;
 	font-size: 10px;
 	background-color: #FFFFCC;
+	z-index: 5;
 }
 
 /* Les FORMS */
