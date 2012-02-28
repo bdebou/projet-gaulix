@@ -35,7 +35,8 @@ $objManager->update($oJoueur);
 unset($oJoueur);
 
 if($CheckRetour){
-	header('location: index.php?page=alliance');
+	//header('location: index.php?page=alliance');
+	echo '<script language="javascript">window.location="index.php?page=alliance";</script>';
 }
 
 ?>

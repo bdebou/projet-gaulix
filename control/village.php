@@ -53,7 +53,8 @@ unset($oJoueur);
 if($chkDebug OR !$chkErr){
 	echo '<br /><a href="index.php?page=village">Retour</a>';
 }elseif(($CheckRetour AND !$chkDebug) OR isset($_GET['anchor'])){
-	header('location: index.php?page=village'.(isset($_GET['anchor'])?'#'.$_GET['anchor']:''));
+	//header('location: index.php?page=village'.(isset($_GET['anchor'])?'#'.$_GET['anchor']:''));
+	echo '<script language="javascript">window.location="index.php?page=village'.(isset($_GET['anchor'])?'#'.$_GET['anchor']:'').'";</script>';
 }
 
 ?>

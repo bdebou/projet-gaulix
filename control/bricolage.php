@@ -33,7 +33,8 @@ unset($oJoueur);
 if($chkDebug OR !$chkErr){
 	echo '<br /><a href="index.php?page=bricolage'.(isset($strAnchor)?'&onglet='.$RetourOnglet.'#'.$strAnchor:'').'">Retour</a>';
 }elseif($CheckRetour){
-	header('location: index.php?page=bricolage'.(isset($strAnchor)?'&onglet='.$RetourOnglet.'#'.$strAnchor:''));
+	//header('location: index.php?page=bricolage'.(isset($strAnchor)?'&onglet='.$RetourOnglet.'#'.$strAnchor:''));
+	echo '<script language="javascript">window.location="index.php?page=bricolage'.(isset($strAnchor)?'&onglet='.$RetourOnglet.'#'.$strAnchor:'').'";</script>';
 }
 
 ?>
