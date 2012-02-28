@@ -27,7 +27,8 @@ if(isset($_POST['chg_email'])){
 if(isset($_POST['SupprimerCpt']) and $_POST['SupprimerCpt'] == 'Supprimer'){
 	include('model/options.php');
 	Supprimer_Compte($oJoueur);
-	header('location: index.php?page=unconnect');
+	//header('location: index.php?page=unconnect');
+	return '<script language="javascript">window.location="index.php?page=unconnect";</script>';
 }
 //=========================
 if(isset($_POST['ChgNot'])){
@@ -40,6 +41,7 @@ $objManager->update($oJoueur);
 unset($oJoueur);
 
 if($CheckRetour){
-	header('location: index.php?page=options');
+	//header('location: index.php?page=options');
+	return '<script language="javascript">window.location="index.php?page=options";</script>';
 }
 ?>
