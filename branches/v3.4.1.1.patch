@@ -1,0 +1,52 @@
+Index: control/forms/options.php
+===================================================================
+--- control/forms/options.php	(revision 75)
++++ control/forms/options.php	(working copy)
+@@ -27,7 +27,8 @@
+ if(isset($_POST['SupprimerCpt']) and $_POST['SupprimerCpt'] == 'Supprimer'){
+ 	include('model/options.php');
+ 	Supprimer_Compte($oJoueur);
+-	header('location: index.php?page=unconnect');
++	//header('location: index.php?page=unconnect');
++	return '<script language="javascript">window.location="index.php?page=unconnect";</script>';
+ }
+ //=========================
+ if(isset($_POST['ChgNot'])){
+@@ -40,6 +41,7 @@
+ unset($oJoueur);
+ 
+ if($CheckRetour){
+-	header('location: index.php?page=options');
++	//header('location: index.php?page=options');
++	return '<script language="javascript">window.location="index.php?page=options";</script>';
+ }
+ ?>
+\ No newline at end of file
+Index: fct/config.php
+===================================================================
+--- fct/config.php	(revision 75)
++++ fct/config.php	(working copy)
+@@ -7,7 +7,7 @@
+ $DB_motdepasse		= 'A3hwDpwdVTPpC3B9'; 	// Mot de passe pour accèder à la base
+ $DB_base			= 'gaulix_be'; 			// Nom de la base
+ 
+-$NumVersion			= '3.4.1';				// Num Version
++$NumVersion			= '3.4.1.1';			// Num Version
+ $MAX_essai			= 3;					// Nombre maximum d'essai de connection
+ $nbLigneCarte		= 13;					// Nombre de ligne de la carte
+ $nbColonneCarte		= 13;					// Nombre de colonne de la carte
+Index: model/competences.php
+===================================================================
+--- model/competences.php	(revision 75)
++++ model/competences.php	(working copy)
+@@ -252,8 +252,8 @@
+ 		$objManager->update($oJoueur);
+ 		unset($oJoueur);
+ 		//redir('./fct/main.php?action=Perf'.ucfirst(substr($type, 0, 3)));
+-		//return '<script language="javascript">window.location=\'./fct/main.php?action=Perf'.ucfirst(substr($type, 0, 3)).'\';</script>';
+-		header('location: index.php?page=competences&action=Perf'.ucfirst(substr($type, 0, 3)));
++		return '<script language="javascript">window.location="index.php?page=competences&action=Perf'.ucfirst(substr($type, 0, 3)).'";</script>';
++		//header('location: index.php?page=competences&action=Perf'.ucfirst(substr($type, 0, 3)));
+ 	}
+ }
+ function GoPerfectionnement($type, &$oJoueur){

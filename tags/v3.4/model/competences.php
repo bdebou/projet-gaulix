@@ -252,8 +252,8 @@ function AfficheModulePerfectionnement($type){
 		$objManager->update($oJoueur);
 		unset($oJoueur);
 		//redir('./fct/main.php?action=Perf'.ucfirst(substr($type, 0, 3)));
-		//return '<script language="javascript">window.location=\'./fct/main.php?action=Perf'.ucfirst(substr($type, 0, 3)).'\';</script>';
-		header('location: index.php?page=competences&action=Perf'.ucfirst(substr($type, 0, 3)));
+		return '<script language="javascript">window.location="index.php?page=competences&action=Perf'.ucfirst(substr($type, 0, 3)).'";</script>';
+		//header('location: index.php?page=competences&action=Perf'.ucfirst(substr($type, 0, 3)));
 	}
 }
 function GoPerfectionnement($type, &$oJoueur){
