@@ -30,7 +30,8 @@ if(!isset($_SESSION['joueur'])){
 					include('view/error/inconnu.php');
 				}
 			}else{
-				header('Location: ./');
+				//header('Location: ./');
+				echo '<script language="javascript">window.location="./";</script>';
 			}
 		}else{
 			include('view/forms/login.php');

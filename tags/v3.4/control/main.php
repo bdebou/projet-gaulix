@@ -62,6 +62,7 @@ unset($oJoueur);
 if($chkDebug OR !$chkErr){
 	echo '<br /><a href="index.php?page=main">Retour</a>';
 }elseif($CheckRetour AND !$chkDebug){
-	header('location: index.php?page=main');
+	//header('location: index.php?page=main');
+	echo '<script language="javascript">window.location="index.php?page=main";</script>';
 }
 ?>

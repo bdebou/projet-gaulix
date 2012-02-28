@@ -22,6 +22,7 @@ unset($oJoueur);
 if($chkDebug OR !$chkErr){
 	echo '<br /><a href="index.php?page=equipement">Retour</a>';
 }elseif($CheckRetour AND !$chkDebug){
-	header('location: index.php?page=equipement');
+	//header('location: index.php?page=equipement');
+	echo '<script language="javascript">window.location="index.php?page=equipement";</script>';
 }
 ?>

@@ -15,6 +15,7 @@ if(isset($_GET['action'])){
 }
 
 if($CheckA){
-	header('location: index.php?page=quete');
+	//header('location: index.php?page=quete');
+	echo '<script language="javascript">window.location="index.php?page=quete";</script>';
 }
 ?>
