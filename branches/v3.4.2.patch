@@ -1,0 +1,90 @@
+Index: fct/DB_Gaulix.sql
+===================================================================
+--- fct/DB_Gaulix.sql	(revision 75)
++++ fct/DB_Gaulix.sql	(working copy)
+@@ -238,8 +238,8 @@
+ (NULL, 'l,13,0', NULL, 12, NULL, NULL, NULL, NULL, '1970-01-01 01:00:00', NULL, NULL, NULL, 0, NULL, NULL),
+ (NULL, 'l,13,13', NULL, 13, NULL, NULL, NULL, NULL, '1970-01-01 01:00:00', NULL, NULL, NULL, 0, NULL, NULL),
+ -- Carte M
+-(NULL, 'm,7,5', NULL, 7, NULL, 5000, NULL, NULL, '1970-01-01 01:00:00', NULL, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,9,7', NULL, 7, NULL, 5000, NULL, NULL, '1970-01-01 01:00:00', NULL, NULL, NULL, 0, NULL, NULL),
++(NULL, 'm,8,5', NULL, 7, NULL, 5000, NULL, NULL, '1970-01-01 01:00:00', NULL, NULL, NULL, 0, NULL, NULL),
++(NULL, 'm,11,9', NULL, 7, NULL, 5000, NULL, NULL, '1970-01-01 01:00:00', NULL, NULL, NULL, 0, NULL, NULL),
+ (NULL, 'm,4,1', NULL, 7, NULL, 5000, NULL, NULL, '1970-01-01 01:00:00', NULL, NULL, NULL, 0, NULL, NULL),
+ (NULL, 'm,8,11', NULL, 8, NULL, NULL, 5000, NULL, '1970-01-01 01:00:00', NULL, NULL, NULL, 0, NULL, NULL),
+ (NULL, 'm,3,2', NULL, 8, NULL, NULL, 5000, NULL, '1970-01-01 01:00:00', NULL, NULL, NULL, 0, NULL, NULL),
+@@ -379,27 +379,27 @@
+ (NULL, 'y,0,13', NULL, 16, NULL, NULL, NULL, NULL, '1970-01-01 01:00:00', NULL, NULL, NULL, 0, NULL, NULL),
+ (NULL, 'y,13,0', NULL, 14, NULL, NULL, NULL, NULL, '1970-01-01 01:00:00', NULL, NULL, NULL, 0, NULL, NULL),
+ -- Camp Romain
+-(NULL, 'm,3,3', 'romain', 3, NULL, NULL, NULL, NULL, NULL, 200, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,9,3', 'romain', 3, NULL, NULL, NULL, NULL, NULL, 200, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,9,9', 'romain', 3, NULL, NULL, NULL, NULL, NULL, 200, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,3,9', 'romain', 3, NULL, NULL, NULL, NULL, NULL, 200, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,6,6', 'romain', 3, NULL, NULL, NULL, NULL, NULL, 200, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,3,5', 'romain', 2, NULL, NULL, NULL, NULL, NULL, 300, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,3,7', 'romain', 2, NULL, NULL, NULL, NULL, NULL, 300, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,5,3', 'romain', 2, NULL, NULL, NULL, NULL, NULL, 300, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,5,9', 'romain', 2, NULL, NULL, NULL, NULL, NULL, 300, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,7,3', 'romain', 2, NULL, NULL, NULL, NULL, NULL, 300, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,7,9', 'romain', 2, NULL, NULL, NULL, NULL, NULL, 300, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,9,5', 'romain', 2, NULL, NULL, NULL, NULL, NULL, 300, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,9,7', 'romain', 2, NULL, NULL, NULL, NULL, NULL, 300, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,5,5', 'romain', 5, 10000, NULL, NULL, NULL, NULL, 1000, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,7,5', 'romain', 5, 10000, NULL, NULL, NULL, NULL, 1000, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,5,7', 'romain', 5, 10000, NULL, NULL, NULL, NULL, 1000, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,7,7', 'romain', 5, 10000, NULL, NULL, NULL, NULL, 1000, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,6,5', 'romain', 4, 'Tissu=300,Sac40=1,LBtS=20,ResPtCentauree=25,ResVerveine=20,ResGui=40,ResAbsinthe=15,ResMiel=100,MlF=250,Arc=1,PPlB=30,GPlB=30,PlF=20', NULL, NULL, NULL, NULL, 300, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,5,6', 'romain', 4, 'Tissu=200,Sac50=2,ResPtCentauree=35,ResAbsinthe=50,ResGui=45,MlF=200,PlF=150,GPlB=80,PrPT=50', NULL, NULL, NULL, NULL, 300, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,6,7', 'romain', 4, 'Tissu=500,Sac50=1,ResAbsinthe=35,ResGui=60,ResVerveine=45,ResMiel=150,MlF=100,PlF=150,Arc=1,CBtD=30,GPlB=100', NULL, NULL, NULL, NULL, 300, NULL, NULL, 0, NULL, NULL),
+-(NULL, 'm,7,6', 'romain', 4, 'Sac100=1,ResMiel=200,ResAbsinthe=50,ResVerveine=45,ResGui=30,LBtD=25,CBtD=25,GPlB=50,PPlB=45,MlF=150,PlF=50,PtL=10,PtFl=30', NULL, NULL, NULL, NULL, 300, NULL, NULL, 0, NULL, NULL);
++(NULL, 'm,3,3', 'romain', 3, NULL, NULL, NULL, NULL, NULL, 250, NULL, NULL, 1, NULL, NULL),
++(NULL, 'm,9,3', 'romain', 3, NULL, NULL, NULL, NULL, NULL, 250, NULL, NULL, 1, NULL, NULL),
++(NULL, 'm,9,9', 'romain', 3, NULL, NULL, NULL, NULL, NULL, 250, NULL, NULL, 1, NULL, NULL),
++(NULL, 'm,3,9', 'romain', 3, NULL, NULL, NULL, NULL, NULL, 250, NULL, NULL, 1, NULL, NULL),
++(NULL, 'm,6,6', 'romain', 3, NULL, NULL, NULL, NULL, NULL, 350, NULL, NULL, 3, NULL, NULL),
++(NULL, 'm,3,5', 'romain', 2, NULL, NULL, NULL, NULL, NULL, 400, NULL, NULL, 2, NULL, NULL),
++(NULL, 'm,3,7', 'romain', 2, NULL, NULL, NULL, NULL, NULL, 400, NULL, NULL, 2, NULL, NULL),
++(NULL, 'm,5,3', 'romain', 2, NULL, NULL, NULL, NULL, NULL, 400, NULL, NULL, 2, NULL, NULL),
++(NULL, 'm,5,9', 'romain', 2, NULL, NULL, NULL, NULL, NULL, 400, NULL, NULL, 2, NULL, NULL),
++(NULL, 'm,7,3', 'romain', 2, NULL, NULL, NULL, NULL, NULL, 400, NULL, NULL, 2, NULL, NULL),
++(NULL, 'm,7,9', 'romain', 2, NULL, NULL, NULL, NULL, NULL, 400, NULL, NULL, 2, NULL, NULL),
++(NULL, 'm,9,5', 'romain', 2, NULL, NULL, NULL, NULL, NULL, 400, NULL, NULL, 2, NULL, NULL),
++(NULL, 'm,9,7', 'romain', 2, NULL, NULL, NULL, NULL, NULL, 400, NULL, NULL, 2, NULL, NULL),
++(NULL, 'm,5,5', 'romain', 5, 10000, NULL, NULL, NULL, NULL, 1250, NULL, NULL, 5, NULL, NULL),
++(NULL, 'm,7,5', 'romain', 5, 10000, NULL, NULL, NULL, NULL, 1250, NULL, NULL, 5, NULL, NULL),
++(NULL, 'm,5,7', 'romain', 5, 10000, NULL, NULL, NULL, NULL, 1250, NULL, NULL, 5, NULL, NULL),
++(NULL, 'm,7,7', 'romain', 5, 10000, NULL, NULL, NULL, NULL, 1250, NULL, NULL, 5, NULL, NULL),
++(NULL, 'm,6,5', 'romain', 4, 'Tissu=300,Sac40=1,LBtS=20,ResPtCentauree=25,ResVerveine=20,ResGui=40,ResAbsinthe=15,ResMiel=100,MlF=250,Arc=1,PPlB=30,GPlB=30,PlF=20', NULL, NULL, NULL, NULL, 550, NULL, NULL, 5, NULL, NULL),
++(NULL, 'm,5,6', 'romain', 4, 'Tissu=200,Sac50=2,ResPtCentauree=35,ResAbsinthe=50,ResGui=45,MlF=200,PlF=150,GPlB=80,PrPT=50', NULL, NULL, NULL, NULL, 550, NULL, NULL, 5, NULL, NULL),
++(NULL, 'm,6,7', 'romain', 4, 'Tissu=500,Sac50=1,ResAbsinthe=35,ResGui=60,ResVerveine=45,ResMiel=150,MlF=100,PlF=150,Arc=1,CBtD=30,GPlB=100', NULL, NULL, NULL, NULL, 550, NULL, NULL, 5, NULL, NULL),
++(NULL, 'm,7,6', 'romain', 4, 'Sac100=1,ResMiel=200,ResAbsinthe=50,ResVerveine=45,ResGui=30,LBtD=25,CBtD=25,GPlB=50,PPlB=45,MlF=150,PlF=50,PtL=10,PtFl=30', NULL, NULL, NULL, NULL, 50, NULL, NULL, 5, NULL, NULL);
+ -- --------------------------------------------------------
+ 
+ --
+Index: fct/config.php
+===================================================================
+--- fct/config.php	(revision 76)
++++ fct/config.php	(working copy)
+@@ -7,7 +7,7 @@
+ $DB_motdepasse		= 'A3hwDpwdVTPpC3B9'; 	// Mot de passe pour accèder à la base
+ $DB_base			= 'gaulix_be'; 			// Nom de la base
+ 
+-$NumVersion			= '3.4.1.1';			// Num Version
++$NumVersion			= '3.4.2';			// Num Version
+ $MAX_essai			= 3;					// Nombre maximum d'essai de connection
+ $nbLigneCarte		= 13;					// Nombre de ligne de la carte
+ $nbColonneCarte		= 13;					// Nombre de colonne de la carte
+Index: model/main.php
+===================================================================
+--- model/main.php	(revision 75)
++++ model/main.php	(working copy)
+@@ -533,7 +533,7 @@
+ 						.'<br />'
+ 						.'<img alt="'.$rstBatiment['batiment_nom'].'" src="./fct/fct_image.php?type=VieCarte&amp;value='.$row['etat_batiment'].'&amp;max='.($rstBatiment['batiment_vie'] + (50 * $row['niveau_batiment'])).'" />';
+ 					$txt .= '
+-				<li><a href="index.php?page=main&amp;action=attaquer&amp;id=' . $nbBatiment . '">Attaquer <img src="img/'.strtolower($rstBatiment['batiment_nom']).'-b.png" alt="'.$rstBatiment['batiment_nom'].'" height="20px" onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulle).'\');" onmouseout="cache();" /></a></li>';
++				<li><a href="index.php?page=main&amp;action=attaquer&amp;id=' . $nbBatiment . '">Attaquer <img src="img/'.strtolower($rstBatiment['batiment_type']).'-b.png" alt="'.$rstBatiment['batiment_nom'].'" height="20px" onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulle).'\');" onmouseout="cache();" /></a></li>';
+ 					$chkBatimentsEnd = true;
+ 					$nbBatiment++;
+ 				}
