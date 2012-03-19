@@ -18,16 +18,6 @@ $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 					<div class="g-plusone" data-size="tall" data-href="http://www.gaulix.be"></div>
 				</td>
 			</tr>
-			<tr>
-				<td>
-					<div class="jeux-gratuit_net" style="position:relative;width:60px;height:31px;">
-						<a href="http://www.jeu-gratuit.net/jeux-de-strategie-et-jeux-de-role/jeu-gaulix.html" target="_blank">
-							<img src="http://www.jeu-gratuit.net/images/bannieres/88x31_general_7.png" alt="votez pour Gaulix" width="60" height="31" border="0" />
-						</a>
-						<a href="http://www.jeu-gratuit.net/jeux-de-strategie-et-jeux-de-role/jeu-gaulix.html#voter" target="_blank" style="position:absolute; top:8px; left:-1px; font-family:arial; font-size:11px; font-weight:bold; color:#000000; text-decoration:none; line-height:12px; width:60px; text-align:center;">Votez ici !!</a>
-					</div>
-				</td>
-			</tr>
 		</table>
 	</div>
 	<div class="pub">
