@@ -1,0 +1,359 @@
+*{
+	font-family: "MedievalSharp", "Palatino Linotype", "Book Antiqua", Palatino, serif;
+}
+
+body{
+	width: 840px;
+	margin: 20px auto 20px auto;
+	background: url("../img/bcg/parchemin01.gif") no-repeat center top, url("../img/bcg/parchemin03.gif") no-repeat center bottom;
+	background-color: DarkOliveGreen;
+    font-family: Arial,Helvetica,sans-serif;
+}
+div.container{
+	background: url('../img/bcg/parchemin02.gif') repeat-y center;
+	padding: 0px 20px 0px 20px;
+}
+div.version,
+div.actions,
+div.menu{
+	clear: both;
+}
+div.loginstatus,
+div.module_social,
+div.menu,
+div.mouvements,
+div.main,
+div.pub,
+div.carte,
+div.login{
+	float: left;
+}
+div.module_social,
+div.statistiques{
+	float: right;
+}
+div.login,
+div.loginstatus, div.loginstatus table,
+div.mouvements,
+div.actions,
+div.pub,
+div.menu,
+div.main,
+div.statistiques{
+	border-collapse: collapse;
+	border: 2px solid black;
+}
+div.main,
+div.loginstatus,
+div.pub,
+div.module_social,
+div.statistiques{
+	padding: 3px;
+}
+div.loginstatus,
+div.mouvements,
+div.actions,
+div.pub,
+div.menu,
+div.main,
+div.module_social,
+div.carte,
+div.statistiques{
+	margin: 2px;
+}
+div.history,
+div.village,
+div.login,
+div.main,
+div.mouvements,
+div.loginstatus{
+	height: auto;
+}
+div.mouvements,
+div.actions,
+div.login{
+	width: auto;
+}
+div.login{
+	width: 180px;
+	margin: 0px 5px 5px 0px;
+	background: green;
+}
+div.loginstatus,
+div.menu,
+div.main{
+	width: 788px;
+}
+div.loginstatus{
+	background: red;
+}
+div.carte{
+	width: 465px;
+	text-align: center;
+}
+div.pion{
+	margin: auto;
+	width: 15px;
+	height: 15px;
+}
+div.actions{
+	height: 170px;
+	overflow: auto;
+}
+div.pub{
+	width: 300px;
+	height: 250px;
+	text-align: center;
+	
+}
+div.menu{
+	padding-left: 3px;
+	padding-right: 3px;
+}
+div.equipement{
+	margin-left: auto;
+	margin-right: auto;
+}
+div.statistiques{
+	height: 100px;
+	width : 200px;
+}
+
+/*  Les Onglets */
+.onglet{
+	display:inline-block;
+	margin-left:1px;
+	margin-right:1px;
+	padding:3px;
+	border:1px solid black;
+	cursor:pointer;
+}
+.onglet_0{
+	background:#bbbbbb;
+	border-bottom:1px solid black;
+}
+.onglet_1{
+	background:#dddddd;
+	border-bottom:0px solid black;
+	padding-bottom:4px;
+}
+.contenu_onglet{
+	border:1px solid black;
+	margin-top:-1px;
+	padding:5px;
+	display:none;
+}
+
+/*	Les tables	*/
+table.options,
+table.mouvements,
+table.regles_credit, table.regles_credit td,
+table.quetes, table.quetes td{
+	border: none;
+}
+table.InfoBulle{
+	width: 190px;
+}
+table.regles_competences td.regles_competences_niveau{
+	width: 100px;
+}
+table.mouvements{
+	width: 220px;
+	height: 185px;
+}
+table.equipement, 
+table.village, 
+table.ressources, 
+table.clans,
+table.perfectionnement,
+table.inventaire,
+table.bricolage,
+table.options,
+table.classement,
+table.druide,
+table.module_social,
+table.regles_credit,
+table.quetes,
+table.fiche_quete,
+table.chat_clan,
+table.regles_competences,
+table.loginstatus,
+table.statistiques{
+	width: 100%;
+}
+table.village, table.village td, table.village th, 
+table.ressources, table.ressources td, table.ressources th, 
+table.equipement, table.equipement td,
+table.clans, table.clans td, table.clans th, 
+table.fiche_quete, table.fiche_quete td, table.fiche_quete th, 
+table.history, table.history th, table.history td,
+table.classement, table.classement td, table.classement th,
+table.scores, table.scores td, table.scores th,
+table.experience, table.experience td, table.experience th,
+table.points, table.points td, table.points th,
+table.equipements, table.equipements td, table.equipements th,
+table.perfectionnement, table.perfectionnement th, table.perfectionnement td, 
+table.inventaire , table.inventaire th, table.inventaire td, table.inventaire td.tdtitre, table.inventaire td.corp,
+table.allcarte, table.allcarte td,
+table.carte, table.carte td,
+table.corps td.membre,
+table.competence, table.competence td,
+table.bricolage, table.bricolage td, table.bricolage th,
+table.notification, table.notification td, table.notification th,
+table.druide, table.druide td,
+table.mouvements, table.mouvements td,
+table.marchandise, table.marchandise td, table.marchandise th,
+table.InfoBulle, table.InfoBulle td, table.InfoBulle th,
+table.chat_clan, table.chat_clan th, table.chat_clan td,
+table.regles_competences, table.regles_competences th, table.regles_competences td,
+table.loginstatus td,
+table.statistiques, table.statistiques td{
+	border-collapse: collapse;
+	border: 1px solid black;
+}
+table.equipement td, table.equipements td, table.equipements th,
+table.village td,
+table.allcarte td,
+table.carte td,
+table.inventaire th, table.inventaire td, table.inventaire td.corp,
+table.experience td, table.experience th,
+table.points td, table.points th,
+table.corps td.membre,
+table.scores td, table.scores th,
+table.classement td, table.classement th,
+table.notification td, table.notification th,
+table.mouvements td,
+table.marchandise td, table.marchandise th,
+table.module_social td,
+table.quetes td,
+table.fiche_quete td,
+table.InfoBulle th, table.InfoBulle td,
+table.loginstatus td,
+table.statistiques td{
+	text-align: center;
+}
+table.fiche_quete td.description{
+	text-align: left;
+}
+table.notification td,
+table.quetes td{
+	padding: 5px;
+}
+table.regles_competences th{
+	background: grey;
+}
+table.notification th{
+	background: lightgrey;
+}
+table.inventaire td.corp{
+	width: 300px;
+}
+table.history,
+table.mouvements{
+	margin: 5px;
+}
+table.perfectionnement th,
+table.regles_credit td,
+table.quetes td{
+	width: 50%;
+}
+table.allcarte,
+table.carte{
+	background-image: url('../img/bcg/herbe.gif');
+}
+table.carte td{
+	width: 32px;
+	height: 32px;
+	padding: 0px;
+}
+table.allcarte td{
+	width: 10px;
+	height: 10px;
+	padding: 0px;
+	line-height:10px;
+}
+table.inventaire th{
+	text-decoration: underline;
+}
+table.inventaire td.tdtitre{
+	background: grey;
+	text-align: left;
+}
+table.corps{
+	margin-left: auto;
+	margin-right: auto;
+	width:150px;
+}
+table.equipements{
+	float: left;
+	margin: 5px;
+}
+table.competence,
+table.options tr,
+table.regles_credit tr,
+table.quetes tr{
+	vertical-align: top;
+}
+table.corps td{
+	border: none;
+}
+table.competence{
+	margin: 10px;
+}
+/*	InfoBulle	*/
+.infobulle{
+	position: absolute;	
+	visibility : hidden;
+	padding: 10px;
+	font-family: Verdana, Arial;
+	font-size: 10px;
+	background-color: #FFFFCC;
+	z-index: 5;
+}
+
+/* Les FORMS */
+form.production{
+	display: inline;
+}
+form.nouveau_troc fieldset{
+	width:600px;
+	display:inline
+}
+form.nouveau_troc fieldset input{
+	width:40px;
+	margin-right:20px;
+}
+form.nouveau_troc fieldset.donner{
+	background:lightgreen;
+}
+form.nouveau_troc fieldset.recevoir{
+	background:lightcoral;
+}
+
+/* Les BUTTON */
+button.bt-menu{
+	float: left;
+	width: 125px;
+	height: 30px;
+	margin: 3px;
+	display: block;
+	font-size: 1em;
+	font-weight: bold;
+}
+button.inventaire,
+button.marcher,
+button.entrepot{
+	font-size: 10px;
+	width: 100px;
+	display: inline;
+}
+button.mouvements{
+	width: 50px;
+	height: 30px;
+}
+button.bricollage{
+	width: 150px;
+}
+button.quete{
+	width: 200px;
+}
