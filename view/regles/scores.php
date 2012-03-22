@@ -7,6 +7,6 @@
 <div style="float:left; width:400px;">
 	<p>Pour certaines actions, un nombre X de points vous sera attribué et un tableau des scores sera créé.</p>
 	<p>Pour la liste des points attribué pour chaque action, voir tableau ci-contre.</p>
-	<p>Chaque <u>construction de batiment</u> vous rapportera un nombre spécifique de points, mais vous les predrez si il est détruit.</p>
-	<p>Chaque <u>Quête</u> vous apporte un nombre spécifique de points.</p>
+	<p>Chaque <span class="underline">construction de batiment</span> vous rapportera un nombre spécifique de points, mais vous les predrez si il est détruit.</p>
+	<p>Chaque <span class="underline">Quête</span> vous apporte un nombre spécifique de points.</p>
 </div>

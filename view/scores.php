@@ -38,8 +38,8 @@ foreach($lignes as $ligne){
 		<tr style="vertical-align:top;">
 		<td style="width:400px;">
 			<p>Pour rappel, voici la liste des gains de points pour chaque action :</p>
-			<p>Chaque <u>construction de batiment</u> vous rapportera un nombre spécifique de points, mais vous les predrez si il est détruit.</p>
-			<p>Chaque <u>Quête</u> vous apporte un nombre spécifique de points.</p>
+			<p>Chaque <span class="underline">construction de batiment</span> vous rapportera un nombre spécifique de points, mais vous les predrez si il est détruit.</p>
+			<p>Chaque <span class="underline">Quête</span> vous apporte un nombre spécifique de points.</p>
 		</td>
 		<td>
 			<?php include_once('model/regles.php'); echo AfficheTableauGainScores();?>
