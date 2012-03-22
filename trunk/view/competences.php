@@ -9,5 +9,10 @@
 			<?php echo AfficheModulePerfectionnement('defense');?>
 		</td>
 	</tr>
-	<?php echo AfficheAutreCompetences();	?>
+	<?php
+	$temp = AfficheAutreCompetences();
+	echo $temp[0];
+	?>
+	</table>
+	<?php echo $temp[1];?>
 </div>

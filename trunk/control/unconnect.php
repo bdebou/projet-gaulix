@@ -3,4 +3,4 @@ session_start();
 session_destroy();
 //header('Location: ./');
 ?>
-<script language="javascript">window.location="./";</script>
+<script type="text/javascript">window.location="./";</script>
