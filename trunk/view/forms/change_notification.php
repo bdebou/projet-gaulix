@@ -17,7 +17,6 @@ $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 					<td style="text-align:left;">Combat</td>
 					<td><input type="radio" name="NotCombat" value="yes"<?php echo ($oJoueur->GetNotifCombat()?' checked="checked"':'');?> /></td>
 					<td><input type="radio" name="NotCombat" value="no"<?php echo (!$oJoueur->GetNotifCombat()?' checked="checked"':'');?> /></td>
-					</td>
 				</tr>
 				<tr>
 					<td colspan="3" style="text-align:center;">
