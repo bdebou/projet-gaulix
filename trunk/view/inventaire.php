@@ -63,10 +63,11 @@ For($i=$id; $i<=($oJoueur->QuelCapaciteMonBolga() -1);$i++){
 		$numC = 0;
 	}
 }
-
+if($numC <= 2){
+	echo '</tr>';
+}
 $objManager->update($oJoueur);
 unset($oJoueur);
 ?>
-	</tr>
 </table>
 </div>
