@@ -39,6 +39,7 @@ class PersonnagesManager{
 		$q = $this->db->prepare('UPDATE table_joueurs SET 
 				position = :position, 
 				vie = :vie, 
+				civilisation = :civilisation, 
 				maison_installe = :maison_installe, 
 				val_attaque = :val_attaque, 
 				val_defense = :val_defense, 
@@ -78,6 +79,7 @@ class PersonnagesManager{
 		
 		$q->bindValue(':position', implode(',', array_merge(array($perso->GetCarte()), $perso->GetPosition())), PDO::PARAM_STR);
 		$q->bindValue(':vie', $perso->GetVie(), PDO::PARAM_STR);
+		$q->bindvalue(':civilisation', $perso->GetCivilisation(), PDO::PARAM_STR);
 		$arAtt = $perso->GetAttPerso();
 		$q->bindValue(':val_attaque', $arAtt['0'], PDO::PARAM_INT);
 		$arDef = $perso->GetDefPerso();
@@ -139,11 +141,11 @@ class PersonnagesManager{
 
 		return $q->execute();
 	}
-	public function UpdateMarcher(marchant $marcher){
-		$q = $this->db->prepare('UPDATE table_marcher SET 
+	public function UpdateMarche(marchant $marche){
+		$q = $this->db->prepare('UPDATE table_marche SET 
 				contenu_vendeur = :contenu_vendeur 
 				WHERE type_vendeur = "marchant"');
-		$contenu = implode(',', $marcher->GetLstContenu());
+		$contenu = implode(',', $marche->GetLstContenu());
 		$q->bindValue(':contenu_vendeur', $contenu, PDO::PARAM_STR);
 		
 		return $q->execute();
