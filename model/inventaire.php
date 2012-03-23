@@ -209,10 +209,10 @@ function AfficheObjetInventaire($CodeObject, $arInfoObject, $id, $nbObjet, &$oJo
 function ActionVendre(&$check, $id, &$oJoueur, &$objManager){
 	if(isset($_SESSION['main'][$id]['code'])){
 
-		$sql = "SELECT contenu_vendeur FROM table_marcher WHERE type_vendeur='marchant'";
+		$sql = "SELECT contenu_vendeur FROM table_marche WHERE type_vendeur='marchant'";
 		$requete = mysql_query($sql) or die (mysql_error());
 
-		$objMarcher = new marchant(mysql_fetch_array($requete, MYSQL_ASSOC));
+		$objMarche = new marchant(mysql_fetch_array($requete, MYSQL_ASSOC));
 
 		if($oJoueur->GetCombienElementDansBolga($_SESSION['main'][$id]['code']) == 0){
 			$check = false;
@@ -224,10 +224,10 @@ function ActionVendre(&$check, $id, &$oJoueur, &$objManager){
 		if($check){
 			for ($i = 1; $i <= $_GET['qte']; $i++) {
 				$oJoueur->VendreObjet($_SESSION['main'][$id]['code'], $_SESSION['main'][$id]['prix']);
-				$objMarcher->AddMarchandise($_SESSION['main'][$id]['code']);
+				$objMarche->AddMarchandise($_SESSION['main'][$id]['code']);
 			}
 				
-			$objManager->UpdateMarcher($objMarcher);
+			$objManager->UpdateMarche($objMarche);
 				
 		}
 

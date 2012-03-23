@@ -27,7 +27,7 @@ function AfficheBatiment(&$batiment, &$oJoueur){
 	$PositionBatiment	= implode(',', array_merge(array($batiment->GetCarte()),$batiment->GetCoordonnee()));
 	$PositionJoueur		= $oJoueur->GetCoordonnee();
 	$chkDruide = false;
-	$chkMarcher = false;
+	$chkMarche = false;
 
 	switch($batiment->GetType()){
 		case 'maison':
@@ -48,9 +48,9 @@ function AfficheBatiment(&$batiment, &$oJoueur){
 			$ImgSize = 'width';
 			$contenu = $batiment->AfficheContenu($oJoueur);
 			break;
-		case 'marcher':
+		case 'marche':
 			if($PositionBatiment == $PositionJoueur){
-				$chkMarcher = true;
+				$chkMarche = true;
 			}else{
 				$contenu = '<p>Vous devez vous placez sur son emplacement pour afficher les transactions disponibles.</p>';
 			}
@@ -89,7 +89,7 @@ function AfficheBatiment(&$batiment, &$oJoueur){
 			<td colspan="'.($batiment->GetType() == 'entrepot'?'5':'4').'">'.$contenu.'</td>
 		</tr>'
 	.($chkDruide?$batiment->AfficheDruide($oJoueur):'')
-	.($chkMarcher?$batiment->AfficheTransactions($oJoueur):'')
+	.($chkMarche?$batiment->AfficheTransactions($oJoueur):'')
 	.'<tr style="background:lightgrey;"><td colspan="5" style="text-align:right;"><a href="#TopPage" alt="TopPage">Top</a></td></tr>'
 	.'</table>';
 	return $txt;
@@ -109,7 +109,7 @@ function CheckRessource(&$oJoueur, &$batiment, &$maison){
 	return true;
 }
 function AddTransaction($vendeur, $achat=array('nourriture'=>'NULL', 'pierre'=>'NULL', 'bois'=>'NULL', 'or'=>'NULL'), $vente=array('nourriture'=>'NULL', 'pierre'=>'NULL', 'bois'=>'NULL', 'or'=>'NULL')){
-	$sql="INSERT INTO `table_marcher` (
+	$sql="INSERT INTO `table_marche` (
 	`ID_troc`, 
 	`vendeur`, 
 	`acheteur`, 
@@ -127,7 +127,7 @@ function AddTransaction($vendeur, $achat=array('nourriture'=>'NULL', 'pierre'=>'
 	mysql_query($sql) or die ( mysql_error() .'<br />'.$sql);
 }
 function UpdateTransaction($id, $type='vendu') {
-	$sql = "UPDATE table_marcher SET
+	$sql = "UPDATE table_marche SET
 		acheteur=" . ($type == 'vendu' ? "'" . $_SESSION['joueur'] . "'" : 'NULL') . ", 
 		status_vente=1 
 		WHERE ID_troc=$id;";
@@ -403,12 +403,12 @@ function ActionDruide(&$chkErr, $id, &$oJoueur, &$objManager){
 		echo 'Erreur GLX0002: Fonction ActionDruide';
 	}
 }
-function ActionVenteMarcher(&$check, $id, &$oJoueur, &$objManager){
+function ActionVenteMarche(&$check, $id, &$oJoueur, &$objManager){
 	if(isset($_SESSION['main']['vente'])){
-		$sql = "SELECT contenu_vendeur FROM table_marcher WHERE type_vendeur='marchant'";
+		$sql = "SELECT contenu_vendeur FROM table_marche WHERE type_vendeur='marchant'";
 		$requete = mysql_query($sql) or die (mysql_error());
 
-		$objMarcher = new marchant(mysql_fetch_array($requete, MYSQL_ASSOC));
+		$objMarche = new marchant(mysql_fetch_array($requete, MYSQL_ASSOC));
 
 		for ($i = 1; $i <= $_GET['qte']; $i++) {
 			if($oJoueur->GetArgent() < $_SESSION['main']['vente'][$id]['prix']){
@@ -418,22 +418,22 @@ function ActionVenteMarcher(&$check, $id, &$oJoueur, &$objManager){
 			$oJoueur->AddInventaire($_SESSION['main']['vente'][$id]['code'], $_SESSION['main']['vente'][$id]['type'], 1, false);
 			$oJoueur->MindOr($_SESSION['main']['vente'][$id]['prix']);
 				
-			$objMarcher->RemoveMarchandise($_SESSION['main']['vente'][$id]['code']);
+			$objMarche->RemoveMarchandise($_SESSION['main']['vente'][$id]['code']);
 		}
 
 
-		$objManager->UpdateMarcher($objMarcher);
+		$objManager->UpdateMarche($objMarche);
 		unset($_SESSION['main']['vente']);
 	}else{
 		$check = false;
-		echo 'Erreur GLX0002: Fonction ActionVenteMarcher';
+		echo 'Erreur GLX0002: Fonction ActionVenteMarché';
 	}
 }
 function ActionAnnulerTransaction(&$chkErr, $id, &$oJoueur, &$objManager){
 	if(isset($_GET['action']) and $_GET['action'] == 'annulertransaction'){
 		UpdateTransaction($_SESSION['main']['transaction'][$id]['annuler'], 'annule');
 
-		$sql = "SELECT vente_or, vente_nourriture, vente_bois, vente_pierre FROM table_marcher WHERE ID_troc=".$_SESSION['main']['transaction'][$id]['annuler'].";";
+		$sql = "SELECT vente_or, vente_nourriture, vente_bois, vente_pierre FROM table_marche WHERE ID_troc=".$_SESSION['main']['transaction'][$id]['annuler'].";";
 		$requete = mysql_query($sql) or die (mysql_error());
 		$row = mysql_fetch_array($requete, MYSQL_ASSOC);
 
@@ -455,7 +455,7 @@ function ActionAnnulerTransaction(&$chkErr, $id, &$oJoueur, &$objManager){
 }
 function ActionAccepterTransaction(&$chkErr, $id, &$oJoueur, &$objManager){
 	if(isset($_GET['action']) and $_GET['action'] == 'acceptertransaction'){
-		$sql = "SELECT * FROM table_marcher WHERE ID_troc=".$_SESSION['main']['transaction'][$id]['accepter'].";";
+		$sql = "SELECT * FROM table_marche WHERE ID_troc=".$_SESSION['main']['transaction'][$id]['accepter'].";";
 		$requete = mysql_query($sql) or die (mysql_error());
 		$row = mysql_fetch_array($requete, MYSQL_ASSOC);
 
@@ -510,7 +510,7 @@ function ActionAccepterTransaction(&$chkErr, $id, &$oJoueur, &$objManager){
 		echo 'Erreur GLX0002: Fonction ActionAccepterTransaction';
 	}
 }
-function ActionTransactionMarcher(&$chkErr, &$oJoueur, &$objManager){
+function ActionTransactionMarche(&$chkErr, &$oJoueur, &$objManager){
 	if(isset($_POST['transaction'])){
 		$_SESSION['transaction']['acceptation'] = null;
 
@@ -545,7 +545,7 @@ function ActionTransactionMarcher(&$chkErr, &$oJoueur, &$objManager){
 		unset($_POST['transaction']);
 	}else{
 		$check = false;
-		echo 'Erreur GLX0002: Fonction ActionTransactionMarcher';
+		echo 'Erreur GLX0002: Fonction ActionTransactionMarché';
 	}
 }
 
