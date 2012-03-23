@@ -6,7 +6,7 @@ function ReglesAfficheTableauBatiment(){
 	$sql="SELECT * FROM table_batiment;";
 	$requete = mysql_query($sql) or die (mysql_error());
 	while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
-		if(in_array($row['batiment_type'], array('maison', 'bank', 'entrepot', 'tour', 'mur', 'ferme', 'marcher', 'mine'))){
+		if(in_array($row['batiment_type'], array('maison', 'bank', 'entrepot', 'tour', 'mur', 'ferme', 'marche', 'mine'))){
 			$txt .= '
 	<tr>
 	
@@ -173,8 +173,8 @@ function AfficheListeCompetences(){
 	
 	return $txt;
 }
-function NombreDeGaulois(){
-	$sql = "SELECT id FROM table_joueurs;";
+function NombreDeJoueurs($civilisation){
+	$sql = "SELECT id FROM table_joueurs WHERE civilisation='".$civilisation."';";
 	$rqt = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
 	
 	return mysql_num_rows($rqt);
