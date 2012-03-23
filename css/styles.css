@@ -143,12 +143,16 @@ div.statistiques{
 	padding:5px;
 	display:none;
 }
-
+.Contenu_Info{
+	padding:15px;
+	display:none;
+}
 /*	Les tables	*/
 table.options,
 table.mouvements,
 table.regles_credit, table.regles_credit td,
-table.quetes, table.quetes td{
+table.quetes, table.quetes td,
+table.all_cartes, table.all_cartes td{
 	border: none;
 }
 table.InfoBulle{
@@ -178,7 +182,10 @@ table.fiche_quete,
 table.chat_clan,
 table.regles_competences,
 table.loginstatus,
-table.statistiques{
+table.statistiques,
+table.lst_village,
+table.lst_carrière,
+table.inscription{
 	width: 100%;
 }
 table.village, table.village td, table.village th, 
@@ -194,7 +201,6 @@ table.points, table.points td, table.points th,
 table.equipements, table.equipements td, table.equipements th,
 table.perfectionnement, table.perfectionnement th, table.perfectionnement td, 
 table.inventaire , table.inventaire th, table.inventaire td, table.inventaire td.tdtitre, table.inventaire td.corp,
-table.allcarte, table.allcarte td,
 table.carte, table.carte td,
 table.corps td.membre,
 table.competence, table.competence td,
@@ -207,13 +213,16 @@ table.InfoBulle, table.InfoBulle td, table.InfoBulle th,
 table.chat_clan, table.chat_clan th, table.chat_clan td,
 table.regles_competences, table.regles_competences th, table.regles_competences td,
 table.loginstatus td,
-table.statistiques, table.statistiques td{
+table.statistiques, table.statistiques td,
+table.inscription td.info
+table.lst_village, table.lst_village td,
+table.lst_carrière, table.lst_carrière td{
 	border-collapse: collapse;
 	border: 1px solid black;
 }
 table.equipement td, table.equipements td, table.equipements th,
 table.village td,
-table.allcarte td,
+table.carte_petite td,
 table.carte td,
 table.inventaire th, table.inventaire td, table.inventaire td.corp,
 table.experience td, table.experience th,
@@ -242,7 +251,8 @@ table.quetes td{
 table.regles_competences th{
 	background: grey;
 }
-table.notification th{
+table.notification th,
+table.inscription td.info{
 	background: lightgrey;
 }
 table.inventaire td.corp{
@@ -257,8 +267,17 @@ table.regles_credit td,
 table.quetes td{
 	width: 50%;
 }
-table.allcarte,
+table.all_cartes{
+	margin-left: auto;
+	margin-right: auto;
+	border-spacing: 0px;
+}
+table.all_cartes td{
+	padding: 0px;
+}
+table.carte_petite,
 table.carte{
+	margin: 0px;
 	background-image: url('../img/bcg/herbe.gif');
 }
 table.carte td{
@@ -266,7 +285,7 @@ table.carte td{
 	height: 32px;
 	padding: 0px;
 }
-table.allcarte td{
+table.carte_petite td{
 	width: 10px;
 	height: 10px;
 	padding: 0px;
@@ -341,7 +360,7 @@ button.bt-menu{
 	font-weight: bold;
 }
 button.inventaire,
-button.marcher,
+button.marche,
 button.entrepot{
 	font-size: 10px;
 	width: 100px;
