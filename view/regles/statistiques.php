@@ -4,7 +4,10 @@
 			<th>Statistiques</th>
 		</tr>
 		<tr>
-			<td><?php echo NombreDeGaulois();?> Gaulois inscrits</td>
+			<td><?php echo NombreDeJoueurs(InscriptionStepA::CIVI_GAULOIS);?> Gaulois inscrits</td>
+		</tr>
+		<tr>
+			<td><?php echo NombreDeJoueurs(InscriptionStepA::CIVI_ROMAINS);?> Romains inscrits</td>
 		</tr>
 		<tr>
 			<td>
