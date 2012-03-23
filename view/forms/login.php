@@ -14,7 +14,7 @@
 			<tr>
 				<td style="text-align:center;">
 					<input type="submit" name="submit" value="Se connecter" style="width: 160px" />
-					<input type="button" name="inscription" value="S'inscrire" style="width: 160px;" onclick="window.location='./index.php?page=inscription';" />
+					<input type="button" name="inscription" value="S'inscrire" style="width: 160px;" onclick="window.location='./index.php?page=inscription_a';" />
 					<a href="./index.php?page=mp_oublie" style="font-size:10px;">Mot de passe oublié</a>
 				</td>
 			</tr>

@@ -15,7 +15,7 @@ include('view/header.php');
 
 if(!isset($_SESSION['joueur'])){
 
-	if (isset($_GET['page']) && in_array($_GET['page'], array('inscription', 'mp_oublie', 'unconnect'))){
+	if (isset($_GET['page']) && in_array($_GET['page'], array('inscription_a', 'inscription_b', 'mp_oublie', 'unconnect'))){
 		include('control/'.$_GET['page'].'.php');
 	}else{
 
@@ -31,7 +31,7 @@ if(!isset($_SESSION['joueur'])){
 				}
 			}else{
 				//header('Location: ./');
-				echo '<script language="javascript">window.location="./";</script>';
+				echo '<script type="text/javascript">window.location="./";</script>';
 			}
 		}else{
 			include('view/forms/login.php');

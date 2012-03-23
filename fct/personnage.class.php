@@ -6,6 +6,8 @@ class personnage{
 			$mail,
 			$position,
 			$vie,
+			$civilisation,
+			$village,
 			$val_attaque, $val_defense,
 			$argent,
 			$experience,
@@ -28,8 +30,8 @@ class personnage{
 			$clan,
 			$DateLastMessageLu,
 			$lstCompetences,
-			$NotAttaque, $NotCombat,
-			$NbPoints;
+			$not_attaque, $not_combat,
+			$nb_points;
 			
 	Const TAILLE_MINIMUM_BOLGA	= 20;			//La taille minimum du bolga
 	Const DUREE_SORT			= 432000;		// Limite de temp pour l'utilisation d'un sort (3600 * 24 *5).
@@ -300,7 +302,7 @@ class personnage{
 	}
 	
 	public function UpdatePoints($nb){
-		$this->NbPoints += $nb;
+		$this->nb_points += $nb;
 	}
 	
 	//Gestion du bolga
@@ -620,8 +622,8 @@ class personnage{
 	//Notifications
 	public function SetNotification($type, $value){
 		switch($type){
-			case 'combat':	$this->NotCombat = $value;	break;
-			case 'attaque':	$this->NotAttaque = $value;	break;
+			case 'combat':	$this->not_combat = $value;	break;
+			case 'attaque':	$this->not_attaque = $value;	break;
 		}
 	}
 	public function SetLastMessageLu(){
@@ -630,38 +632,48 @@ class personnage{
 	
 	//Remplir l'objet joueur
 	public function hydrate(array $donnees){
-		date_default_timezone_set('Europe/Brussels');
 		foreach ($donnees as $key => $value){
 			switch ($key){
-				case 'login':				$this->$key = strval($value); break;
-				case 'mail':				$this->$key = strval($value); break;
-				case 'position':			$this->$key = explode(',', $value); break;
-				case 'vie':					$this->$key = intval($value); break;
-				case 'val_attaque':			$this->$key = intval($value); break;
-				case 'val_defense':			$this->$key = intval($value); break;
-				case 'experience':			$this->$key = intval($value); break;
-				case 'niveau':				$this->$key = intval($value); break;
-				case 'deplacement':			$this->$key = intval($value); break;
-				case 'last_action':			$this->$key = strtotime($value); break;
+				case 'login':
+				case 'mail':
+				case 'civilisation':
+				case 'village':				$this->$key = strval($value);
+											break;
+				case 'position':			$this->$key = explode(',', $value);
+											break;
+				case 'id':
+				case 'nb_points':
+				case 'argent':
+				case 'nb_combats':
+				case 'nb_victoire':
+				case 'nb_vaincu':
+				case 'nb_mort':
+				case 'val_attaque':
+				case 'val_defense':
+				case 'experience':
+				case 'niveau':
+				case 'deplacement':
+				case 'vie':					$this->$key = intval($value);
+											break;
+				case 'last_action':			$this->$key = strtotime($value);
+											break;
 				case 'date_last_combat':	$this->last_combat = strtotime($value); break;
-				case 'attaque_tour':		$this->$key = (is_null($value)?false:true); break;
-				case 'chk_chasse':			$this->$key = (is_null($value)?false:true); break;
-				case 'chk_object':			$this->$key = (is_null($value)?false:true); break;
-				case 'chk_legion':			$this->$key = (is_null($value)?false:true); break;
-				case 'last_object':			$this->$key = (is_null($value)?NULL:strval($value)); break;
-				case 'code_casque':			$this->$key = (is_null($value)?NULL:strval($value)); break;
-				case 'code_arme':			$this->$key = (is_null($value)?NULL:strval($value)); break;
-				case 'code_bouclier':		$this->$key = (is_null($value)?NULL:strval($value)); break;
-				case 'code_jambiere':		$this->$key = (is_null($value)?NULL:strval($value)); break;
-				case 'code_cuirasse':		$this->$key = (is_null($value)?NULL:strval($value)); break;
-				case 'code_sac':			$this->$key = (is_null($value)?NULL:strval($value)); break;
-				case 'nb_combats':			$this->$key = intval($value); break;
-				case 'nb_victoire':			$this->$key = intval($value); break;
-				case 'nb_vaincu':			$this->$key = intval($value); break;
-				case 'nb_mort':				$this->$key = intval($value); break;
+				case 'not_attaque':
+				case 'not_combat':
+				case 'attaque_tour':
+				case 'chk_chasse':
+				case 'chk_object':
+				case 'chk_legion':			$this->$key = (is_null($value)?false:true);
+											break;
+				case 'last_object':
+				case 'code_casque':
+				case 'code_arme':
+				case 'code_bouclier':
+				case 'code_jambiere':
+				case 'code_cuirasse':
+				case 'code_sac':			$this->$key = (is_null($value)?NULL:strval($value));
+											break;
 				case 'inventaire':			$this->arInventaire = (is_null($value)?null:explode(',', $value)); break;
-				case 'id':					$this->$key = intval($value); break;
-				case 'argent':				$this->$key = intval($value); break;
 				case 'date_perf_attaque':	$this->$key = (is_null($value)?NULL:strtotime($value)); break;
 				case 'tmp_perf_attaque':	$this->$key = (is_null($value)?NULL:intval($value)); break;
 				case 'date_perf_defense':	$this->$key = (is_null($value)?NULL:strtotime($value)); break;
@@ -669,9 +681,7 @@ class personnage{
 				case 'maison_installe':		$this->$key = (is_null($value)?NULL:explode(',', $value)); break;
 				case 'clan':				$this->$key = (is_null($value)?NULL:htmlspecialchars_decode($value, ENT_QUOTES)); break;
 				case 'date_last_msg_lu':	$this->DateLastMessageLu = strtotime($value); break;
-				case 'not_attaque':			$this->NotAttaque = (is_null($value)?false:true); break;
-				case 'not_combat':			$this->NotCombat = (is_null($value)?false:true); break;
-				case 'nb_points':			$this->NbPoints = intval($value); break;
+				
 				case 'livre_sorts':
 					if(is_null($value)){
 						$this->LivreSorts = 'NoBook';
@@ -795,6 +805,7 @@ class personnage{
 	public function GetLogin(){				return $this->login;}
 	public function GetMail(){				return $this->mail;}
 	public function GetVie(){				return $this->vie;}
+	public function GetCivilisation(){		return $this->civilisation;}
 	public function GetMaisonInstalle(){	return $this->maison_installe;}
 	public function GetAttaqueTour(){		return $this->attaque_tour;}
 	public function GetClan(){				return $this->clan;}
@@ -802,9 +813,9 @@ class personnage{
 	public function GetCarte(){				return $this->position['0'];}
 	public function GetCoordonnee(){		return implode(',', $this->position);}
 	public function GetMaxExperience(){		return (($this->niveau + 1) * 100);}
-	public function GetNotifCombat(){		return $this->NotCombat;}
-	public function GetNotifAttaque(){		return $this->NotAttaque;}
-	public function GetNbPoints(){			return $this->NbPoints;}
+	public function GetNotifCombat(){		return $this->not_combat;}
+	public function GetNotifAttaque(){		return $this->not_attaque;}
+	public function GetNbPoints(){			return $this->nb_points;}
 	//Les Compétences
 	public function GetNiveauCompetence($competence){
 		return $this->lstCompetences[ucfirst($competence)];
