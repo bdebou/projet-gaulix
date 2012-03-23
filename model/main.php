@@ -390,7 +390,7 @@ function AfficheCollecteRessource(personnage &$oJoueur) {
 		}
 	} else {
 		if ((strtotime('now') - $objRessource->GetDateDebutAction()) >= $objRessource->GetTempRessource()) {
-			return '<script language="javascript">window.location=\'index.php?page=main&action=ressource\';</script>';
+			return '<script type="text/javascript">window.location=\'index.php?page=main&action=ressource\';</script>';
 		} elseif ($objRessource->GetCollecteur() == $oJoueur->GetLogin()) {
 			return '<p style="display:inline;">Vous êtes en train de collecter ' . $txtRes . ' ' . AfficheIcone(strtolower($objRessource->GetNom())) . '. Vous en avez encore pour :</p>
 				<div style="display:inline;" id="TimeToWaitRessource"></div><p style="display:inline;"> N\'interrompez pas votre collecte sinon ce sera perdu.</p>'
