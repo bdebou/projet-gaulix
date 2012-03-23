@@ -1,5 +1,5 @@
 <?php
-class marcher extends batiment{
+class marche extends batiment{
 	//--- fonction qui est lancer lors de la création de l'objet. ---
 	public function __construct(array $carte, array $batiment){
 		$this->Hydrate($carte, $batiment);
@@ -15,13 +15,13 @@ class marcher extends batiment{
 	private function AfficheObjetsDuMarchant(personnage &$oJoueur){
 		$txt = null;
 		
-		$sql = "SELECT contenu_vendeur FROM table_marcher WHERE type_vendeur='marchant'";
+		$sql = "SELECT contenu_vendeur FROM table_marche WHERE type_vendeur='marchant'";
 		$requete = mysql_query($sql) or die (mysql_error());
 		
 		if(mysql_num_rows($requete) == 0){
 			$txt .= '
 			<tr>
-				<td colspan="4">Aucun objet en vente au marcher nationnal.</td>
+				<td colspan="4">Aucun objet en vente au marché nationnal.</td>
 			</tr>';
 		}else{
 			//on crée l'objet Marecher
@@ -128,11 +128,11 @@ class marcher extends batiment{
 			
 			$txtBt .= '
 			<button type="button" '
-				.'class="marcher" '
+				.'class="marche" '
 				.($chkAchat?'':'disabled="disabled" ')
 				.'onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulleAchat).'\');" '
 				.'onmouseout="cache();" '
-				.'onclick="window.location=\'index.php?page=village&action=VenteMarcher&amp;id='.$id.'&amp;qte='.$StepAchat.'&amp;anchor='.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'\'">'
+				.'onclick="window.location=\'index.php?page=village&action=VenteMarche&amp;id='.$id.'&amp;qte='.$StepAchat.'&amp;anchor='.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'\'">'
 					.'Acheter '.$StepAchat.'x'
 			.'</button>' ;
 		}
@@ -151,7 +151,7 @@ class marcher extends batiment{
 	private function AffichePropositionsTrocs(personnage &$oJoueur){
 		$txt = null;
 		
-		$sql = "SELECT * FROM table_marcher WHERE status_vente IS NULL AND vendeur IS NOT NULL AND vendeur IN ('".implode("', '", ListeMembreClan($oJoueur->GetClan()))."')";
+		$sql = "SELECT * FROM table_marche WHERE status_vente IS NULL AND vendeur IS NOT NULL AND vendeur IN ('".implode("', '", ListeMembreClan($oJoueur->GetClan()))."')";
 		$requete = mysql_query($sql) or die (mysql_error());
 		
 		if(mysql_num_rows($requete) == 0){
@@ -208,7 +208,7 @@ class marcher extends batiment{
 									'<button type="button" 
 										onclick="window.location=\'index.php?page=village&action=annulertransaction&id='.$numTransaction.'&anchor='.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'\'" 
 										style="width:40px;">'
-										.AfficheIcone('marcher_cancel')
+										.AfficheIcone('marche_cancel')
 									.'</button>'
 									:'')
 								.($oJoueur->GetLogin() != $row['vendeur']?
@@ -217,7 +217,7 @@ class marcher extends batiment{
 										onclick="window.location=\'index.php?page=village&action=acceptertransaction&id='.$numTransaction.'&anchor='.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'\'" 
 										style="width:40px;" '
 										.(!$checkValid?'disabled="disabled"':'').'>'
-										.AfficheIcone((!$checkValid?'marcher_attention':'marcher_accept'))
+										.AfficheIcone((!$checkValid?'marche_attention':'marche_accept'))
 									.'</button>'
 									:'')
 							.'</td>
