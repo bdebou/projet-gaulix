@@ -121,7 +121,7 @@ function AfficheAutreCompetences(){
 	
 	$objManager->update($oJoueur);
 	unset($oJoueur);
-	return $txt.'</table>'.$txtJScript;
+	return array($txt, $txtJScript);
 }
 function AfficheAvancementCompetence($competence, $info, &$chkFinis){
 	if($competence['cmp_temp'] >= (strtotime('now')-strtotime($competence['cmp_date']))){
@@ -252,7 +252,7 @@ function AfficheModulePerfectionnement($type){
 		$objManager->update($oJoueur);
 		unset($oJoueur);
 		//redir('./fct/main.php?action=Perf'.ucfirst(substr($type, 0, 3)));
-		return '<script language="javascript">window.location="index.php?page=competences&action=Perf'.ucfirst(substr($type, 0, 3)).'";</script>';
+		return '<script type="text/javascript">window.location="index.php?page=competences&action=Perf'.ucfirst(substr($type, 0, 3)).'";</script>';
 		//header('location: index.php?page=competences&action=Perf'.ucfirst(substr($type, 0, 3)));
 	}
 }
