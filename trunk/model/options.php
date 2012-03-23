@@ -1,5 +1,6 @@
 <?php
 function Supprimer_Compte(personnage &$oJoueur){
+	global $objManager;
 		//on supprimer les batiments du joueur
 	$sql = "SELECT id_case_carte FROM  table_carte WHERE login='" . $oJoueur->GetLogin() . "' AND id_type_batiment NOT IN (7, 8, 10, 11, 12, 13, 14, 15, 16, 17);";
 	$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
@@ -30,11 +31,11 @@ function Supprimer_Compte(personnage &$oJoueur){
 		//echo $sqlRemove;
 	}
 		
-		//On reset toutes les transactions au marcher
-	$sql = "SELECT ID_troc FROM table_marcher WHERE vendeur='" . $oJoueur->GetLogin() . "';";
+		//On reset toutes les transactions au marche
+	$sql = "SELECT ID_troc FROM table_marche WHERE vendeur='" . $oJoueur->GetLogin() . "';";
 	$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
 	while ($row = mysql_fetch_array($requete, MYSQL_ASSOC)) {
-		$sqlRemove = "DELETE FROM table_marcher WHERE ID_troc=" . intval($row['ID_troc']) . ";";
+		$sqlRemove = "DELETE FROM table_marche WHERE ID_troc=" . intval($row['ID_troc']) . ";";
 		mysql_query($sqlRemove) or die(mysql_error() . '<br />' . $sqlRemove);
 		//echo $sqlRemove;
 	}
@@ -65,6 +66,7 @@ function Supprimer_Compte(personnage &$oJoueur){
 	$requete = mysql_query($sqlRemove) or die (mysql_error() . '<br />' . $sqlRemove);
 		//echo $sqlRemove;
 	
+	echo '<script type="text/javascript">window.location="index.php?page=unconnect";</script>';
 }
 function ChangeNotification(personnage &$oJoueur){
 	if(isset($_POST['NotAttaque'])){
