@@ -2,12 +2,14 @@
 global 	$NumVersion, $nbLigneCarte, $nbColonneCarte, $db, $temp_combat, $arCouleurs, $lstBatimentConstructionUnique, $MAX_essai, $lstPoints,
 		$objManager, $CodeCouleurQuete, $lstNonBatiment, $chkDebug;
 
+date_default_timezone_set('Europe/Brussels');
+
 $DB_serveur			= 'localhost'; 			// Nom du serveur
 $DB_utilisateur		= 'gaulix_be'; 			// Nom de l'utilisateur de la base
 $DB_motdepasse		= 'A3hwDpwdVTPpC3B9'; 	// Mot de passe pour accèder à la base
 $DB_base			= 'gaulix_be'; 			// Nom de la base
 
-$NumVersion			= '3.4';				// Num Version
+$NumVersion			= '3.5';				// Num Version
 $MAX_essai			= 3;					// Nombre maximum d'essai de connection
 $nbLigneCarte		= 13;					// Nombre de ligne de la carte
 $nbColonneCarte		= 13;					// Nombre de colonne de la carte
@@ -15,7 +17,7 @@ $nbCarteH			= 5;					// Nombre de carte horizontale
 $nbCarteV			= 5;					// Nombre de carte Verticale
 $temp_combat		= 3600 * 1;				// Temp entre chaque combat
 
-$chkDebug			= false;
+$chkDebug			= true;
 
 //les couleurs
 $arCouleurs			= array('Attaque'		=> '#FF0000',					// Red 
@@ -32,7 +34,7 @@ $arCouleurs			= array('Attaque'		=> '#FF0000',					// Red
 $lstBatimentConstructionUnique	= array(4,		//Entrepot
 										5,		//Banque
 										6,		//Ferme
-										9,		//Marcher
+										9,		//Marche
 										18);	//Mine
 
 //Liste des batiments disponible

@@ -72,7 +72,7 @@ function AfficheCarte($numCarte, $AllCartes = false){
 	}
 
 	if($AllCartes){
-		$txt .= '<table class="allcarte" onmouseover="montre(\''.CorrectDataInfoBulle('<b>Carte '.strtoupper($numCarte).'</b>').'\');" onmouseout="cache();">';
+		$txt .= '<table class="carte_petite" onmouseover="montre(\''.CorrectDataInfoBulle('<b>Carte '.strtoupper($numCarte).'</b>').'\');" onmouseout="cache();">';
 		$size = 8;
 	}else{
 		$txt .= '<table class="carte">';
