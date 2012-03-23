@@ -33,9 +33,9 @@ function AfficheIcone($type, $HeightIcone = 20) {
 		case 'nourriture':			$FileName = 'ResNou';										break;
 		case 'argent':
 		case 'or':					$FileName = 'ResOr';										break;
-		case 'marcher_cancel':		$Name = 'Annuler transaction';								break;
-		case 'marcher_accept':		$Name = 'Accepter transaction';								break;
-		case 'marcher_attention':	$Name = 'Transaction impossible';							break;
+		case 'marche_cancel':		$Name = 'Annuler transaction';								break;
+		case 'marche_accept':		$Name = 'Accepter transaction';								break;
+		case 'marche_attention':	$Name = 'Transaction impossible';							break;
 		case 'gmedalor':			$Name = 'Médaille d\'or au classement général';				break;
 		case 'gmedalargent':		$Name = 'Médaille d\'argent au classement général';			break;
 		case 'gmedalbronze':		$Name = 'Médaille de bronze classement général';			break;
@@ -535,7 +535,7 @@ function AfficheNbMessageAlliance($clan, $date){
 //|				ACTIONS				|
 //+---------------------------------+
 function ActionMettreDansBolga(&$check, $type, personnage &$oJoueur, &$objManager){
-	if(isset($_SESSION['main']['LoginStatus'])){
+	if(isset($_SESSION['LoginStatus'])){
 		//On vérifie si le bolga est plein ou pas
 		if(count($oJoueur->GetLstInventaire()) >= $oJoueur->QuelCapaciteMonBolga()){
 			$check = false;
@@ -543,7 +543,7 @@ function ActionMettreDansBolga(&$check, $type, personnage &$oJoueur, &$objManage
 			return;
 		}
 		//on vérifie si on a bien la quantitée
-		if(!isset($_SESSION['main']['LoginStatus'][$type])){
+		if(!isset($_SESSION['LoginStatus'][$type])){
 			$check = false;
 			echo 'Erreur GLX0003: Fonction ActionMettreDansBolga - Pas assez de ressource';
 			return;
@@ -552,20 +552,20 @@ function ActionMettreDansBolga(&$check, $type, personnage &$oJoueur, &$objManage
 		$maison = FoundBatiment(1);
 		switch($type){
 			case 'Nourriture':
-				$maison->MindNourriture($_SESSION['main']['LoginStatus'][$type]);
+				$maison->MindNourriture($_SESSION['LoginStatus'][$type]);
 				break;
 			case 'Bois':
-				$maison->MindBois($_SESSION['main']['LoginStatus'][$type]);
+				$maison->MindBois($_SESSION['LoginStatus'][$type]);
 				break;
 			case 'Pierre':
-				$maison->MindPierre($_SESSION['main']['LoginStatus'][$type]);
+				$maison->MindPierre($_SESSION['LoginStatus'][$type]);
 				break;
 		}
-		$oJoueur->AddInventaire('Res'.ucfirst(substr($type, 0, 3)).$_SESSION['main']['LoginStatus'][$type], strtolower($type), 1, false);
+		$oJoueur->AddInventaire('Res'.ucfirst(substr($type, 0, 3)).$_SESSION['LoginStatus'][$type], strtolower($type), 1, false);
 
 		$objManager->UpdateBatiment($maison);
 
-		unset($_SESSION['main']['LoginStatus']);
+		unset($_SESSION['LoginStatus']);
 	}else{
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionMettreDansBolga';

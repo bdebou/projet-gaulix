@@ -18,7 +18,7 @@ function AfficheRessource($type, personnage &$oJoueur){
 				break;
 		}
 		if ($nb > 500) {
-			$_SESSION['main']['LoginStatus'][$type] = $qte;
+			$_SESSION['LoginStatus'][$type] = $qte;
 			
 			$InfoBulle = '<table class="equipement"><tr><td>Mettre ' . $qte . 'pts ' . AfficheIcone($type, 15) . ' dans votre Bolga</td></tr></table>';
 			$txtBt = '
