@@ -45,6 +45,6 @@ if($chkDebug OR !$chkErr){
 	echo '<br /><a href="index.php?page=inventaire">Retour</a>';
 }elseif($CheckRetour){
 	//header('location: index.php?page=inventaire');
-	echo '<script language="javascript">window.location="index.php?page=inventaire";</script>';
+	echo '<script type="text/javascript">window.location="index.php?page=inventaire";</script>';
 }
 ?>

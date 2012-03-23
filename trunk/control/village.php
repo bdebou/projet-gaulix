@@ -22,7 +22,8 @@ if(isset($_POST['depot'])){
 	ActionRetrait($chkErr, $oJoueur, $objManager);
 	$CheckRetour = true;
 }elseif(isset($_POST['transaction'])){
-	ActionTransactionMarcher($chkErr, $oJoueur, $objManager);
+	ActionTransactionMarche($chkErr, $oJoueur, $objManager);
+	$_GET['anchor'] = $_POST['anchor'];
 	$CheckRetour = true;
 }elseif(isset($_GET['action'])){
 	switch($_GET['action']){
@@ -36,7 +37,7 @@ if(isset($_POST['depot'])){
 		case 'viderstockmine':			ActionViderStock($chkErr, 18, 'mine', $oJoueur, $objManager); break;
 		case 'productionmine':			ActionProduction($chkErr, 18, 'mine', $_GET['type'], $oJoueur, $objManager); break;
 		case 'druide':					ActionDruide($chkErr, $_GET['id'], $oJoueur, $objManager); break;
-		case 'VenteMarcher':			ActionVenteMarcher($chkErr, $_GET['id'], $oJoueur, $objManager); break;
+		case 'VenteMarche':				ActionVenteMarche($chkErr, $_GET['id'], $oJoueur, $objManager); break;
 		case 'annulertransaction':		ActionAnnulerTransaction($chkErr, $_GET['id'], $oJoueur, $objManager); break;
 		case 'acceptertransaction':		ActionAccepterTransaction($chkErr, $_GET['id'], $oJoueur, $objManager); break;
 	}
@@ -52,9 +53,14 @@ unset($oJoueur);
 
 if($chkDebug OR !$chkErr){
 	echo '<br /><a href="index.php?page=village">Retour</a>';
-}elseif(($CheckRetour AND !$chkDebug) OR isset($_GET['anchor'])){
+}elseif(($CheckRetour AND !$chkDebug)){
 	//header('location: index.php?page=village'.(isset($_GET['anchor'])?'#'.$_GET['anchor']:''));
-	echo '<script language="javascript">window.location="index.php?page=village'.(isset($_GET['anchor'])?'#'.$_GET['anchor']:'').'";</script>';
+	if(isset($_GET['anchor'])){
+		$txtAnchor = '#'.$_GET['anchor'];
+	}elseif(isset($_POST['anchor'])){
+		$txtAnchor = '#'.$_POST['anchor'];
+	}
+	echo '<script type="text/javascript">window.location="index.php?page=village'.(isset($txtAnchor)?$txtAnchor:NULL).'";</script>';
 }
 
 ?>

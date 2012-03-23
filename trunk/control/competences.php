@@ -34,7 +34,7 @@ if($chkDebug OR !$chkErr){
 	echo '<br /><a href="index.php?page=competences">Retour</a>';
 }elseif($CheckRetour){
 	//header('location: index.php?page=competences');
-	echo '<script language="javascript">window.location="index.php?page=competences";</script>';
+	echo '<script type="text/javascript">window.location="index.php?page=competences";</script>';
 }
 
 ?>

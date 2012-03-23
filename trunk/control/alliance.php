@@ -36,7 +36,7 @@ unset($oJoueur);
 
 if($CheckRetour){
 	//header('location: index.php?page=alliance');
-	echo '<script language="javascript">window.location="index.php?page=alliance";</script>';
+	echo '<script type="text/javascript">window.location="index.php?page=alliance";</script>';
 }
 
 ?>

@@ -242,7 +242,7 @@ abstract class batiment{
 				
 			}else{
 				
-				return '<script language="javascript">window.location=\'index.php?page=village&action=ameliorer&id='.$id.'\';</script>';
+				return '<script type="text/javascript">window.location=\'index.php?page=village&action=ameliorer&id='.$id.'\';</script>';
 				
 			}
 			
