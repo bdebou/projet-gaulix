@@ -264,7 +264,7 @@ function AfficheRedirectionBatiment(personnage &$oJoueur){
 		return '<p>Allez à votre '
 					.'<a href="index.php?page=village&amp;anchor='.implode('_', array_merge(array($batiment->GetCarte()), $batiment->GetCoordonnee())).'">'
 						.strtolower(get_class($batiment))
-						.' <img src="img/'.strtolower(get_class($batiment)).'-a.png" alt="'.strtolower(get_class($batiment)).'" title="Votre '.strtolower(get_class($batiment)).'" height="20px" />'
+						.' <img src="img/carte/'.strtolower(get_class($batiment)).'-a.png" alt="'.strtolower(get_class($batiment)).'" title="Votre '.strtolower(get_class($batiment)).'" height="20px" />'
 					.'</a>'
 				.' pour voir les options possibles</p>';
 	}else{
@@ -280,7 +280,7 @@ function AfficheActionViderStock(personnage &$oJoueur){
 		$_SESSION['main'][get_class($batiment)]['vider'] = $batiment->GetStockContenu();
 		
 		return '<p>Votre stock de la '.strtolower(get_class($batiment))
-				.'<img src="img/'.strtolower(get_class($batiment)).'-a.png" alt="'.strtolower(get_class($batiment)).'" title="Votre '.strtolower(get_class($batiment)).'" height="20px" />'
+				.'<img src="img/carte/'.strtolower(get_class($batiment)).'-a.png" alt="'.strtolower(get_class($batiment)).'" title="Votre '.strtolower(get_class($batiment)).'" height="20px" />'
 				.' est plein ('.$batiment->GetStockContenu().'x '.AfficheIcone($batiment->GetIconeNameProduction($batiment->GetTypeContenu())).'): 
 				<a href="index.php?page=main&amp;action=viderstock'.strtolower(get_class($batiment)).'">Vider</a> ou 
 				<a href="index.php?page=village&amp;anchor='.implode('_', array_merge(array($batiment->GetCarte()), $batiment->GetCoordonnee())).'">Changer de production</a></p>';
