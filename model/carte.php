@@ -24,7 +24,7 @@ function AfficheCarte($numCarte, $AllCartes = false){
 			if($numCarte == $Quete->GetCarte() AND in_array($Quete->GetTypeQuete(), array('romains'))){
 				$arPosition = $Quete->GetPosition();
 				$InfoBulle = '<b>'.$Quete->GetNom().'</b>';
-				$grille[intval($arPosition[0])][intval($arPosition[1])]['batiment'] = ' onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulle).'\');" onmouseout="cache();" style="background: url(\'./img/'.($AllCartes?'mini/':'').$Quete->GetTypeQuete().'.png\') no-repeat center;"';
+				$grille[intval($arPosition[0])][intval($arPosition[1])]['batiment'] = ' onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulle).'\');" onmouseout="cache();" style="background: url(\'./img/quetes/icones/'.($AllCartes?'mini/':'').$Quete->GetTypeQuete().'.png\') no-repeat center;"';
 			}
 		}
 	}
@@ -50,7 +50,7 @@ function AfficheCarte($numCarte, $AllCartes = false){
 				$row['contenu_batiment'].'x '.AfficheIcone('or')
 				:'<b>Plusieurs objets</b>')
 				:'');
-				$grille[intval($position[1])][intval($position[2])]['batiment'] = ' onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulle).'\');" onmouseout="cache();" style="background: url(\'./img/'.($AllCartes?'mini/':'').$batiment['batiment_type'].'-';
+				$grille[intval($position[1])][intval($position[2])]['batiment'] = ' onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulle).'\');" onmouseout="cache();" style="background: url(\'./img/carte/'.($AllCartes?'mini/':'').$batiment['batiment_type'].'-';
 				if($row['login']==$_SESSION['joueur']){
 					$grille[intval($position[1])][intval($position[2])]['batiment'] .= 'a';
 				}else{
@@ -65,7 +65,7 @@ function AfficheCarte($numCarte, $AllCartes = false){
                         $InfoBulle = $batiment['batiment_description'];
                         break;
 				}
-				$grille[intval($position[1])][intval($position[2])]['batiment'] = ' onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulle).'\');" onmouseout="cache();" style="background: url(\'./img/'.($AllCartes?'mini/':'').$batiment['batiment_nom'].'';
+				$grille[intval($position[1])][intval($position[2])]['batiment'] = ' onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulle).'\');" onmouseout="cache();" style="background: url(\'./img/carte/'.($AllCartes?'mini/':'').$batiment['batiment_nom'].'';
 			}
 			$grille[intval($position[1])][intval($position[2])]['batiment'] .= '.png\') no-repeat center;"';
 		}
@@ -86,7 +86,7 @@ function AfficheCarte($numCarte, $AllCartes = false){
 		for($j=0;$j<=$nbColonneCarte;$j++){
 			$txt .= '<td'.(isset($grille[$i][$j]['batiment'])?$grille[$i][$j]['batiment']:'').'>';
 			if(isset($grille[$i][$j]['login'])){
-				$txt .= '<img alt="Perso '.$grille[$i][$j]['login'].'" src="./img/homme-'.($_SESSION['joueur']==$grille[$i][$j]['login']?'green':'grey').'.png" height="'.$size.'px" width="'.$size.'px" onmouseover="montre(\''.CorrectDataInfoBulle('<b>'.$grille[$i][$j]['login'].'</b><br /><img alt="Barre de Vie" src="./fct/fct_image.php?type=VieCarte&amp;value='.$grille[$i][$j]['vie'].'&amp;max='.personnage::VIE_MAX.'" />').'\');" onmouseout="cache();" />';
+				$txt .= '<img alt="Perso '.$grille[$i][$j]['login'].'" src="./img/carte/homme-'.($_SESSION['joueur']==$grille[$i][$j]['login']?'green':'grey').'.png" height="'.$size.'px" width="'.$size.'px" onmouseover="montre(\''.CorrectDataInfoBulle('<b>'.$grille[$i][$j]['login'].'</b><br /><img alt="Barre de Vie" src="./fct/fct_image.php?type=VieCarte&amp;value='.$grille[$i][$j]['vie'].'&amp;max='.personnage::VIE_MAX.'" />').'\');" onmouseout="cache();" />';
 			}
 			$txt .= '</td>';
 		}
