@@ -530,6 +530,21 @@ function AfficheNbMessageAlliance($clan, $date){
 	$requete = mysql_query($sql) or die (mysql_error());
 	return mysql_num_rows($requete);
 }
+function GetInfoCarriere($code, $info = null){
+	$sql = "SELECT * FROM table_carrieres_lst WHERE carriere_code='".$code."';";
+	$rqtMetier = mysql_query($sql) or die ( mysql_error() );
+
+	if(mysql_num_rows($rqtMetier) > 0){
+		if(is_null($info)){
+			return mysql_fetch_array($rqtMetier, MYSQL_ASSOC);
+		}else{
+			$temp = mysql_fetch_array($rqtMetier, MYSQL_ASSOC);
+			return $temp[$info];
+		}
+	}else{
+		return null;
+	}
+}
 
 //+---------------------------------+
 //|				ACTIONS				|
