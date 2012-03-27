@@ -286,14 +286,16 @@ class InscriptionStepB{
 		$rqt = mysql_query($sql) or die ( mysql_error() );
 		
 		while($row = mysql_fetch_array($rqt, MYSQL_ASSOC)){
-			$temp = explode(',', $row['maison_installe']);
-			if(!is_null($temp[0])){
-				break;
+			if(!is_null($row['maison_installe'])){
+				$temp = explode(',', $row['maison_installe']);
+				if(!is_null($temp[0])){
+					return $temp[0];
+				}
 			}
 		}
 		
+		return null;
 		
-		return $temp[0];
 	}
 }
 ?>
