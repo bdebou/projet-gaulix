@@ -1,12 +1,14 @@
 <?php
 class InscriptionStepB{
 	private	$Village,
+			$CarteVillage,
 			$Carriere,
 			$NewVillage,
 			$SendCheck,
 			$Message;
 	
 	const NB_MAX_VILLAGEOIS			= 5;
+	const SIZE_MAX_VILLAGE			= 20;
 	
 	const STYLE_BLANC				= ' style = "background-color: #ffffff" ';
 	const STYLE_ROUGE				= ' style = "background-color: #ff0000" ';
@@ -14,6 +16,7 @@ class InscriptionStepB{
 	public function __construct(){
 		$this->SendCheck = false;
 		$this->Message = NULL;
+		$this->CarteVillage = NULL;
 	}
 	
 	//Les CHECKS
@@ -21,21 +24,31 @@ class InscriptionStepB{
 	private function CheckIfNull($var){
 		return (!empty($var))?true:false;
 	}
-		public function CheckVillage(){
+	public function CheckVillage(){
 		if($this->Village == 'VillageNew'){
+			$this->CarteVillage = NULL;
 			return false;
+		}else{
+			$this->CarteVillage = $this->GetCarteVillage($this->Village);
 		}
+		
 		return true;
 	}
 	public function CheckNewVillage(){
-		$sql = "SELECT id FROM table_joueurs WHERE village='".$this->NewVillage."'";
-		// On vérifie si ce login existe
-		$requete = mysql_query($sql) or die ( mysql_error() );
-	
-		if(mysql_num_rows($requete) != 0){
-			$this->Message .= '<li>Le village "'.$this->NewVillage.'" existe déjà.</li>';
+		if(strlen($this->NewVillage) > self::SIZE_MAX_VILLAGE){
+			$this->Message .= '<li>Nom de village trop long (max '.self::SIZE_MAX_VILLAGE.' caractères)</li>';
 			return false;
+		}else{
+			$sql = "SELECT id FROM table_joueurs WHERE village='".$this->NewVillage."'";
+			// On vérifie si ce login existe
+			$requete = mysql_query($sql) or die ( mysql_error() );
+			
+			if(mysql_num_rows($requete) != 0){
+				$this->Message .= '<li>Le village "'.$this->NewVillage.'" existe déjà.</li>';
+				return false;
+			}
 		}
+		
 		
 		$this->Village = $this->NewVillage;
 		return true;
@@ -45,33 +58,42 @@ class InscriptionStepB{
 	}
 	private function envoi_sql(){ //fonction qui envoie la requete SQL
 		require('./fct/config.php'); // On réclame le fichier
-		$sql = 	"INSERT INTO table_joueurs (
-				`id`, 
-				`login`, 
-				`password`, 
-				`mail`, 
-				`dates`, 
-				`civilisation`, 
-				`village`,
-				`position`, 
-				`carriere`, 
-				`last_action`, 
-				`date_last_combat`) 
-			VALUES (
-				NULL, 
-				'".$_SESSION['inscription']['login']."', 
-				'".$_SESSION['inscription']['password']."', 
-				'".$_SESSION['inscription']['mail']."', 
-				'".date('Y-m-d H:i:s')."', 
-				'".$_SESSION['inscription']['civilisation']."', 
-				'".$this->Village."', 
-				'".$this->PositionAleatoire($_SESSION['inscription']['civilisation'])."', 
-				'".$this->Carriere."', 
-				'".date('Y-m-d H:i:s')."', 
-				'".date('Y-m-d H:i:s')."');";
-		mysql_query($sql) or die ( mysql_error().'<br />'.$sql);
-		//echo $sql;
 		
+		$sql = 	"INSERT INTO table_joueurs (
+					`id`, 
+					`login`, 
+					`password`, 
+					`mail`, 
+					`dates`, 
+					`civilisation`, 
+					`village`,
+					`position`, 
+					`carriere`, 
+					`last_action`, 
+					`date_last_combat`) 
+				VALUES (
+					NULL, 
+					'".$_SESSION['inscription']['login']."', 
+					'".$_SESSION['inscription']['password']."', 
+					'".$_SESSION['inscription']['mail']."', 
+					'".date('Y-m-d H:i:s')."', 
+					'".$_SESSION['inscription']['civilisation']."', 
+					'".$this->Village."', 
+					'".$this->PositionAleatoire($_SESSION['inscription']['civilisation'])."', 
+					'".$this->Carriere."', 
+					'".date('Y-m-d H:i:s')."', 
+					'".date('Y-m-d H:i:s')."');";
+		mysql_query($sql) or die ( mysql_error().'<br />'.$sql);
+		
+		$sql = "INSERT INTO table_villages (
+					`villages_nom`, 
+					`villages_civilisation`, 
+					`villages_citoyen`)
+				VALUES (
+					'".$this->Village."', 
+					'".$_SESSION['inscription']['civilisation']."', 
+					'".$_SESSION['inscription']['login']."');";
+		mysql_query($sql) or die ( mysql_error().'<br />'.$sql);
 	}
 	
 	public function loadForm($data){
@@ -109,6 +131,7 @@ class InscriptionStepB{
 		return false; 
 	}
 	private function printForm(){
+		$temp = $this->GetInfoMetier($this->Carriere);
 		echo '
 		<div style="padding:2px;margin:2px;" >
 			<h3>Vous êtes inscrit</h3>
@@ -121,21 +144,26 @@ class InscriptionStepB{
 				<li><b>Votre login : </b>'.$_SESSION['inscription']['login'].'</li>
 				<li><b>Votre mail : </b>'.$_SESSION['inscription']['mail'].'</li>
 				<li><b>Votre Village : </b>'.$this->Village.'</li>
-				<li><b>Votre Carrière : </b>'.$this->Carriere.'</li>
+				<li><b>Votre Carrière : </b>'.$temp['carriere_nom'].'</li>
 			</ul>
 		</div>
 		<button type="button" style="width:160px;" onclick="window.location=\'./\'">Retour</button>';
 	}
 	private function PositionAleatoire($civilisation){
-		global $nbLigneCarte, $nbColonneCarte, $nbCarteV, $nbCarteH;
-		switch($civilisation){
-			case InscriptionStepA::CIVI_GAULOIS:
-				$Cartes = array('a','b','c','d','e','f','g','h','i','j','m','n','o');
-				break;
-			case InscriptionStepA::CIVI_ROMAINS:
-				$Cartes = array('k','l','p','q','r','s','t','u','v','w','x','y');
-				break;
+		global $nbLigneCarte, $nbColonneCarte;
+		if(is_null($this->CarteVillage)){
+			switch($civilisation){
+				case InscriptionStepA::CIVI_GAULOIS:
+					$Cartes = array('a','b','c','d','e','f','g','h','i','j','m','n','o');
+					break;
+				case InscriptionStepA::CIVI_ROMAINS:
+					$Cartes = array('k','l','p','q','r','s','t','u','v','w','x','y');
+					break;
+			}
+		}else{
+			$Cartes = array($this->CarteVillage);
 		}
+		
 		//$Cartes = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y');
 
 		$numL = mt_rand(0,$nbLigneCarte);
@@ -201,7 +229,7 @@ class InscriptionStepB{
 		
 	}
 	public function GetListeCarrieres(){
-		$sql = "SELECT carriere_nom, carriere_debouchees FROM table_carrieres_lst WHERE carriere_niveau=0 ORDER BY carriere_nom ASC;";
+		$sql = "SELECT carriere_nom, carriere_debouchees, carriere_code FROM table_carrieres_lst WHERE carriere_niveau=0 AND carriere_civilisation='".$_SESSION['inscription']['civilisation']."' ORDER BY carriere_nom ASC;";
 		$rqtMetier = mysql_query($sql) or die ( mysql_error() );
 		
 		if(mysql_num_rows($rqtMetier) > 0){
@@ -209,7 +237,7 @@ class InscriptionStepB{
 			while($row = mysql_fetch_array($rqtMetier, MYSQL_ASSOC)){
 				$temp  = '<tr>
 							<td>
-								<input required="required" type="radio" name="carriere" value="'.strtolower($row['carriere_nom']).'" />
+								<input required="required" type="radio" name="carriere" value="'.strtolower($row['carriere_code']).'" />
 							</td>
 							<td>'
 								.'<h2>'.ucfirst($row['carriere_nom']).'</h2>';
@@ -252,6 +280,20 @@ class InscriptionStepB{
 		}else{
 			return null;
 		}
+	}
+	private function GetCarteVillage($Village){
+		$sql = "SELECT maison_installe FROM table_joueurs WHERE civilisation='".$_SESSION['inscription']['civilisation']."' AND village='".$Village."';";
+		$rqt = mysql_query($sql) or die ( mysql_error() );
+		
+		while($row = mysql_fetch_array($rqt, MYSQL_ASSOC)){
+			$temp = explode(',', $row['maison_installe']);
+			if(!is_null($temp[0])){
+				break;
+			}
+		}
+		
+		
+		return $temp[0];
 	}
 }
 ?>
