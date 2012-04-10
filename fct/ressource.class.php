@@ -1,5 +1,5 @@
 <?php
-class Ressource{
+class ressource{
 	
 	private $intIDCase,
 			$strCoordonnee,

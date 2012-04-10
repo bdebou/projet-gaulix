@@ -352,7 +352,7 @@ function AfficheCollecteRessource(personnage &$oJoueur) {
 		return null;
 	}
 	//si c'est une ressource, on continu en créant l'objet Ressource
-	$objRessource = new Ressource($resultCarte, $resultBatiment);
+	$objRessource = new ressource($resultCarte, $resultBatiment);
 	$_SESSION['main']['ressource'] = $objRessource;
 
 	switch ($objRessource->GetNom()) {
