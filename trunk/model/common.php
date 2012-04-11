@@ -2,7 +2,7 @@
 function FoundBatiment($idType = false, $login = false, $Coordonnees = false) {
 	global $lstNonBatiment, $objManager;
 	$sql = "SELECT * FROM table_carte WHERE
-			login='". ($login ? $login : $_SESSION['joueur']) . "'"
+			login". ($login ? " = '".$login."'" : ' IS NULL')
 	. ($idType ? " AND id_type_batiment=$idType" : "")
 	. ($Coordonnees ? " AND coordonnee='$Coordonnees'" : "")
 	. " AND detruit IS NULL;";
@@ -10,18 +10,21 @@ function FoundBatiment($idType = false, $login = false, $Coordonnees = false) {
 	$requete = mysql_query($sql) or die(mysql_error() . '<br />Function FoundBatiment SQL = ' . $sql);
 	if (mysql_num_rows($requete) > 0) {
 		$carte = mysql_fetch_array($requete, MYSQL_ASSOC);
-		if(!in_array($carte['id_type_batiment'], $lstNonBatiment)){
-			$sql2 = "SELECT * FROM table_batiment WHERE id_batiment=" . $carte['id_type_batiment'] . ";";
-			$requete2 = mysql_query($sql2) or die(mysql_error() . '<br />' . $sql2);
-			$batiment = mysql_fetch_array($requete2, MYSQL_ASSOC);
-			$objBatiment =  new $batiment['batiment_type']($carte, $batiment);
-			$objManager->UpdateBatiment($objBatiment);
-			return $objBatiment;
-			//return new batiment($carte, $batiment);
-		}
-	} else {
-		return null;
+			
+		$sql2 = "SELECT * FROM table_batiment WHERE id_batiment=" . $carte['id_type_batiment'] . ";";
+		$requete2 = mysql_query($sql2) or die(mysql_error() . '<br />' . $sql2);
+		
+		$batiment = mysql_fetch_array($requete2, MYSQL_ASSOC);
+		
+		$objBatiment =  new $batiment['batiment_type']($carte, $batiment);
+		
+		$objManager->UpdateBatiment($objBatiment);
+		
+		return $objBatiment;
 	}
+	
+	return null;
+	
 }
 function AfficheIcone($type, $HeightIcone = 20) {
 	$Name = $type;
@@ -564,7 +567,7 @@ function ActionMettreDansBolga(&$check, $type, personnage &$oJoueur, &$objManage
 			return;
 		}
 		//Si tout OK, alors on transfert
-		$maison = FoundBatiment(1);
+		$maison = $oJoueur->GetObjSaMaison();
 		switch($type){
 			case 'Nourriture':
 				$maison->MindNourriture($_SESSION['LoginStatus'][$type]);
@@ -592,11 +595,11 @@ function ActionRessource(&$check, personnage &$oJoueur, &$objManager, $id = NULL
 			$_SESSION['main']['ressource']->StartCollect($oJoueur, $id);
 		}elseif((strtotime('now') - $_SESSION['main']['ressource']->GetDateDebutAction()) >= $_SESSION['main']['ressource']->GetTempRessource()){
 			if($oJoueur->GetLogin() == $_SESSION['main']['ressource']->GetCollecteur()){
-				$oMaison = FoundBatiment(1, $oJoueur->GetLogin());
+				$oMaison = $oJoueur->GetObjSaMaison();
 				$_SESSION['main']['ressource']->FinishCollect($oJoueur, $oMaison);
 			}else{
 				$oCollecteur = $objManager->GetPersoLogin($_SESSION['main']['ressource']->GetCollecteur());
-				$oMaison = FoundBatiment(1, $oCollecteur->GetLogin());
+				$oMaison = $oCollecteur->GetObjSaMaison();
 				$_SESSION['main']['ressource']->FinishCollect($oCollecteur, $oMaison);
 				$objManager->update($oCollecteur);
 				unset($oCollecteur);
@@ -626,13 +629,13 @@ function ActionDeplacement(&$check, &$oJoueur){
 		echo 'Erreur GLX0002: Fonction ActionDeplacement';
 	}
 }
-function ActionUtiliser(&$check, &$arInfoObject, &$oJoueur, &$objManager){
+function ActionUtiliser(&$check, &$arInfoObject, personnage &$oJoueur, &$objManager){
 	if(!is_null($arInfoObject['code'])){
 		if($arInfoObject['action']){
 			$oJoueur->AddInventaire($arInfoObject['code'], $arInfoObject['type']);
 		}
 
-		$maison = FoundBatiment(1);
+		$maison = $oJoueur->GetObjSaMaison();
 
 		switch($arInfoObject['type']){
 			case 'vie':			$oJoueur->GagnerVie($arInfoObject['value']);							break;
@@ -661,7 +664,7 @@ function ActionUtiliser(&$check, &$arInfoObject, &$oJoueur, &$objManager){
 		echo 'Erreur GLX0002: Fonction ActionUtiliser';
 	}
 }
-function ActionLaisser(&$check, &$oJoueur){
+function ActionLaisser(&$check, personnage &$oJoueur){
 	if(isset($_GET['type'])){
 		if($_GET['type'] == 'objet'){
 			$oJoueur->SetLastObject(true,null);

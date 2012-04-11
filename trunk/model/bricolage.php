@@ -181,12 +181,12 @@ function AfficheInfoObjetBricolage($Objet, &$numObjet){
 	unset($oJoueur);
 	return $txt;
 }
-function AfficheRessourceBesoin($lstRessources, &$ChkRessource, &$oJoueur, $nb = 1){
+function AfficheRessourceBesoin($lstRessources, &$ChkRessource, personnage &$oJoueur, $nb = 1){
 	$txt = '<ul style="list-style-type:none; padding:0px; text-align:center;">';
 	//$ChkRessource = true;
 	$nbRes = 0;
 	$arLstRessources = explode(',', $lstRessources);
-	$maison = FoundBatiment(1);
+	$maison = $oJoueur->GetObjSaMaison();
 	foreach($arLstRessources as $Ressource){
 		$arRessource = explode('=', $Ressource);
 		$chkFound[$nbRes] = false;
@@ -229,11 +229,11 @@ function AfficheRessourceBesoin($lstRessources, &$ChkRessource, &$oJoueur, $nb =
 	
 	return $txt;
 }
-function ActionFabriquer(&$check, $id, &$oJoueur, &$objManager){
+function ActionFabriquer(&$check, $id, personnage &$oJoueur, &$objManager){
 	global $lstPoints;
 	if(isset($_SESSION['main']['bricolage'][$id])){
 		//on trouve la maison
-		$maison = FoundBatiment(1);
+		$maison = $oJoueur->GetObjSaMaison();
 
 		if(!is_null($maison)){
 			$LstPrix = explode(',', $_SESSION['main']['bricolage'][$id]['prix']);

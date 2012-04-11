@@ -4,27 +4,27 @@ function CreateListBatiment(personnage &$oJoueur){
 	
 	$lstBatiment = null;
 	
-	$sql = "SELECT * FROM table_carte WHERE login='".$oJoueur->GetLogin()."' AND detruit IS NULL;";
+	$sql = "SELECT coordonnee, id_type_batiment FROM table_carte WHERE login='".$oJoueur->GetLogin()."' AND detruit IS NULL;";
 	$requete = mysql_query($sql) or die ( mysql_error() );
 	
 	if(mysql_num_rows($requete) > 0){
 	
 		while($carte = mysql_fetch_array($requete, MYSQL_ASSOC)){
 			if(!in_array($carte['id_type_batiment'], $lstNonBatiment)){
-				$lstBatiment[] = AfficheBatiment(FoundBatiment(NULL, NULL, $carte['coordonnee']), $oJoueur);
+				$lstBatiment[] = AfficheBatiment(FoundBatiment(NULL, $oJoueur->GetLogin(), $carte['coordonnee']), $oJoueur);
 			}
 		}
 	}
 
 	return $lstBatiment;
 }
-function AfficheBatiment(&$batiment, &$oJoueur){
+function AfficheBatiment(batiment &$batiment, personnage &$oJoueur){
 	$ImgSize = 'height';
 	$txt = '
 	<table class="village">';
 
 	$contenu = 'Ne peut rien contenir';
-	$PositionBatiment	= implode(',', array_merge(array($batiment->GetCarte()),$batiment->GetCoordonnee()));
+	$PositionBatiment	= implode(',', array_merge(array($batiment->GetCarte()), $batiment->GetCoordonnee()));
 	$PositionJoueur		= $oJoueur->GetCoordonnee();
 	$chkDruide = false;
 	$chkMarche = false;
@@ -137,10 +137,10 @@ function UpdateTransaction($id, $type='vendu') {
 //+---------------------------------+
 //|				ACTIONS				|
 //+---------------------------------+
-function ActionAmeliorerBatiment(&$check, &$oJoueur, &$objManager, $coordonnee){
+function ActionAmeliorerBatiment(&$check, personnage &$oJoueur, &$objManager, $coordonnee){
 	if(isset($_SESSION['main'][$coordonnee])){
 
-		$maison = FoundBatiment(1);
+		$maison = $oJoueur->GetObjSaMaison();
 		$chk = true;
 
 		if(!is_null($maison)){
@@ -193,12 +193,12 @@ function ActionAmeliorerBatiment(&$check, &$oJoueur, &$objManager, $coordonnee){
 		echo 'Erreur GLX0002: Fonction ActionAmeliorerBatiment';
 	}
 }
-function ActionReparer(&$check, $id, $num, &$oJoueur, &$objManager){
+function ActionReparer(&$check, $id, $num, personnage &$oJoueur, &$objManager){
 	if(isset($_SESSION['main']['Reparer'])){
 		$batiment = FoundBatiment(null, $oJoueur->GetLogin(), $oJoueur->GetCoordonnee());
 		
 		if(!is_null($batiment)){
-			if(CheckIfAssezRessource(array('ResOr', $_SESSION['main']['Reparer'][$id]['montant']), $oJoueur, FoundBatiment(1))){
+			if(CheckIfAssezRessource(array('ResOr', $_SESSION['main']['Reparer'][$id]['montant']), $oJoueur, $oJoueur->GetObjSaMaison())){
 				$batiment->Reparer($_SESSION['main']['Reparer'][$id]['pts'], $oJoueur);
 				$oJoueur->MindOr($_SESSION['main']['Reparer'][$id]['montant']);
 				$objManager->UpdateBatiment($batiment);
@@ -284,9 +284,9 @@ function ActionReprendre(&$check, $id, &$oJoueur, &$objManager){
 		echo 'Erreur GLX0002: Fonction ActionReprendre';
 	}
 }
-function ActionViderStock(&$check, $id, $type, &$oJoueur, &$objManager){
+function ActionViderStock(&$check, $id, $type, personnage &$oJoueur, &$objManager){
 	if(isset($_SESSION['main'][$type]['vider'])){
-		$maison = FoundBatiment(1);
+		$maison = $oJoueur->GetObjSaMaison();
 		if(!is_null($maison)){
 			$batiment = FoundBatiment($id, null, $oJoueur->GetCoordonnee());
 			if(!is_null($batiment)){
@@ -309,8 +309,8 @@ function ActionViderStock(&$check, $id, $type, &$oJoueur, &$objManager){
 		echo 'Erreur GLX0002: Fonction ActionViderStock';
 	}
 }
-function ActionProduction(&$check, $id, $NomBatiment, $type, &$oJoueur, &$objManager){
-	$maison = FoundBatiment(1);
+function ActionProduction(&$check, $id, $NomBatiment, $type, personnage &$oJoueur, &$objManager){
+	$maison = $oJoueur->GetObjSaMaison();
 	if(!is_null($maison)){
 		$batiment = FoundBatiment($id, null, $oJoueur->GetCoordonnee());
 		if(!is_null($batiment)){
@@ -329,9 +329,9 @@ function ActionProduction(&$check, $id, $NomBatiment, $type, &$oJoueur, &$objMan
 		echo 'Erreur GLX0003: Fonction ActionProduction - Maison Introuvable';
 	}
 }
-function ActionDruide(&$chkErr, $id, &$oJoueur, &$objManager){
+function ActionDruide(&$chkErr, $id, personnage &$oJoueur, &$objManager){
 	if(isset($_SESSION['main']['druide'])){
-		$maison = FoundBatiment(1);
+		$maison = $oJoueur->GetObjSaMaison();
 		foreach($_SESSION['main']['druide'][$id] as $key=>$value){
 			switch($key){
 				case 'N' :
@@ -429,7 +429,7 @@ function ActionVenteMarche(&$check, $id, &$oJoueur, &$objManager){
 		echo 'Erreur GLX0002: Fonction ActionVenteMarché';
 	}
 }
-function ActionAnnulerTransaction(&$chkErr, $id, &$oJoueur, &$objManager){
+function ActionAnnulerTransaction(&$chkErr, $id, personnage &$oJoueur, &$objManager){
 	if(isset($_GET['action']) and $_GET['action'] == 'annulertransaction'){
 		UpdateTransaction($_SESSION['main']['transaction'][$id]['annuler'], 'annule');
 
@@ -437,7 +437,7 @@ function ActionAnnulerTransaction(&$chkErr, $id, &$oJoueur, &$objManager){
 		$requete = mysql_query($sql) or die (mysql_error());
 		$row = mysql_fetch_array($requete, MYSQL_ASSOC);
 
-		$maison = FoundBatiment(1);
+		$maison = $oJoueur->GetObjSaMaison();
 
 		$maison->AddNourriture($row['vente_nourriture']);
 		$maison->AddPierre($row['vente_pierre']);
@@ -453,13 +453,13 @@ function ActionAnnulerTransaction(&$chkErr, $id, &$oJoueur, &$objManager){
 		echo 'Erreur GLX0002: Fonction ActionAnnulerTransaction';
 	}
 }
-function ActionAccepterTransaction(&$chkErr, $id, &$oJoueur, &$objManager){
+function ActionAccepterTransaction(&$chkErr, $id, personnage &$oJoueur, &$objManager){
 	if(isset($_GET['action']) and $_GET['action'] == 'acceptertransaction'){
 		$sql = "SELECT * FROM table_marche WHERE ID_troc=".$_SESSION['main']['transaction'][$id]['accepter'].";";
 		$requete = mysql_query($sql) or die (mysql_error());
 		$row = mysql_fetch_array($requete, MYSQL_ASSOC);
 
-		$maisonA = FoundBatiment(1);
+		$maisonA = $oJoueur->GetObjSaMaison();
 		$maisonV = FoundBatiment(1, $row['vendeur']);
 		$vendeur = $objManager->GetPersoLogin($row['vendeur']);
 
@@ -510,11 +510,11 @@ function ActionAccepterTransaction(&$chkErr, $id, &$oJoueur, &$objManager){
 		echo 'Erreur GLX0002: Fonction ActionAccepterTransaction';
 	}
 }
-function ActionTransactionMarche(&$chkErr, &$oJoueur, &$objManager){
+function ActionTransactionMarche(&$chkErr, personnage &$oJoueur, &$objManager){
 	if(isset($_POST['transaction'])){
 		$_SESSION['transaction']['acceptation'] = null;
 
-		$maison = FoundBatiment(1);
+		$maison = $oJoueur->GetObjSaMaison();
 
 		if($_POST['VOr']			> $oJoueur->GetArgent()){
 			$_SESSION['transaction']['acceptation'] .= 'Transaction annulée : Pas assez d\'or<br />';

@@ -161,7 +161,7 @@ class marche extends batiment{
 			</tr>';
 		}else{
 			//on trouve la maison du joueur
-			$maison = FoundBatiment(1);
+			$maison = $oJoueur->GetObjSaMaison();
 			
 			$txt .= '
 			<tr>
