@@ -151,8 +151,8 @@ function AfficheAvancementCompetence($competence, $info, &$chkFinis){
 		.$txtStatus
 	.'</table>';
 }
-function AfficheInfoCompetence($competence, &$oJoueur){
-	$maison = FoundBatiment(1);
+function AfficheInfoCompetence($competence, personnage &$oJoueur){
+	$maison = $oJoueur->GetObjSaMaison();
 	$check = false;
 	if(	!is_null($maison)
 		AND $competence['cmp_lst_prix_or']			<= $oJoueur->GetArgent()
@@ -347,9 +347,9 @@ function ActionPerfAtt(&$check, &$oJoueur){
 		echo 'Erreur GLX0002: Fonction ActionPerfAtt';
 	}
 }
-function ActionCompetence(&$check, &$oJoueur, $cmp, &$objManager){
+function ActionCompetence(&$check, personnage &$oJoueur, $cmp, &$objManager){
 	if(!is_null($_SESSION['main'][$cmp])){
-		$maison = FoundBatiment(1);
+		$maison = $oJoueur->GetObjSaMaison();
 
 		AddEnregistrementCompetence($cmp, $_SESSION['main'][$cmp]['niveau'], $_SESSION['main'][$cmp]['temp']);
 
