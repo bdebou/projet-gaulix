@@ -8,6 +8,7 @@ class personnage{
 			$vie,
 			$civilisation,
 			$village,
+			$carriere,
 			$val_attaque, $val_defense,
 			$argent,
 			$experience,
@@ -308,8 +309,6 @@ class personnage{
 	//Gestion du bolga
 	public function AddInventaire($codeObjet, $typeObjet = 'ObjetPouvantEtreGroupé', $nbObjet = 1, $chkLast = true){
 		$chk = false;
-		//$lstRes = array('ResBoi', 'ResNou', 'ResPie', 'ResVie', 'ResDep');
-		//$lstBri = array('sac', 'arme', 'bouclier', 'jambiere', 'casque', 'cuirasse');
 		
 		//la structure est type1=nb1,type2=nb2 (exemple : cuir=6,longbaton=3)
 		if(!is_null($this->arInventaire)){
@@ -491,6 +490,7 @@ class personnage{
 								'down'	=>array('u','v','w','x','y'),
 								'left'	=>array('a','f','k','p','u'),
 								'right'	=>array('e','j','o','t','y'));
+		
 		$arPosition = array(	'up'	=>array('x'=>($this->position[1] - 1), 'y'=>$this->position[2]),
 								'down'	=>array('x'=>($this->position[1] + 1), 'y'=>$this->position[2]),
 								'left'	=>array('x'=>$this->position[1], 'y'=>($this->position[2] - 1)),
@@ -499,27 +499,29 @@ class personnage{
 		if(		($direction == 'up'		AND $this->position[1] == 0)
 			OR	($direction == 'down'	AND $this->position[1] == $nbLigneCarte)
 			OR	($direction == 'left'	AND $this->position[2] == 0)
-			OR	($direction == 'right'	AND $this->position[2] == $nbColonneCarte)){
-			if(	(in_array($direction, array('up', 'down'))
-					AND ($this->position[2] == 0
-						OR $this->position[2] == $nbColonneCarte)
-				) OR (
-				in_array($direction, array('left', 'right'))
-					AND ($this->position[1] == 0
-						OR $this->position[1] == $nbLigneCarte))){
-						if(in_array($this->GetCarte(), $arCoteCarte[$direction])){return false;}
-			}else{return false;}
-		}
+			OR	($direction == 'right'	AND $this->position[2] == $nbColonneCarte))
+			{
+				if(in_array($this->GetCarte(), $arCoteCarte[$direction]))
+				{
+					return false;
+				}
+			}
 		
 		//a t on encore assez de déplacement?
-		if($this->deplacement<=0){return false;}
+		if($this->deplacement <= 0)
+		{
+			return false;
+		}
 		//Y a t il un mur ou une tour?
-		if($this->chkIfMur(implode(',', array($this->GetCarte(), $arPosition[$direction]['x'], $arPosition[$direction]['y'])))){return false;}
+		if($this->chkIfBatimentBloquant(implode(',', array($this->GetCarte(), $arPosition[$direction]['x'], $arPosition[$direction]['y']))))
+		{
+			return false;
+		}
 		//Si non on peut bouger
 		return true;
 	}
-	Private function chkIfMur($position){
-		$TypeBatimentBloquant = array('mur'=>2, 'tour'=>3);
+	Private function chkIfBatimentBloquant($position){
+		$TypeBatimentBloquant = array(2 /*Mur*/, 3 /*Tour*/);
 		$sql = "SELECT coordonnee, login 
 				FROM table_carte 
 				WHERE 
@@ -528,8 +530,8 @@ class personnage{
 					AND detruit IS NULL;";
 		$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
 		while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
-			//if($row['coordonnee'] == $position AND $row['login'] != $this->login){
-			if($row['coordonnee'] == $position){
+			if($row['coordonnee'] == $position)
+			{
 				return true;
 			}
 		}
@@ -576,8 +578,10 @@ class personnage{
 	
 	Private function ListeCodesEquipement(){
 		$tmp = null;
-		foreach (array('code_arme', 'code_bouclier', 'code_cuirasse', 'code_jambiere', 'code_casque') as $Type){
-			if(!is_null($this->$Type)){
+		foreach (array('code_arme', 'code_bouclier', 'code_cuirasse', 'code_jambiere', 'code_casque') as $Type)
+		{
+			if(!is_null($this->$Type))
+			{
 				$tmp[] = $this->$Type;
 			}
 		}
@@ -588,14 +592,17 @@ class personnage{
 			//on initialise la valeur des équipements
 		$ValSort = 0;
 		
-		if(!is_null($this->LstSorts)){
-			foreach($this->LstSorts as $Sort){
+		if(!is_null($this->LstSorts))
+		{
+			foreach($this->LstSorts as $Sort)
+			{
 				$arSort = explode('=', $Sort);
 		
 				$sql = "SELECT ".$type." FROM table_objets WHERE objet_code='".$arSort[0]."';";
 				$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
 		
-				while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
+				while($row = mysql_fetch_array($requete, MYSQL_ASSOC))
+				{
 					$ValSort += intval($row[$type]);
 				}
 			}
@@ -637,10 +644,13 @@ class personnage{
 				case 'login':
 				case 'mail':
 				case 'civilisation':
-				case 'village':				$this->$key = strval($value);
-											break;
-				case 'position':			$this->$key = explode(',', $value);
-											break;
+				case 'village':
+				case 'carriere':
+					$this->$key = strval($value);
+					break;
+				case 'position':
+					$this->$key = explode(',', $value);
+					break;
 				case 'id':
 				case 'nb_points':
 				case 'argent':
@@ -653,34 +663,52 @@ class personnage{
 				case 'experience':
 				case 'niveau':
 				case 'deplacement':
-				case 'vie':					$this->$key = intval($value);
-											break;
-				case 'last_action':			$this->$key = strtotime($value);
-											break;
-				case 'date_last_combat':	$this->last_combat = strtotime($value); break;
+				case 'vie':
+					$this->$key = intval($value);
+					break;
+				case 'last_action':
+					$this->$key = strtotime($value);
+					break;
+				case 'date_last_combat':
+					$this->last_combat = strtotime($value);
+					break;
 				case 'not_attaque':
 				case 'not_combat':
 				case 'attaque_tour':
 				case 'chk_chasse':
 				case 'chk_object':
-				case 'chk_legion':			$this->$key = (is_null($value)?false:true);
-											break;
+				case 'chk_legion':
+					$this->$key = (is_null($value)?false:true);
+					break;
 				case 'last_object':
 				case 'code_casque':
 				case 'code_arme':
 				case 'code_bouclier':
 				case 'code_jambiere':
 				case 'code_cuirasse':
-				case 'code_sac':			$this->$key = (is_null($value)?NULL:strval($value));
-											break;
-				case 'inventaire':			$this->arInventaire = (is_null($value)?null:explode(',', $value)); break;
-				case 'date_perf_attaque':	$this->$key = (is_null($value)?NULL:strtotime($value)); break;
-				case 'tmp_perf_attaque':	$this->$key = (is_null($value)?NULL:intval($value)); break;
-				case 'date_perf_defense':	$this->$key = (is_null($value)?NULL:strtotime($value)); break;
-				case 'tmp_perf_defense':	$this->$key = (is_null($value)?NULL:intval($value)); break;
-				case 'maison_installe':		$this->$key = (is_null($value)?NULL:explode(',', $value)); break;
-				case 'clan':				$this->$key = (is_null($value)?NULL:htmlspecialchars_decode($value, ENT_QUOTES)); break;
-				case 'date_last_msg_lu':	$this->DateLastMessageLu = strtotime($value); break;
+				case 'code_sac':
+					$this->$key = (is_null($value)?NULL:strval($value));
+					break;
+				case 'inventaire':
+					$this->arInventaire = (is_null($value)?null:explode(',', $value));
+					break;
+				case 'date_perf_defense':
+				case 'date_perf_attaque':
+					$this->$key = (is_null($value)?NULL:strtotime($value));
+					break;
+				case 'tmp_perf_attaque':
+				case 'tmp_perf_defense':
+					$this->$key = (is_null($value)?NULL:intval($value));
+					break;
+				case 'maison_installe':
+					$this->$key = (is_null($value)?NULL:explode(',', $value));
+					break;
+				case 'clan':
+					$this->$key = (is_null($value)?NULL:htmlspecialchars_decode($value, ENT_QUOTES));
+					break;
+				case 'date_last_msg_lu':
+					$this->DateLastMessageLu = strtotime($value);
+					break;
 				
 				case 'livre_sorts':
 					if(is_null($value)){
@@ -806,6 +834,8 @@ class personnage{
 	public function GetMail(){				return $this->mail;}
 	public function GetVie(){				return $this->vie;}
 	public function GetCivilisation(){		return $this->civilisation;}
+	public function GetVillage(){			return $this->village;}
+	public function GetCodeCarriere(){		return $this->carriere;}
 	public function GetMaisonInstalle(){	return $this->maison_installe;}
 	public function GetAttaqueTour(){		return $this->attaque_tour;}
 	public function GetClan(){				return $this->clan;}
@@ -821,6 +851,6 @@ class personnage{
 		return $this->lstCompetences[ucfirst($competence)];
 	}
 	public function GetDateLasMessageLu(){	return $this->DateLastMessageLu;}
-
+	public function GetObjSaMaison(){		return FoundBatiment(1, $this->login);}
 }
 ?>
