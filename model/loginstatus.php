@@ -1,6 +1,6 @@
 <?php
 function AfficheRessource($type, personnage &$oJoueur){
-	$maison = FoundBatiment(1);
+	$maison = $oJoueur->GetObjSaMaison();
 	
 	if(!is_null($maison)){
 		switch (ucfirst($type)){
