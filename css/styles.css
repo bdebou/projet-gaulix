@@ -118,6 +118,10 @@ div.statistiques{
 	height: 100px;
 	width : 200px;
 }
+div.loginstatus span.login{
+	 font-weight: bold;
+	 text-transform: uppercase;
+}
 
 /*  Les Onglets */
 .onglet{
@@ -151,8 +155,7 @@ div.statistiques{
 table.options,
 table.mouvements,
 table.regles_credit, table.regles_credit td,
-table.quetes, table.quetes td,
-table.all_cartes, table.all_cartes td{
+table.quetes, table.quetes td{
 	border: none;
 }
 table.InfoBulle{
@@ -184,7 +187,7 @@ table.regles_competences,
 table.loginstatus,
 table.statistiques,
 table.lst_village,
-table.lst_carrière,
+table.lst_carriere,
 table.inscription{
 	width: 100%;
 }
@@ -216,7 +219,7 @@ table.loginstatus td,
 table.statistiques, table.statistiques td,
 table.inscription td.info
 table.lst_village, table.lst_village td,
-table.lst_carrière, table.lst_carrière td{
+table.lst_carriere, table.lst_carriere td{
 	border-collapse: collapse;
 	border: 1px solid black;
 }
@@ -271,25 +274,45 @@ table.all_cartes{
 	margin-left: auto;
 	margin-right: auto;
 	border-spacing: 0px;
+	background-image: url('../img/carte/mini/gaule.png');
+	border-collapse: collapse;
+	border: 1px solid black;
 }
 table.all_cartes td{
 	padding: 0px;
+	border-collapse: collapse;
+	border: 1px solid black;
 }
 table.carte_petite,
 table.carte{
 	margin: 0px;
-	background-image: url('../img/bcg/herbe.gif');
+	border-collapse: collapse;
+	border: none;
+	/*background-image: url('../img/bcg/herbe.gif');*/
 }
 table.carte td{
 	width: 32px;
 	height: 32px;
 	padding: 0px;
+	border: 1px solid black;
 }
 table.carte_petite td{
-	width: 10px;
-	height: 10px;
 	padding: 0px;
-	line-height:10px;
+	
+	/*AVEC le cadrillage*/
+	
+	/* width: 10px;
+	height: 10px;
+	border: 1px solid black;
+	line-height:10px; */
+	
+	/*SANS le cadrillage*/
+	
+	width: 11px;
+	height: 11px;
+	line-height: 11px;
+	border: none;
+	
 }
 table.inventaire th{
 	text-decoration: underline;
