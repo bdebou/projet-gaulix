@@ -11,9 +11,11 @@ $arDef = $oJoueur->GetDefPerso();
 	<a id="TopPage"></a>
 	<table class="loginstatus">
 		<tr>
-			<td style="background-color: Brown; font-weight:bold; text-transform:uppercase; width:200px;">
-				<?php echo $oJoueur->GetLogin();?> (<?php echo $oJoueur->GetNiveau();?>)
-				<?php echo AfficheRecompenses($oJoueur->GetLogin(), $oJoueur->GetClan());?>
+			<td style="background-color: Brown; width:200px;">
+				<span class="login"><?php echo $oJoueur->GetLogin();?></span><?php echo AfficheRecompenses($oJoueur->GetLogin(), $oJoueur->GetClan());?>
+				<br />
+				<?php echo ucfirst(GetInfoCarriere($oJoueur->GetCodeCarriere(),'carriere_nom'));?>
+				
 			</td>
 			<td style="width:150px;">
 				<img alt="Barre de Vie" src="./fct/fct_image.php?type=vie&amp;value=<?php echo $oJoueur->GetVie();?>&amp;max=<?php echo personnage::VIE_MAX;?>" />
@@ -24,7 +26,7 @@ $arDef = $oJoueur->GetDefPerso();
 			<td style="background-color:<?php echo $arCouleurs['Or'];?>; width:145px;">
 				<?php echo AfficheIcone('or');?> : <?php echo $oJoueur->GetArgent();?>
 			</td>
-			<?php if(!is_null(FoundBatiment(1))){?>
+			<?php if(!is_null($oJoueur->GetObjSaMaison())){?>
 			<td style="background-color:<?php echo $arCouleurs['Nourriture'];?>;">
 				<?php echo AfficheRessource('Nourriture', $oJoueur)?>
 			</td>
@@ -44,7 +46,7 @@ $arDef = $oJoueur->GetDefPerso();
 			<td style="background-color:<?php echo $arCouleurs['Defense'];?>;">
 				<?php echo AfficheIcone('defense');?> : <?php echo $arDef['0'];?> (<?php echo $arDef['1'];?>)
 			</td>
-			<?php if(!is_null(FoundBatiment(1))){?>
+			<?php if(!is_null($oJoueur->GetObjSaMaison())){?>
 			<td style="background-color:<?php echo $arCouleurs['Pierre'];?>;">
 				<?php echo AfficheRessource('Pierre', $oJoueur)?>
 			</td>
