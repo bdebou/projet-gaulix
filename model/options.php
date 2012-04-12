@@ -15,7 +15,8 @@ function Supprimer_Compte(personnage &$oJoueur){
 		if($_SESSION['main']['ressource']->GetCollecteur() == $oJoueur->GetLogin()){
 			$_SESSION['main']['ressource']->FreeRessource($oJoueur);
 		}
-		$objManager->UpdateRessource($_SESSION['main']['ressource']);
+		$objManager->UpdateBatiment($_SESSION['main']['ressource']);
+		
 		unset($_SESSION['main']['ressource']);
 	}
 		

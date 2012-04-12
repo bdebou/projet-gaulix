@@ -609,7 +609,8 @@ function ActionRessource(&$check, personnage &$oJoueur, &$objManager, $id = NULL
 			$objManager->UpdateBatiment($oMaison);
 			unset($oMaison);
 		}
-		$objManager->UpdateRessource($_SESSION['main']['ressource']);
+		//$objManager->UpdateRessource($_SESSION['main']['ressource']);
+		$objManager->UpdateBatiment($_SESSION['main']['ressource']);
 		unset($_SESSION['main']['ressource']);
 	}else{
 		$check = false;
