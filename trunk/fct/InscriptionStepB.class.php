@@ -38,6 +38,9 @@ class InscriptionStepB{
 		if(strlen($this->NewVillage) > self::SIZE_MAX_VILLAGE){
 			$this->Message .= '<li>Nom de village trop long (max '.self::SIZE_MAX_VILLAGE.' caractères)</li>';
 			return false;
+		}elseif(empty($this->NewVillage) or is_null($this->NewVillage)){
+			$this->Message .= '<li>Veuillez introduire un nom de village</li>';
+			return false;
 		}else{
 			$sql = "SELECT id FROM table_joueurs WHERE village='".$this->NewVillage."'";
 			// On vérifie si ce login existe
@@ -131,7 +134,6 @@ class InscriptionStepB{
 		return false; 
 	}
 	private function printForm(){
-		$temp = $this->GetInfoMetier($this->Carriere);
 		echo '
 		<div style="padding:2px;margin:2px;" >
 			<h3>Vous êtes inscrit</h3>
@@ -144,7 +146,7 @@ class InscriptionStepB{
 				<li><b>Votre login : </b>'.$_SESSION['inscription']['login'].'</li>
 				<li><b>Votre mail : </b>'.$_SESSION['inscription']['mail'].'</li>
 				<li><b>Votre Village : </b>'.$this->Village.'</li>
-				<li><b>Votre Carrière : </b>'.$temp['carriere_nom'].'</li>
+				<li><b>Votre Carrière : </b>'.GetInfoCarriere($this->Carriere, 'carriere_nom').'</li>
 			</ul>
 		</div>
 		<button type="button" style="width:160px;" onclick="window.location=\'./\'">Retour</button>';
@@ -164,13 +166,16 @@ class InscriptionStepB{
 			$Cartes = array($this->CarteVillage);
 		}
 		
-		//$Cartes = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y');
+		$arCaseLibre = FreeCaseCarte($Cartes[array_rand($Cartes)]);
+		
+		return $arCaseLibre[array_rand($arCaseLibre)];
+		/* //$Cartes = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y');
 
 		$numL = mt_rand(0,$nbLigneCarte);
 		$numC = mt_rand(0,$nbColonneCarte);
 		//$carteV = mt_rand(0, $nbCarteV);
 		//$carteH = mt_rand(0, $nbCarteH);
-		return implode(',', array($Cartes[array_rand($Cartes)], $numL, $numC));
+		return implode(',', array($Cartes[array_rand($Cartes)], $numL, $numC)); */
 	}
 	
 	//Les GETS
@@ -184,16 +189,16 @@ class InscriptionStepB{
 		$nbVillageois = 0;
 		$txtListVillageois = '<ul class="liste_villageois">';
 		while($row = mysql_fetch_array($rqtVillage, MYSQL_ASSOC)){
-			$txtListVillageois .= '<li>'.$row['login'].' ('.$row['carriere'].').</li>';
+			$txtListVillageois .= '<li>'.$row['login'].' ('.GetInfoCarriere($row['carriere'], 'carriere_nom').').</li>';
 			$nbVillageois++;
 			if($nbVillageois > self::NB_MAX_VILLAGEOIS){break;}
 		}
 		$txtListVillageois .= '</ul>';
 		
-		$txt  = '<h2>'.ucfirst($strVillage).'</h2>';
-		$txt .= '<p>Voici une partie des villageois :</p>';
-		$txt .= $txtListVillageois;
-		$txt .= '';
+		$txt  = '<h2 onmouseover="montre(\''.CorrectDataInfoBulle('<p>Voici une partie des villageois :</p>'.$txtListVillageois).'\');" onmouseout="cache();">'.ucfirst($strVillage).'</h2>';
+		//$txt .= '<p>Voici une partie des villageois :</p>';
+		//$txt .= $txtListVillageois;
+		//$txt .= '';
 		
 		return $txt;
 	}
@@ -240,27 +245,9 @@ class InscriptionStepB{
 								<input required="required" type="radio" name="carriere" value="'.strtolower($row['carriere_code']).'" />
 							</td>
 							<td>'
-								.'<h2>'.ucfirst($row['carriere_nom']).'</h2>';
-				
-				$arDebouchees_a = explode(',', $row['carriere_debouchees']);
-				$temp .= '<ul>';
-				//for($i = 0; $i <= self::PRESENTATION_NIV_MAX; $i++){
-					//$arCompetence = explode(',', $lstDebouchees);
-				foreach($arDebouchees_a as $metier_a){
-					$arInfoMetier_a = $this->GetInfoMetier($metier_a);
-					$temp .= '<li>'.ucfirst($arInfoMetier_a['carriere_nom']).'</li>';
-					$temp .= '<ul>';
-					$arDebouchees_b = explode(',', $arInfoMetier_a['carriere_debouchees']);
-					foreach($arDebouchees_b as $metier_b){
-						$arInfoMetier_b = $this->GetInfoMetier($metier_b);
-						$temp .= '<li>'.$arInfoMetier_b['carriere_nom'].'</li>';
-					}
-					$temp .= '</ul>';
-				}
-				
-				$temp .= '</ul>';
-				
-				$temp .= '</td></tr>';
+								.$this->GetDeboucheeCarrire($row['carriere_code'])
+							.'</td>
+						</tr>';
 				
 				$info[] = $temp;
 			}
@@ -271,15 +258,24 @@ class InscriptionStepB{
 		
 		return '<tr><td colspan="2">Aucune carrière disponnible.</td></tr>';
 	}
-	private function GetInfoMetier($code){
-		$sql = "SELECT * FROM table_carrieres_lst WHERE carriere_code='".$code."';";
-		$rqtMetier = mysql_query($sql) or die ( mysql_error() );
+	private function GetDeboucheeCarrire($CarriereCode){
+		$txt = '<ul>';
 		
-		if(mysql_num_rows($rqtMetier) > 0){
-			return mysql_fetch_array($rqtMetier, MYSQL_ASSOC);
-		}else{
-			return null;
+		foreach(explode(',', GetInfoCarriere($CarriereCode, 'carriere_debouchees')) as $metier_a){
+				
+			$txt .= '<li>'.ucfirst(GetInfoCarriere($metier_a, 'carriere_nom')).'</li>';
+			$txt .= '<ul>';
+				
+			foreach(explode(',', GetInfoCarriere($metier_a, 'carriere_debouchees')) as $metier_b){
+		
+				$txt .= '<li>'.ucfirst(GetInfoCarriere($metier_b, 'carriere_nom')).'</li>';
+			}
+			$txt .= '</ul>';
 		}
+		
+		$txt .= '</ul>';
+		
+		return '<h2 onmouseover="montre(\''.CorrectDataInfoBulle($txt).'\');" onmouseout="cache();">'.ucfirst(GetInfoCarriere($CarriereCode, 'carriere_nom')).'</h2>';
 	}
 	private function GetCarteVillage($Village){
 		$sql = "SELECT maison_installe FROM table_joueurs WHERE civilisation='".$_SESSION['inscription']['civilisation']."' AND village='".$Village."';";
