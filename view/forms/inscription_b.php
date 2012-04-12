@@ -1,10 +1,8 @@
 <div class="main">
 	<h1>Inscription (étape 2/2)</h1>
 	<?php
-	print_r($_SESSION);
 	if(!is_null($objStepTwo->GetMessage())){
 		echo $objStepTwo->GetMessage();
-		
 	}
 	?>
 	<form method="post" action="index.php?page=inscription_b">
@@ -35,7 +33,7 @@
 					</table>
 				</td>
 				<td>
-					<table class="lst_carrière">
+					<table class="lst_carriere">
 					<?php
 					if(is_array($objStepTwo->GetListeCarrieres())){
 						foreach($objStepTwo->GetListeCarrieres() as $carriere){
