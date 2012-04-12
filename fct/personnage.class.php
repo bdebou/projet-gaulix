@@ -512,29 +512,60 @@ class personnage{
 		{
 			return false;
 		}
+		
+		$PositionAVerifier = implode(',', array($this->GetCarte(), $arPosition[$direction]['x'], $arPosition[$direction]['y']));
+
 		//Y a t il un mur ou une tour?
-		if($this->chkIfBatimentBloquant(implode(',', array($this->GetCarte(), $arPosition[$direction]['x'], $arPosition[$direction]['y']))))
-		{
-			return false;
-		}
+		if($this->chkIfBatimentBloquant($PositionAVerifier)){return false;}
+		
+		//On vérifie si on peut aller sur la mer
+		if($this->CheckIfCaseMer($PositionAVerifier)){return false;}
+		
 		//Si non on peut bouger
 		return true;
 	}
-	Private function chkIfBatimentBloquant($position){
-		$TypeBatimentBloquant = array(2 /*Mur*/, 3 /*Tour*/);
-		$sql = "SELECT coordonnee, login 
+	private function CheckIfCaseMer($position){
+		$sql = "SELECT id_case_carte
 				FROM table_carte 
 				WHERE 
-					login NOT IN ('".implode("', '", ListeMembreClan($this->clan))."') 
-					AND id_type_batiment IN (".implode(', ', $TypeBatimentBloquant).") 
-					AND detruit IS NULL;";
+					coordonnee = '".$position."' 
+					AND id_type_batiment = 11;";
+		
 		$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
-		while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
+		
+		if(mysql_num_rows($requete) > 0){
+			return true;
+		}
+		/* while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
 			if($row['coordonnee'] == $position)
 			{
 				return true;
 			}
+		} */
+		return false;
+	}
+	Private function chkIfBatimentBloquant($position){
+		$TypeBatimentBloquant = array(2 /*Mur*/, 3 /*Tour*/);
+		$sql = "SELECT id_case_carte 
+				FROM table_carte 
+				WHERE 
+					login NOT IN ('".implode("', '", ListeMembreClan($this->clan))."') 
+					AND coordonnee = '".$position."'
+					AND id_type_batiment IN (".implode(', ', $TypeBatimentBloquant).") 
+					AND detruit IS NULL;";
+		
+		$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
+		
+		if(mysql_num_rows($requete) > 0){
+			
+			return true;
 		}
+		/* while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
+			if($row['coordonnee'] == $position)
+			{
+				return true;
+			}
+		} */
 		return false;
 	}
 	//Ressuscite le joueur
