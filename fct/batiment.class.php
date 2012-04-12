@@ -224,6 +224,25 @@ abstract class batiment{
 	}
 	
 	//--- Les modules d'affichage ---
+	public function GetInfoBulle($AllCartes = false){
+		return '<table>'
+					.'<tr>'
+						.($AllCartes?
+						'<td rowspan="2">'
+							.'<img src="./img/carte/'.$this->GetImgName().'.png" alt="'.$this->GetNom().'" title="'.$this->GetNom().'" />'
+						.'</td>'
+						:'')
+						.'<th>'
+							.$this->GetNom().(!is_null($this->GetLogin())?' de '.$this->GetLogin():'')
+						.'</th>'
+					.'</tr>'
+					.'<tr>'
+						.'<td>'
+							.'<img alt="'.$this->GetNom().'" src="./fct/fct_image.php?type=etatcarte&amp;value='.$this->GetEtat().'&amp;max='.$this->GetEtatMax().'" />'
+						.'</td>'
+					.'</tr>'
+				.'</table>';
+	}
 	public function AfficheOptionAmeliorer(&$oJoueur){
 		
 		$id = str_replace(',', '_', $this->Coordonnee);
@@ -253,7 +272,7 @@ abstract class batiment{
 			$prixAmelioration['Pierre']		= $this->PrixPierre		+ intval(($this->Niveau / 2) * $this->PrixPierre);
 			$prixAmelioration['Nourriture']	= $this->PrixNourriture	+ intval(($this->Niveau / 2) * $this->PrixNourriture);
 	
-			$maison = FoundBatiment(1);
+			$maison = $oJoueur->GetObjSaMaison();
 			
 			$_SESSION['main'][$id]['prixAmelioration'] = $prixAmelioration;
 	
@@ -370,6 +389,7 @@ abstract class batiment{
 	public function GetPrixNourriture(){		return $this->PrixNourriture;}
 	public function GetDateAmelioration(){		return $this->DateAmelioration;}
 	public function GetTmpAmelioration(){		return $this->TmpAmelioration;}
+	public function GetImgName(){				return get_class($this).'-'.($this->Login == $_SESSION['joueur']?'a':'b');}
 	public function GetCoordonnee(){
 		$arPosition = explode(',', $this->Coordonnee);
 		return array($arPosition['1'], $arPosition['2']);
@@ -387,6 +407,7 @@ abstract class batiment{
 			return 'Finish';
 		}
 	}
+	
 }
 
 ?>
