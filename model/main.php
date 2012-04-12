@@ -224,24 +224,13 @@ function AfficheActions(personnage &$oJoueur) {
 		}
 
 		//=== On affiche le choix des ennemis attaquables
-		$sql = "SELECT
-		id, 
-		login, 
-		vie, 
-		val_attaque, val_defense, 
-		niveau, 
-		date_last_combat 
-		FROM table_joueurs 
-		WHERE 
+		$sql = "SELECT * FROM table_joueurs WHERE 
 		login NOT IN ('".implode("', '", ListeMembreClan($oJoueur->GetClan()))."') 
 		AND position IN('".implode("', '", $arSQLPosition)."');";
 		echo AfficheListeEnnemisAFrapper($oJoueur, $sql);
 
 		//=== On affiche la liste des batiment attaquables
-		$SQLCarte = "SELECT *
-		FROM table_carte 
-		WHERE 
-		detruit IS NULL 
+		$SQLCarte = "SELECT * FROM table_carte WHERE detruit IS NULL 
 		AND login NOT IN ('".implode("', '", ListeMembreClan($oJoueur->GetClan()))."') 
 		AND coordonnee IN ('".implode("', '", $arSQLPosition)."');";
 		echo AfficheListeBatimentAttaquable($SQLCarte, $chkConstruction = true);
@@ -259,8 +248,8 @@ function AfficheActions(personnage &$oJoueur) {
 	echo AfficheQueteAPorteeDeTire($LstQueteAccessible);
 }
 function AfficheRedirectionBatiment(personnage &$oJoueur){
-	$batiment = FoundBatiment(false, false, $oJoueur->GetCoordonnee());
-	if(!is_null($batiment)){
+	$batiment = FoundBatiment(false, $oJoueur->GetLogin(), $oJoueur->GetCoordonnee());
+	if(!is_null($batiment) and get_class($batiment) != 'ressource'){
 		return '<p>Allez à votre '
 					.'<a href="index.php?page=village&amp;anchor='.implode('_', array_merge(array($batiment->GetCarte()), $batiment->GetCoordonnee())).'">'
 						.strtolower(get_class($batiment))
@@ -331,37 +320,26 @@ function AfficheCollecteRessource(personnage &$oJoueur) {
 	if (ChkIfFree($oJoueur->GetPosition(), $oJoueur->GetCarte())) {
 		return null;
 	}
-
-	//Si non on continue et on récupére les infos de la case
-	$sqlCarte = "SELECT * FROM table_carte WHERE coordonnee='" . implode(',', array_merge(array($oJoueur->GetCarte()), $oJoueur->GetPosition())) . "' AND detruit IS NULL;";
-	$requeteCarte = mysql_query($sqlCarte) or die(mysql_error() . '<br />' . $sqlCarte);
-	//on re vérifie si il y a bien quelque chose sur la case, si non --> Finis
-	if (mysql_num_rows($requeteCarte) == 0) {
-		return null;
+	
+	$objRessource = FoundBatiment(NULL, NULL, implode(',', array_merge(array($oJoueur->GetCarte()), $oJoueur->GetPosition())));
+	
+	if(is_null($objRessource) OR (get_class($objRessource) AND get_class($objRessource) != 'ressource'))
+	{
+		return NULL;
 	}
-	//si il y a quelque chose, on continue en stockant les infos de la case
-	$resultCarte = mysql_fetch_array($requeteCarte, MYSQL_ASSOC);
-
-	//on va récupere les info du type d'occupation de la case
-	$sqlBatiment = "SELECT batiment_type, batiment_nom, batiment_description FROM table_batiment WHERE id_batiment=" . $resultCarte['id_type_batiment'] . ";";
-	$requeteBatiment = mysql_query($sqlBatiment) or die(mysql_error() . '<br />' . $sqlBatiment);
-	$resultBatiment = mysql_fetch_array($requeteBatiment, MYSQL_ASSOC);
-
-	//Si le batiment n'est pas une ressource --> fini
-	if ($resultBatiment['batiment_type'] != 'ressource') {
-		return null;
-	}
-	//si c'est une ressource, on continu en créant l'objet Ressource
-	$objRessource = new ressource($resultCarte, $resultBatiment);
+	
 	$_SESSION['main']['ressource'] = $objRessource;
 
-	switch ($objRessource->GetNom()) {
-		case 'Bois': $txtRes = 'des buches';
-		break;
-		case 'Pierre': $txtRes = 'des pierres';
-		break;
-		case 'Or': $txtRes = 'de l\'or';
-		break;
+	switch ($objRessource->GetNomType()) {
+		case ressource::NOM_RESSOURCE_BOIS:
+			$txtRes = 'des buches';
+			break;
+		case ressource::NOM_RESSOURCE_PIERRE:
+			$txtRes = 'des pierres';
+			break;
+		case ressource::NOM_RESSOURCE_OR:
+			$txtRes = 'de l\'or';
+			break;
 	}
 
 	//Dans quel etat est la ressource?
@@ -370,19 +348,19 @@ function AfficheCollecteRessource(personnage &$oJoueur) {
 			return '<p>Vous devez avoir la compétence <u>' . $objRessource->GetCompetenceRequise() . '</u> de niveau 1 pour ramasser ' . $txtRes . '</p><hr />';
 		} else {
 			$txt = null;
-			if ($oJoueur->GetNiveauCompetence($objRessource->GetCompetenceRequise()) >= Ressource::NIVEAU_NORMAL) {
+			if ($oJoueur->GetNiveauCompetence($objRessource->GetCompetenceRequise()) >= ressource::NIVEAU_NORMAL) {
 				$txt .= '<p style="text-align:center;">'
-				. '<a href="index.php?page=main&amp;action=ressource&amp;id='.Ressource::TYPE_NORMAL.'">'
-				. 'Collecter ' . $objRessource->GetQuantiteCollecte($oJoueur->GetNiveauCompetence($objRessource->GetCompetenceRequise())) . ' ' . AfficheIcone(strtolower($objRessource->GetNom()))
+				. '<a href="index.php?page=main&amp;action=ressource&amp;id='.ressource::TYPE_NORMAL.'">'
+				. 'Collecter ' . $objRessource->GetQuantiteCollecte($oJoueur->GetNiveauCompetence($objRessource->GetCompetenceRequise())) . ' ' . AfficheIcone(strtolower($objRessource->GetNomType()))
 				. '</a>'
 				. '</p>';
 			}
 			//Si on est sur de la pierre, on peut collecter aussi de l'or
-			if ($objRessource->GetNom() == 'Pierre'
-			AND $oJoueur->GetNiveauCompetence($objRessource->GetCompetenceRequise()) >= Ressource::NIVEAU_OR) {
+			if ($objRessource->GetNomType() == ressource::NOM_RESSOURCE_PIERRE
+			AND $oJoueur->GetNiveauCompetence($objRessource->GetCompetenceRequise()) >= ressource::NIVEAU_OR) {
 				$txt .= '<p style="text-align:center;">'
-				. '<a href="index.php?page=main&amp;action=ressource&amp;id='.Ressource::TYPE_OR.'">'
-				. 'Collecter ' . $objRessource->GetQuantiteCollecte($oJoueur->GetNiveauCompetence($objRessource->GetCompetenceRequise()), Ressource::TYPE_OR) . ' ' . AfficheIcone(strtolower($objRessource->GetNom(Ressource::TYPE_OR)))
+				. '<a href="index.php?page=main&amp;action=ressource&amp;id='.ressource::TYPE_OR.'">'
+				. 'Collecter ' . $objRessource->GetQuantiteCollecte($oJoueur->GetNiveauCompetence($objRessource->GetCompetenceRequise()), ressource::TYPE_OR) . ' ' . AfficheIcone(strtolower($objRessource->GetNomType(ressource::TYPE_OR)))
 				. '</a>'
 				. '</p>';
 			}
@@ -392,7 +370,7 @@ function AfficheCollecteRessource(personnage &$oJoueur) {
 		if ((strtotime('now') - $objRessource->GetDateDebutAction()) >= $objRessource->GetTempRessource()) {
 			return '<script type="text/javascript">window.location=\'index.php?page=main&action=ressource\';</script>';
 		} elseif ($objRessource->GetCollecteur() == $oJoueur->GetLogin()) {
-			return '<p style="display:inline;">Vous êtes en train de collecter ' . $txtRes . ' ' . AfficheIcone(strtolower($objRessource->GetNom())) . '. Vous en avez encore pour :</p>
+			return '<p style="display:inline;">Vous êtes en train de collecter ' . $txtRes . ' ' . AfficheIcone(strtolower($objRessource->GetNomType())) . '. Vous en avez encore pour :</p>
 				<div style="display:inline;" id="TimeToWaitRessource"></div><p style="display:inline;"> N\'interrompez pas votre collecte sinon ce sera perdu.</p>'
 			. AfficheCompteurTemp('Ressource', 'index.php?page=main&action=ressource', ($objRessource->GetTempRessource() - (strtotime('now') - $objRessource->GetDateDebutAction())))
 			. '<hr />';
@@ -470,7 +448,7 @@ function AfficheListeEnnemisAFrapper(personnage &$oJoueur, $sql) {
 						}
 						$_SESSION['main']['frapper'][$nbEnnemis] = $row['id'];
 						$InfoBulle = '<table class="InfoBulle">'
-							.'<tr><th colspan="2">'.$row['login'].' ('.$row['niveau'].')</th></tr>'
+							.'<tr><th colspan="2">'.$row['login'].' ('.ucfirst(GetInfoCarriere($row['carriere'], 'carriere_nom')).')</th></tr>'
 							.'<tr><td colspan="2"><img alt="'.$row['login'].'" src="./fct/fct_image.php?type=VieCarte&amp;value='.$row['vie'].'&amp;max=300" /></td></tr>'
 							.'<tr>'
 							.'<td><img src="img/icones/ic_attaque.png" alt="Attaque" height="20px" /> : '.$row['val_attaque'].'</td>'
@@ -478,7 +456,7 @@ function AfficheListeEnnemisAFrapper(personnage &$oJoueur, $sql) {
 							.'</tr>'
 							.'</table>';
 						$txt .= '
-				<li><a href="index.php?page=main&amp;action=frapper&amp;id=' . $nbEnnemis . '">Attaquer <img src="img/homme-grey.png" alt="Ennemi" height="20px" onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulle).'\');" onmouseout="cache();" /> '.$row['login'].' ('.$row['niveau'].')</a></li>';
+				<li><a href="index.php?page=main&amp;action=frapper&amp;id=' . $nbEnnemis . '">Attaquer <img src="img/carte/'.$row['civilisation'].'-b.png" alt="Ennemi" height="20px" onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulle).'\');" onmouseout="cache();" /> '.$row['login'].' ('.ucfirst(GetInfoCarriere($row['carriere'], 'carriere_nom')).')</a></li>';
 						$chkEnnemisEnd = true;
 						$nbEnnemis++;
 					}
@@ -590,7 +568,7 @@ function AfficheMenuConstruction(personnage &$oJoueur, &$chkConstruction) {
 			$nbBatiment = 0;
 
 			//on trouve la maison
-			$maison = FoundBatiment(1);
+			$maison = $oJoueur->GetObjSaMaison();
 
 			while ($row = mysql_fetch_array($rqtBatiment, MYSQL_ASSOC)) {
 				if (ChkIfBatimentDejaConstruit($row['id_batiment'])) {
@@ -988,7 +966,8 @@ function ActionMove(&$check, personnage &$oJoueur, &$objManager){
 		if($_SESSION['main']['ressource']->GetCollecteur() == $oJoueur->GetLogin()){
 			$_SESSION['main']['ressource']->FreeRessource($oJoueur);
 		}
-		$objManager->UpdateRessource($_SESSION['main']['ressource']);
+		//$objManager->UpdateRessource($_SESSION['main']['ressource']);
+		$objManager->UpdateBatiment($_SESSION['main']['ressource']);
 		unset($_SESSION['main']['ressource']);
 	}
 
@@ -1036,7 +1015,7 @@ function ActionMove(&$check, personnage &$oJoueur, &$objManager){
 }
 function ActionChasser(&$check, personnage &$oJoueur, &$objManager){
 	if(isset($_SESSION['main']['chasser'])){
-		$maison = FoundBatiment(1);
+		$maison = $oJoueur->GetObjSaMaison();
 		$maison->AddNourriture($_SESSION['main']['chasser']['nourriture']);
 		if(!is_null($_SESSION['main']['chasser']['cuir'])){
 			$oJoueur->AddInventaire('ResCuir', NULL, $_SESSION['main']['chasser']['cuir'], false);
@@ -1130,7 +1109,7 @@ function ActionConstruire(&$check, $id, personnage &$oJoueur, &$objManager){
 	//on ajoute un historique que le batiment est construit
 	AddHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'Construction', NULL, NULL, 'Batiment construit. ID du batiment = '.$_SESSION['main'][$id]['construire']);
 	//On trouve la maison
-	$maison = FoundBatiment(1);
+	$maison = $oJoueur->GetObjSaMaison();
 	//on paie le batiment
 	if(isset($_SESSION['main'][$id]['prix_or'])){
 		$oJoueur->MindOr($_SESSION['main'][$id]['prix_or']);
