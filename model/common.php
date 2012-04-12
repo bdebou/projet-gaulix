@@ -10,17 +10,19 @@ function FoundBatiment($idType = false, $login = false, $Coordonnees = false) {
 	$requete = mysql_query($sql) or die(mysql_error() . '<br />Function FoundBatiment SQL = ' . $sql);
 	if (mysql_num_rows($requete) > 0) {
 		$carte = mysql_fetch_array($requete, MYSQL_ASSOC);
+		if(!in_array($carte['id_type_batiment'], $lstNonBatiment))
+		{	
+			$sql2 = "SELECT * FROM table_batiment WHERE id_batiment=" . $carte['id_type_batiment'] . ";";
+			$requete2 = mysql_query($sql2) or die(mysql_error() . '<br />' . $sql2);
 			
-		$sql2 = "SELECT * FROM table_batiment WHERE id_batiment=" . $carte['id_type_batiment'] . ";";
-		$requete2 = mysql_query($sql2) or die(mysql_error() . '<br />' . $sql2);
-		
-		$batiment = mysql_fetch_array($requete2, MYSQL_ASSOC);
-		
-		$objBatiment =  new $batiment['batiment_type']($carte, $batiment);
-		
-		$objManager->UpdateBatiment($objBatiment);
-		
-		return $objBatiment;
+			$batiment = mysql_fetch_array($requete2, MYSQL_ASSOC);
+			
+			$objBatiment =  new $batiment['batiment_type']($carte, $batiment);
+			
+			$objManager->UpdateBatiment($objBatiment);
+			
+			return $objBatiment;
+		}
 	}
 	
 	return null;
@@ -451,7 +453,7 @@ function QuelTypeRessource($Code) {
 	}
 }
 function FreeCaseCarte($carte = NULL) {
-	$sql = "SELECT coordonnee FROM table_carte WHERE detruit IS NULL;";
+	$sql = "SELECT coordonnee FROM table_carte WHERE detruit IS NULL AND id_type_batiment NOT IN (11);";
 	$requete = mysql_query($sql) or die(mysql_error() . $sql);
 	while ($row = mysql_fetch_array($requete, MYSQL_ASSOC)) {
 		$arCoordonnee = explode(',', $row['coordonnee']);
@@ -462,7 +464,7 @@ function FreeCaseCarte($carte = NULL) {
 
 	global $nbLigneCarte, $nbColonneCarte;
 	//ATTENTION la carte M est retirée car c'est la carte du camp romain
-	$arCartes = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y');
+	$arCartes = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y');
 
 	if (is_null($carte)) {
 		$carte = $arCartes[array_rand($arCartes)];
