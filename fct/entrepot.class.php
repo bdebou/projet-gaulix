@@ -55,13 +55,7 @@ class entrepot extends batiment{
 		
 		foreach ($carte as $key => $value){
 			switch ($key){
-				case 'contenu_batiment':
-					if(is_null($value)){
-						$this->Contenu = NULL;
-					}else{
-						$this->Contenu = explode(',', $value);
-					}
-					break;
+				case 'contenu_batiment':	$this->Contenu = (is_null($value)?NULL:explode(',', $value)); break;
 			}
 		}
 	}
