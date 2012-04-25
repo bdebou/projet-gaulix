@@ -30,10 +30,8 @@ if(isset($_POST['depot'])){
 		case 'ameliorer':				ActionAmeliorerBatiment($chkErr, $oJoueur, $objManager, $_GET['id']); break;
 		case 'reparer':					ActionReparer($chkErr, $_GET['id'], $_GET['num'], $oJoueur, $objManager); break;
 		case 'reprendre':				ActionReprendre($chkErr, $_GET['id'], $oJoueur, $objManager); break;
-		case 'stockerferme':			ActionStocker($chkErr, 6, 'ferme', $objManager, $oJoueur); break;
 		case 'viderstockferme':			ActionViderStock($chkErr, 6, 'ferme', $oJoueur, $objManager); break;
 		case 'productionferme':			ActionProduction($chkErr, 6, 'ferme', $_GET['type'], $oJoueur, $objManager); break;
-		case 'stockermine':				ActionStocker($chkErr, 18, 'mine', $objManager, $oJoueur); break;
 		case 'viderstockmine':			ActionViderStock($chkErr, 18, 'mine', $oJoueur, $objManager); break;
 		case 'productionmine':			ActionProduction($chkErr, 18, 'mine', $_GET['type'], $oJoueur, $objManager); break;
 		case 'druide':					ActionDruide($chkErr, $_GET['id'], $oJoueur, $objManager); break;
