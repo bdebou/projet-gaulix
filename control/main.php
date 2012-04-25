@@ -15,9 +15,9 @@ FinishAllCompetenceEnCours($oJoueur);
 $ChkDebugVar = false;
 
 if($chkDebug AND $ChkDebugVar){
-	echo '$_SESSION[\'main\']<br />';print_r($_SESSION['main']);echo '<br />';
-	echo '$_GET<br />';print_r($_GET);echo '<br />';
-	echo '$_POST<br />';print_r($_POST);echo '<br />';
+	echo '$_SESSION[\'main\']<br />';var_dump($_SESSION['main']);echo '<br />';
+	echo '$_GET<br />';var_dump($_GET);echo '<br />';
+	echo '$_POST<br />';var_dump($_POST);echo '<br />';
 	echo '<hr />';
 }
 
@@ -38,10 +38,8 @@ if(isset($_GET['move']) AND $oJoueur->GetDepDispo() > 0){
 		case 'construire':			ActionConstruire($chkErr, $_GET['id'], $oJoueur, $objManager); break;
 		case 'quete':				ActionQuete($chkErr, $_GET['id'], $oJoueur, $objManager); break;
 		case 'utiliser':
-			if(isset($_GET['id'])){
-				ActionUtiliser($chkErr, $_SESSION['main'][$_GET['id']], $oJoueur, $objManager);
-			}else{					ActionUtiliser($chkErr, $_SESSION['main']['objet'], $oJoueur, $objManager);
-			}
+			if(isset($_GET['id'])){	ActionUtiliser($chkErr, $_SESSION['main'][$_GET['id']], $oJoueur, $objManager);
+			}else{					ActionUtiliser($chkErr, $_SESSION['main']['objet'], $oJoueur, $objManager);}
 			break;
 		case 'laisser':				ActionLaisser($chkErr, $oJoueur); break;
 		case 'viderstockmine':		ActionViderStock($chkErr, 18, 'mine', $oJoueur, $objManager); break;
@@ -53,7 +51,7 @@ if(isset($_GET['move']) AND $oJoueur->GetDepDispo() > 0){
 }
 
 if($chkDebug AND $ChkDebugVar){
-	print_r($_SESSION['main']);
+	var_dump($_SESSION['main']);
 }
 
 $objManager->update($oJoueur);
