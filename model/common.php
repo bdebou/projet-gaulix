@@ -2,10 +2,11 @@
 function FoundBatiment($idType = false, $login = false, $Coordonnees = false) {
 	global $lstNonBatiment, $objManager;
 	$sql = "SELECT * FROM table_carte WHERE
-			login". ($login ? " = '".$login."'" : ' IS NULL')
+			detruit IS NULL"
+			.($login ? " AND login = '".$login."'" : '')
 	. ($idType ? " AND id_type_batiment=$idType" : "")
 	. ($Coordonnees ? " AND coordonnee='$Coordonnees'" : "")
-	. " AND detruit IS NULL;";
+	. ";";
 
 	$requete = mysql_query($sql) or die(mysql_error() . '<br />Function FoundBatiment SQL = ' . $sql);
 	if (mysql_num_rows($requete) > 0) {
@@ -152,86 +153,39 @@ function AfficheRecompenses($login = NULL, $alliance = NULL) {
 
 	return (!is_null($login) ? $txtGeneral . $txtMedalHonor : '') . (!is_null($alliance) ? $txtMedalAlliance : '');
 }
-function AfficheListePrix(array $arPrix, array $arRessources = null) {
+function AfficheListePrix($lstPrix, personnage &$oJoueur = NULL, maison &$maison = NULL) {
 	$chk = false;
-	$txt = null;
-	if (isset($arPrix['Nourriture']) AND $arPrix['Nourriture'] > 0) {
-		if (
-		(isset($arRessources['Nourriture']) and $arRessources['Nourriture'] >= $arPrix['Nourriture'])
-		OR
-		is_null($arRessources)
-		) {
-			$ColorPrix = 'black';
-		} else {
-			$ColorPrix = 'red';
+	$txt = NULL;
+	
+	if(!is_null($lstPrix))
+	{
+		foreach($lstPrix as $arPrix)
+		{
+			$Prix = explode('=', $arPrix);
+		
+			if($chk)
+			{
+				$txt .= ', ';
+			}
+		
+			if($Prix[1] > 0)
+			{
+				$ColorPrix = 'black';
+				
+				if (!is_null($oJoueur) AND !is_null($maison) AND !CheckIfAssezRessource($Prix, $oJoueur, $maison))
+				{
+					$ColorPrix = 'red';
+				}
+					
+				$txt .= '<span style="color:' . $ColorPrix . ';">' . $Prix[1] . '</span> ' . AfficheIcone($Prix[0]);
+			}
+			$chk = true;
 		}
-		$txt .= '<span style="color:' . $ColorPrix . ';">' . $arPrix['Nourriture'] . '</span> ' . AfficheIcone('nourriture');
-		$chk = true;
+	}else{
+		$txt = 'Gratuit';
 	}
-	if (isset($arPrix['Bois']) AND $arPrix['Bois'] > 0) {
-		if ($chk) {
-			$txt .= ', ';
-		}
-		if (
-		(isset($arRessources['Bois']) and $arRessources['Bois'] >= $arPrix['Bois'])
-		OR
-		is_null($arRessources)
-		) {
-			$ColorPrix = 'black';
-		} else {
-			$ColorPrix = 'red';
-		}
-		$txt .= '<span style="color:' . $ColorPrix . ';">' . $arPrix['Bois'] . '</span> ' . AfficheIcone('bois');
-		$chk = true;
-	}
-	if (isset($arPrix['Pierre']) AND $arPrix['Pierre'] > 0) {
-		if ($chk) {
-			$txt .= ', ';
-		}
-		if (
-		(isset($arRessources['Pierre']) and $arRessources['Pierre'] >= $arPrix['Pierre'])
-		OR
-		is_null($arRessources)
-		) {
-			$ColorPrix = 'black';
-		} else {
-			$ColorPrix = 'red';
-		}
-		$txt .= '<span style="color:' . $ColorPrix . ';">' . $arPrix['Pierre'] . '</span> ' . AfficheIcone('pierre');
-		$chk = true;
-	}
-	if (isset($arPrix['Or']) AND $arPrix['Or'] > 0) {
-		if ($chk) {
-			$txt .= ', ';
-		}
-		if (
-		(isset($arRessources['Or']) and $arRessources['Or'] >= $arPrix['Or'])
-		OR
-		is_null($arRessources)
-		) {
-			$ColorPrix = 'black';
-		} else {
-			$ColorPrix = 'red';
-		}
-		$txt .= '<span style="color:' . $ColorPrix . ';">' . $arPrix['Or'] . '</span> ' . AfficheIcone('or');
-		$chk = true;
-	}
-	if (isset($arPrix['Hydromel']) AND $arPrix['Hydromel'] > 0) {
-		if ($chk) {
-			$txt .= ', ';
-		}
-		if (
-		(isset($arRessources['Hydromel']) and $arRessources['Hydromel'] >= $arPrix['Hydromel'])
-		OR
-		is_null($arRessources)
-		) {
-			$ColorPrix = 'black';
-		} else {
-			$ColorPrix = 'red';
-		}
-		$txt .= '<span style="color:' . $ColorPrix . ';">' . $arPrix['Hydromel'] . '</span> ' . AfficheIcone('Hydromel');
-		$chk = true;
-	}
+	
+	
 	return $txt;
 }
 function AfficheCompteurTemp($type, $url, $tmp) {
@@ -300,20 +254,34 @@ function DecoupeTemp($intTime) {
 	}
 	return array($nbJours, $nbHeures, $nbMinutes, $nbSecondes);
 }
-function CheckIfAssezRessource(array $arRessource, personnage $Joueur, maison $Maison){
-	if(in_array($arRessource['0'], array('ResBoi', 'ResPie', 'ResNou', 'ResOr'))){
-		if(	('ResBoi' == $arRessource['0'] AND $Maison->GetRessourceBois() >= $arRessource['1'])
-		OR
-		('ResPie' == $arRessource['0'] AND $Maison->GetRessourcePierre() >= $arRessource['1'])
-		OR
-		('ResNou' == $arRessource['0'] AND $Maison->GetRessourceNourriture() >= $arRessource['1'])
-		OR
-		('ResOr' == $arRessource['0'] AND $Joueur->GetArgent() >= $arRessource['1']))
-		{
-			return true;
-		}
-	}else{
-		return $Joueur->AssezElementDansBolga($arRessource['0'], $arRessource['1']);
+function UtilisationRessource(array $arRessource, personnage &$Joueur, maison &$Maison){
+	switch($arRessource[0]){
+		case 'ResBois':
+		case 'ResNourriture':
+		case 'ResPierre':
+			$Maison->MindRessource($arRessource[0], $arRessource[1]);
+			break;
+		case 'ResOr':
+			$Joueur->MindOr($arRessource[1]);
+			break;
+		default:
+			$Joueur->CleanInventaire($arRessource[0], false, $arRessource[1]);
+			break;
+	}
+}
+function CheckIfAssezRessource(array $arRessource, personnage &$Joueur, maison &$Maison){
+	switch($arRessource[0]){
+		case 'ResBois':
+		case 'ResNourriture':
+		case 'ResPierre':
+			if($Maison->GetRessource($arRessource[0]) >= $arRessource[1]){return true;}
+			break;
+		case 'ResOr':
+			if($Joueur->GetArgent() >= $arRessource[1]){return true;}
+			break;
+		default:
+			return $Joueur->AssezElementDansBolga($arRessource[0], $arRessource[1]);
+			break;
 	}
 	return false;
 }
@@ -592,30 +560,37 @@ function ActionMettreDansBolga(&$check, $type, personnage &$oJoueur, &$objManage
 	}
 }
 function ActionRessource(&$check, personnage &$oJoueur, &$objManager, $id = NULL){
-	if(isset($_SESSION['main']['ressource'])){
-		if(is_null($_SESSION['main']['ressource']->GetCollecteur())){
-			$_SESSION['main']['ressource']->StartCollect($oJoueur, $id);
-		}elseif((strtotime('now') - $_SESSION['main']['ressource']->GetDateDebutAction()) >= $_SESSION['main']['ressource']->GetTempRessource()){
-			if($oJoueur->GetLogin() == $_SESSION['main']['ressource']->GetCollecteur()){
-				$oMaison = $oJoueur->GetObjSaMaison();
-				$_SESSION['main']['ressource']->FinishCollect($oJoueur, $oMaison);
-			}else{
-				$oCollecteur = $objManager->GetPersoLogin($_SESSION['main']['ressource']->GetCollecteur());
-				$oMaison = $oCollecteur->GetObjSaMaison();
-				$_SESSION['main']['ressource']->FinishCollect($oCollecteur, $oMaison);
-				$objManager->update($oCollecteur);
-				unset($oCollecteur);
-			}
-			$objManager->UpdateBatiment($oMaison);
-			unset($oMaison);
+	
+	$objRessource = FoundBatiment(NULL, NULL, $oJoueur->GetCoordonnee());
+	
+	if(is_null($objRessource->GetCollecteur())){
+			
+		$objRessource->StartCollect($oJoueur, $id);
+		
+	}elseif((strtotime('now') - $objRessource->GetDateDebutAction()) >= $objRessource->GetTempRessource()){
+			
+		if($oJoueur->GetLogin() == $objRessource->GetCollecteur()){
+
+			$oMaison = $oJoueur->GetObjSaMaison();
+			$objRessource->FinishCollect($oJoueur, $oMaison);
+
+		}else{
+
+			$oCollecteur = $objManager->GetPersoLogin($objRessource->GetCollecteur());
+			$oMaison = $oCollecteur->GetObjSaMaison();
+			$objRessource->FinishCollect($oCollecteur, $oMaison);
+			$objManager->update($oCollecteur);
+			unset($oCollecteur);
+
 		}
-		//$objManager->UpdateRessource($_SESSION['main']['ressource']);
-		$objManager->UpdateBatiment($_SESSION['main']['ressource']);
-		unset($_SESSION['main']['ressource']);
-	}else{
-		$check = false;
-		echo 'Erreur GLX0002: Fonction ActionRessource';
+			
+		$objManager->UpdateBatiment($oMaison);
+		unset($oMaison);
 	}
+
+	$objManager->UpdateBatiment($objRessource);
+	
+	unset($objRessource);
 }
 function ActionDeplacement(&$check, &$oJoueur){
 	if(!is_null($_SESSION['main']['deplacement'])){
