@@ -154,31 +154,37 @@ function AfficheAvancementCompetence($competence, $info, &$chkFinis){
 function AfficheInfoCompetence($competence, personnage &$oJoueur){
 	$maison = $oJoueur->GetObjSaMaison();
 	$check = false;
-	if(	!is_null($maison)
-		AND $competence['cmp_lst_prix_or']			<= $oJoueur->GetArgent()
-		AND $competence['cmp_lst_prix_nourriture']	<= $maison->GetRessourceNourriture()
-		AND $competence['cmp_lst_prix_bois']		<= $maison->GetRessourceBois()
-		AND $competence['cmp_lst_prix_pierre']		<= $maison->GetRessourcePierre()
-		AND $competence['cmp_lst_prix_hydromel']	<= $oJoueur->GetCombienElementDansBolga('Hydromel')
-		AND (
-			$oJoueur->GetNiveauCompetence(ucfirst($competence['cmp_lst_nom'])) == ($competence['cmp_lst_niveau'] - 1)
-			OR (
-				is_null($oJoueur->GetNiveauCompetence(ucfirst($competence['cmp_lst_nom'])))
-					AND
-				in_array($competence['cmp_lst_niveau'], array(0, 1))
+	
+	if(	!is_null($maison))
+	{
+		$chkPrix = true;
+		foreach(explode(',', $competence['cmp_lst_prix']) as $Prix)
+		{
+			if(!CheckIfAssezRessource(explode('=',$Prix), $oJoueur, $maison))
+			{
+				$chkPrix = false;
+				break;
+			}
+		}
+		
+		if($chkPrix
+			AND (
+				$oJoueur->GetNiveauCompetence(ucfirst($competence['cmp_lst_nom'])) == ($competence['cmp_lst_niveau'] - 1)
+				OR (
+					is_null($oJoueur->GetNiveauCompetence(ucfirst($competence['cmp_lst_nom'])))
+						AND
+					in_array($competence['cmp_lst_niveau'], array(0, 1))
+					)
 				)
 			)
-		){
+		{
 			$check = true;
-			$_SESSION['main'][$competence['cmp_lst_nom']]['prix_or']			= $competence['cmp_lst_prix_or'];
-			$_SESSION['main'][$competence['cmp_lst_nom']]['prix_nourriture']	= $competence['cmp_lst_prix_nourriture'];
-			$_SESSION['main'][$competence['cmp_lst_nom']]['prix_bois']			= $competence['cmp_lst_prix_bois'];
-			$_SESSION['main'][$competence['cmp_lst_nom']]['prix_pierre']		= $competence['cmp_lst_prix_pierre'];
-			$_SESSION['main'][$competence['cmp_lst_nom']]['prix_hydromel']		= $competence['cmp_lst_prix_hydromel'];
+			$_SESSION['main'][$competence['cmp_lst_nom']]['prix']				= explode(',', $competence['cmp_lst_prix']);
 			$_SESSION['main'][$competence['cmp_lst_nom']]['niveau']				= $competence['cmp_lst_niveau'];
 			$_SESSION['main'][$competence['cmp_lst_nom']]['temp']				= $competence['cmp_lst_temp'];
 		}
-	
+	}
+		
 	return '
 	<table class="competence">
 		<tr style="background:lightgrey;"><th colspan="2">'
@@ -193,9 +199,7 @@ function AfficheInfoCompetence($competence, personnage &$oJoueur){
 			<td>Durée : '.AfficheTempPhrase(DecoupeTemp($competence['cmp_lst_temp'])).'</td>
 		</tr>
 		<tr><td colspan="2" style="text-align:center;">Coût : '
-		.AfficheListePrix(
-			array('Or'=>$competence['cmp_lst_prix_or'], 'Bois'=>$competence['cmp_lst_prix_bois'], 'Pierre'=>$competence['cmp_lst_prix_pierre'], 'Nourriture'=>$competence['cmp_lst_prix_nourriture'], 'Hydromel'=>$competence['cmp_lst_prix_hydromel']),
-			array('Or'=>$oJoueur->GetArgent(), 'Bois'=>(!is_null($maison)?$maison->GetRessourceBois():0), 'Pierre'=>(!is_null($maison)?$maison->GetRessourcePierre():0), 'Nourriture'=>(!is_null($maison)?$maison->GetRessourceNourriture():0), 'Hydromel'=>$oJoueur->GetCombienElementDansBolga('Hydromel')))
+		.AfficheListePrix(explode(',', $competence['cmp_lst_prix']), $oJoueur, $maison)
 		.'</td></tr>
 		<tr><td colspan="2" style="text-align:center;">
 			<button 
@@ -292,7 +296,7 @@ function GoPerfectionnement($type, &$oJoueur){
 			<p>Vous avez encore la possibilité d\'augmenter de '.((($oJoueur->GetNiveau() + 1) * $StepPerf) - $nbPerfDone).' points votre '.$type.'.</p>
 		</td></tr>
 		<tr><td style="text-align:center;">Durée : '.AfficheTempPhrase(DecoupeTemp($temp)).'</td></tr>
-		<tr><td style="text-align:center;">Coût : '.AfficheListePrix(array('Or'=>$prix), array('Or'=>$oJoueur->GetArgent())).'</td></tr>
+		<tr><td style="text-align:center;">Coût : '.AfficheListePrix(array('ResOr='.$prix), $oJoueur).'</td></tr>
 		<tr><td style="text-align:center;">
 			<button 
 				type="button" 
@@ -353,12 +357,11 @@ function ActionCompetence(&$check, personnage &$oJoueur, $cmp, &$objManager){
 
 		AddEnregistrementCompetence($cmp, $_SESSION['main'][$cmp]['niveau'], $_SESSION['main'][$cmp]['temp']);
 
-		$maison->MindNourriture($_SESSION['main'][$cmp]['prix_nourriture']);
-		$maison->MindBois($_SESSION['main'][$cmp]['prix_bois']);
-		$maison->MindPierre($_SESSION['main'][$cmp]['prix_pierre']);
-		$oJoueur->CleanInventaire('Hydromel', NULL, $_SESSION['main'][$cmp]['prix_hydromel']);
-		$oJoueur->MindOr($_SESSION['main'][$cmp]['prix_or']);
-
+		foreach($_SESSION['main'][$cmp]['prix'] as $Prix)
+		{
+			UtilisationRessource(explode('=', $Prix), $oJoueur, $maison);
+		}
+		
 		$objManager->UpdateBatiment($maison);
 		unset($maison);
 
