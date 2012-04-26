@@ -1,15 +1,15 @@
 <?php
 class ressource extends batiment{
 	
-	private $intIDCase,
-			$strCoordonnee,
-			$strCollecteur,
-			$intStock,
-			$dteDateAction,
-			$bolVide,
-			$intTypeContenu,
-			$strNom,
-			$strDescription;
+	private $strCoordonnee;
+	private $strCollecteur;
+	private $Login;
+	private $intStock;
+	private $dteDateAction;
+	private $bolVide;
+	private $intTypeContenu;
+	private $strNom;
+	private $strDescription;
 	
 	const TEMP_RESSOURCE			= 900;		//15 minutes pour collecter une ressource
 	const MAX_RESSOURCE				= 5000;
@@ -30,6 +30,9 @@ class ressource extends batiment{
 	
 	// Initialisation de l'objet
 	public function __construct(array $dataCarte, array $dataBatiment){
+		
+		parent::Hydrate($dataCarte, $dataBatiment);
+		
 		$this->hydrate($dataCarte, $dataBatiment);
 	}
 	
@@ -75,6 +78,8 @@ class ressource extends batiment{
 	//On démarre la collect de ressource
 	Public Function StartCollect(personnage &$oCollecteur, $id){
 		$this->strCollecteur = $oCollecteur->GetLogin();
+		//var_dump($oCollecteur);
+		//var_dump($id);
 		$this->dteDateAction = strtotime('now');
 		if($this->strNom == self::NOM_RESSOURCE_PIERRE){
 			$this->intTypeContenu = $id;
@@ -118,6 +123,8 @@ class ressource extends batiment{
 	
 	//Remplir l'objet Ressource
 	public function hydrate(array $dataCarte, array $dataBatiment){
+		
+		
 		foreach ($dataBatiment as $key => $value){
 			switch ($key){
 				case 'batiment_nom':			$this->strNom = strtolower($value); break;
@@ -126,7 +133,6 @@ class ressource extends batiment{
 		}
 		foreach ($dataCarte as $key => $value){
 			switch ($key){
-				case 'id_case_carte':			$this->intIDCase = intval($value); break;
 				//case 'coordonnee':				$this->strCoordonnee = strval($value); break;
 				case 'login':					$this->strCollecteur = (is_null($value)?NULL:strval($value)); break;
 				case 'res_pierre':				if($this->strNom == self::NOM_RESSOURCE_PIERRE){$this->intStock = (is_null($value)?NULL:intval($value));} break;
@@ -139,7 +145,41 @@ class ressource extends batiment{
 		}
 		
 	}
+	
+	// -------------------- GET Affichage ----------------------
+	public function GetInfoBulle($AllCartes = false){
+		return '<table>'
+					.'<tr>'
+						.($AllCartes?
+						'<td rowspan="2">'
+							.'<img src="./img/carte/'.$this->GetImgName().'.png" alt="'.$this->GetNom().'" title="'.$this->GetNom().'" />'
+						.'</td>'
+						:'')
+						.'<th>'
+							.$this->GetNom().(!is_null($this->GetLogin())?' de '.$this->GetLogin():'')
+						.'</th>'
+					.'</tr>'
+					.'<tr>'
+						.'<td>'
+							.'<img alt="'.$this->GetNom().'" src="./fct/fct_image.php?type=etatcarte&amp;value='.$this->GetEtatRessource().'&amp;max='.$this->GetEtatRessourceMax().'" />'
+						.'</td>'
+					.'</tr>'
+				.'</table>';
+	}
+	
 	// -------------------- GET info ----------------------
+	public function GetRessource($type){
+		if($type == 'ResPierre' AND $this->strNom == self::NOM_RESSOURCE_PIERRE){
+			
+			return $this->intStock;
+			
+		}elseif($type == 'ResBois' AND $this->strNom == self::NOM_RESSOURCE_BOIS){
+			
+			return $this->intStock;
+		}
+		
+		return NULL;
+	}
 	public function GetQuantiteCollecte($NiveauCompetence, $type = self::TYPE_NORMAL){
 		if($this->intStock >= $this->QuelQuantiteMaxParAction($NiveauCompetence, $type)){
 			return $this->QuelQuantiteMaxParAction($NiveauCompetence, $type);
@@ -156,12 +196,13 @@ class ressource extends batiment{
 			return $this->strNom;
 		}
 	}
-	public function GetEtat(){					return $this->intStock;}
-	public function GetEtatMax(){				return self::MAX_RESSOURCE;}
+	public function GetEtatRessource(){			return $this->intStock;}
+	public function GetEtatRessourceMax(){		return self::MAX_RESSOURCE;}
 	public function GetTempRessource(){			return self::TEMP_RESSOURCE;}
 	//public function GetCoordonnee(){			return $this->strCoordonnee;}
-	public function GetVide(){					return $this->bolVide;}
+	public function GetDetruit(){				return $this->bolVide;}
 	public function GetDateDebutAction(){		return $this->dteDateAction;}
+	//public function GetContenu(){				return $this->intTypeContenu;}
 	public function GetTypeContenu(){			return $this->intTypeContenu;}
 	public function GetImgName(){				return $this->strNom;}
 	
@@ -172,7 +213,8 @@ class ressource extends batiment{
 			case self::NOM_RESSOURCE_OR:		return self::COMPETENCE_POUR_OR;
 		}
 	}
-	
+	public function GetLogin(){					return $this->strCollecteur;}
+	public function GetDateAction(){			return $this->dteDateAction;}
 	public function GetStatus(){
 		
 	}
