@@ -105,7 +105,7 @@ function AffichageQueteSurGrille(&$grille, $numCarte, $AllCartes){
 function AffichageBatimentSurGrille(&$grille, $numCarte, $AllCartes){
 	global $lstNonBatiment, $lstBatimentsNonConstructible;
 	
-	$sql="SELECT login, coordonnee, id_type_batiment FROM table_carte WHERE id_type_batiment NOT IN (".implode(", ", array_merge($lstNonBatiment, $lstBatimentsNonConstructible))."') AND detruit IS NULL;";
+	$sql="SELECT login, coordonnee, id_type_batiment FROM table_carte WHERE id_type_batiment NOT IN (".implode(", ", array_merge($lstNonBatiment, $lstBatimentsNonConstructible)).") AND detruit IS NULL;";
 	$requete = mysql_query($sql) or die (mysql_error().$sql);
 	
 	while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
