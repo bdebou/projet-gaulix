@@ -12,6 +12,9 @@ function AfficheCarte($numCarte, $AllCartes = false){
 		AffichageQueteSurGrille($grille, $numCarte, $AllCartes);
 	}
 	
+	//on ajoute les ressources
+	AffichageRessourceSurGrille($grille, $numCarte, $AllCartes);
+	
 	//on cache les quetes par les batiments
 	//on ajoute les infos des batiments
 	AffichageBatimentSurGrille($grille, $numCarte, $AllCartes);
@@ -100,9 +103,9 @@ function AffichageQueteSurGrille(&$grille, $numCarte, $AllCartes){
 	}
 }
 function AffichageBatimentSurGrille(&$grille, $numCarte, $AllCartes){
-	global $lstNonBatiment;
-	$sql="SELECT login, coordonnee, id_type_batiment FROM table_carte WHERE detruit IS NULL;";
-	//$sql="SELECT * FROM table_carte WHERE detruit IS NULL;";
+	global $lstNonBatiment, $lstBatimentsNonConstructible;
+	
+	$sql="SELECT login, coordonnee, id_type_batiment FROM table_carte WHERE id_type_batiment NOT IN (".implode(", ", array_merge($lstNonBatiment, $lstBatimentsNonConstructible))."') AND detruit IS NULL;";
 	$requete = mysql_query($sql) or die (mysql_error().$sql);
 	
 	while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
@@ -111,40 +114,45 @@ function AffichageBatimentSurGrille(&$grille, $numCarte, $AllCartes){
 		
 		if($numCarte == $position['0']){
 			
-			//$sqlb = "SELECT batiment_type, batiment_nom, batiment_description, batiment_vie FROM table_batiment WHERE id_batiment=".$row['id_type_batiment'].";";
-			//$requeteb = mysql_query($sqlb) or die (mysql_error().$sqlb);
-			//$batiment = mysql_fetch_array($requeteb, MYSQL_ASSOC);
-			
 			$objBatiment = FoundBatiment($row['id_type_batiment'], $row['login'], $row['coordonnee']);
-			
-			//if(!in_array($row['id_type_batiment'], $lstNonBatiment)){
-			//if(!in_array(get_class($objBatiment), array('ressource', 'carte'))){
+
 			if(!is_null($objBatiment)){
 				
-				
-					//on crée les infos de l'infoBulle
-				/* $InfoBulle = '<table><tr>'
-								.($AllCartes?
-									'<td rowspan="2">'
-										.'<img src="./img/carte/'.$objBatiment->GetImgName().'.png" alt="'.$objBatiment->GetNom().'" title="'.$objBatiment->GetNom().'" />'
-									.'</td>'
-									:'')
-								.'<th>'.$objBatiment->GetNom().(!is_null($objBatiment->GetLogin())?' de '.$objBatiment->GetLogin():'').'</th></tr>'
-								.'<tr><td><img alt="'.$objBatiment->GetNom().'" src="./fct/fct_image.php?type=etatcarte&amp;value='.$objBatiment->GetEtat().'&amp;max='.$objBatiment->GetEtatMax().'" /></td></tr>'
-							.'</table>'; */
 					//on ajoute l'infobulle à l'icone du batiment
 				$grille[intval($position[1])][intval($position[2])]['batiment'] = ' onmouseover="montre(\''.CorrectDataInfoBulle($objBatiment->GetInfoBulle($AllCartes)).'\');" onmouseout="cache();"';
 				
 					//on ajout l'icone du batiment
 				$grille[intval($position[1])][intval($position[2])]['batiment'] .= ' style="background: url(\'./img/carte/'.($AllCartes?'mini/':'').$objBatiment->GetImgName().'.png\') no-repeat center;"';
 				
-			}else{
-				
 			}
 		}
 	}
 }
-function AffichageRessourceSurGrille(){
+function AffichageRessourceSurGrille(&$grille, $numCarte, $AllCartes){
+	global $lstBatimentsNonConstructible;
 	
+	$sql="SELECT login, coordonnee, id_type_batiment FROM table_carte WHERE id_type_batiment IN (".implode(', ', $lstBatimentsNonConstructible).") AND detruit IS NULL;";
+	$requete = mysql_query($sql) or die (mysql_error().$sql);
+	
+	while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
+	
+		$position = explode(',', $row['coordonnee']);
+	
+		if($numCarte == $position['0']){
+				
+			//$objBatiment = FoundBatiment($row['id_type_batiment'], $row['login'], $row['coordonnee']);
+			$objRessource = FoundBatiment(NULL, NULL, $row['coordonnee']);
+
+			if(!is_null($objRessource)){
+	
+				//on ajoute l'infobulle à l'icone du batiment
+				$grille[intval($position[1])][intval($position[2])]['batiment'] = ' onmouseover="montre(\''.CorrectDataInfoBulle($objRessource->GetInfoBulle($AllCartes)).'\');" onmouseout="cache();"';
+	
+				//on ajout l'icone du batiment
+				$grille[intval($position[1])][intval($position[2])]['batiment'] .= ' style="background: url(\'./img/carte/'.($AllCartes?'mini/':'').$objRessource->GetImgName().'.png\') no-repeat center;"';
+	
+			}
+		}
+	}
 }
 ?>
