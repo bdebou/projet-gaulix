@@ -1,6 +1,6 @@
 <?php
 function CreateListBatiment(personnage &$oJoueur){
-	global $lstNonBatiment;
+	global $lstNonBatiment, $lstBatimentsNonConstructible;
 	
 	$lstBatiment = null;
 	
@@ -10,7 +10,7 @@ function CreateListBatiment(personnage &$oJoueur){
 	if(mysql_num_rows($requete) > 0){
 	
 		while($carte = mysql_fetch_array($requete, MYSQL_ASSOC)){
-			if(!in_array($carte['id_type_batiment'], $lstNonBatiment)){
+			if(!in_array($carte['id_type_batiment'], array_merge($lstNonBatiment, $lstBatimentsNonConstructible))){
 				$lstBatiment[] = AfficheBatiment(FoundBatiment(NULL, $oJoueur->GetLogin(), $carte['coordonnee']), $oJoueur);
 			}
 		}
@@ -26,7 +26,7 @@ function AfficheBatiment(batiment &$batiment, personnage &$oJoueur){
 	$contenu = 'Ne peut rien contenir';
 	$PositionBatiment	= implode(',', array_merge(array($batiment->GetCarte()), $batiment->GetCoordonnee()));
 	$PositionJoueur		= $oJoueur->GetCoordonnee();
-	$chkDruide = false;
+	$chkOptions = false;
 	$chkMarche = false;
 
 	switch($batiment->GetType()){
@@ -34,7 +34,7 @@ function AfficheBatiment(batiment &$batiment, personnage &$oJoueur){
 			$ImgSize = 'width';
 			if($PositionBatiment == $PositionJoueur){
 				$contenu = '<p>Ne peut rien contenir.</p>';
-				$chkDruide = true;
+				$chkOptions = false;
 			}else{
 				$contenu = '<p>Vous devez vous placez sur son emplacement pour afficher les options.</p>';
 			}
@@ -61,7 +61,7 @@ function AfficheBatiment(batiment &$batiment, personnage &$oJoueur){
 			<td rowspan="'.($batiment->GetType() == 'entrepot'?'5':'6').'" style="width:400px;">
 				<img alt="'.$batiment->GetType().'" src="./img/batiments/'.$batiment->GetType().'-'.$batiment->GetNiveau().'.png" width="400px" />
 			</td>
-			<th colspan="4"><a name="'.str_replace(',', '_', $PositionBatiment).'">'.$batiment->GetNom().' ('.$batiment->GetNiveau().' / '.batiment::NIVEAU_MAX.')</a></th>
+			<th colspan="4"><a name="'.str_replace(',', '_', $PositionBatiment).'">'.$batiment->GetNom($oJoueur->GetCivilisation()).' ('.$batiment->GetNiveau().' / '.$batiment->GetNiveauMax().')</a></th>
 		</tr>
 		<tr>
 			<td colspan="4">'.$batiment->AfficheOptionAmeliorer($oJoueur).'</td>
@@ -88,25 +88,11 @@ function AfficheBatiment(batiment &$batiment, personnage &$oJoueur){
 		<tr>
 			<td colspan="'.($batiment->GetType() == 'entrepot'?'5':'4').'">'.$contenu.'</td>
 		</tr>'
-	.($chkDruide?$batiment->AfficheDruide($oJoueur):'')
+	.($chkOptions?$batiment->AfficheOptions($oJoueur):'')
 	.($chkMarche?$batiment->AfficheTransactions($oJoueur):'')
 	.'<tr style="background:lightgrey;"><td colspan="5" style="text-align:right;"><a href="#TopPage" alt="TopPage">Top</a></td></tr>'
 	.'</table>';
 	return $txt;
-}
-function CheckRessource(&$oJoueur, &$batiment, &$maison){
-	$lstRessource = array(	'ResBoi'	=> $batiment->GetPrixBois()			+ intval(($batiment->GetNiveau() / 2) * $batiment->GetPrixBois()),
-							'ResPie'	=> $batiment->GetPrixPierre()		+ intval(($batiment->GetNiveau() / 2) * $batiment->GetPrixPierre()),
-							'ResNou'	=> $batiment->GetPrixNourriture()	+ intval(($batiment->GetNiveau() / 2) * $batiment->GetPrixNourriture()),
-							'ResOr'		=> $batiment->GetPrixOr()			+ intval(($batiment->GetNiveau() / 2) * $batiment->GetPrixOr()));
-
-	foreach($lstRessource as $type=>$Valeur){
-		if(!CheckIfAssezRessource(array($type, $Valeur), $oJoueur, $maison)){
-			return  false;
-		}
-	}
-
-	return true;
 }
 function AddTransaction($vendeur, $achat=array('nourriture'=>'NULL', 'pierre'=>'NULL', 'bois'=>'NULL', 'or'=>'NULL'), $vente=array('nourriture'=>'NULL', 'pierre'=>'NULL', 'bois'=>'NULL', 'or'=>'NULL')){
 	$sql="INSERT INTO `table_marche` (
@@ -149,26 +135,45 @@ function ActionAmeliorerBatiment(&$check, personnage &$oJoueur, &$objManager, $c
 				
 			if(!is_null($batiment)){
 
-				if($batiment->GetType() == 'maison'){
+				if(get_class($batiment) == 'maison'){
 					$chk = false;
 				}
 				
 				switch($batiment->GetStatusAmelioration()){
 					case 'Go':
-						if(CheckRessource($oJoueur, $batiment, $maison)){
-							$oJoueur->MindOr($_SESSION['main'][$coordonnee]['prixAmelioration']['Or']);
-							$maison->MindBois($_SESSION['main'][$coordonnee]['prixAmelioration']['Bois']);
-							$maison->MindPierre($_SESSION['main'][$coordonnee]['prixAmelioration']['Pierre']);
-							$maison->MindNourriture($_SESSION['main'][$coordonnee]['prixAmelioration']['Nourriture']);
-							if($batiment->GetType() == 'maison'){
-								$batiment = $maison;
+						$chkPrix = true;
+						if(!is_null($_SESSION['main'][$coordonnee]['prixAmelioration']))
+						{
+							foreach($_SESSION['main'][$coordonnee]['prixAmelioration'] as $Prix)
+							{
+								if(!CheckIfAssezRessource(explode('=', $Prix), $oJoueur, $maison))
+								{
+									$chkPrix = false;
+									break;
+								}
+							}
+							if($chkPrix){
+								foreach($_SESSION['main'][$coordonnee]['prixAmelioration'] as $Prix)
+								{
+									UtilisationRessource(explode('=', $Prix), $oJoueur, $maison);
+								}
+								if(get_class($batiment) == 'maison'){
+									$batiment = $maison;
+								}
+							}else{
+								$check = false;
+								echo 'Erreur GLX0005: Fonction ActionAmeliorerBatiment - Pas assez de ressource.';
 							}
 						}else{
 							$check = false;
-							echo 'Erreur GLX0005: Fonction ActionAmeliorerBatiment - Pas assez de ressource.';
+							echo 'Erreur GLX0006: Fonction ActionAmeliorerBatiment - Pas de prix.';
 						}
 					case 'Finish':
 						$batiment->Amelioration($batiment->GetStatusAmelioration());
+						break;
+					default:
+						$check = false;
+						echo 'Erreur GLX0006: Fonction ActionAmeliorerBatiment.';
 						break;
 				}
 				
