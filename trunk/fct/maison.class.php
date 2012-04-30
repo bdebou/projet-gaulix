@@ -1,9 +1,21 @@
 <?php
 class maison extends batiment{
-	private $ResPierre,
-			$ResBois,
-			$ResNourriture;
+	private $ResPierre;
+	private $ResBois;
+	private $ResNourriture;
 	
+	const COUT_AMELIORATION_NIVEAU_1	= 'ResBois=5,ResOr=10,ResMinF=150';
+	const COUT_AMELIORATION_NIVEAU_2	= 'ResOr=1000,ResBois=1500,ResPierre=2';
+	const COUT_AMELIORATION_NIVEAU_3	= 'ResOr=150000';
+	
+	const TYPE_RES_NOURRITURE			= 'nourriture';
+	const TYPE_RES_BOIS					= 'bois';
+	const TYPE_RES_PIERRE				= 'pierre';
+	const TYPE_RES_SESTERCE				= 'sesterce';
+	
+	const NOM_ROMAIN					= 'Villa';
+	const NOM_GAULOIS					= 'Oppidum';
+		
 	//--- fonction qui est lancer lors de la création de l'objet. ---
 	public function __construct(array $carte, array $batiment){
 		$this->Hydrate($carte, $batiment);
@@ -18,44 +30,47 @@ class maison extends batiment{
 				case 'res_bois': 			$this->ResBois = (is_null($value)?NULL:intval($value)); break;
 				case 'res_pierre':			$this->ResPierre = (is_null($value)?NULL:intval($value)); break;
 				case 'res_nourriture':		$this->ResNourriture = (is_null($value)?NULL:intval($value)); break;
+				case 'contenu_batiment':	$this->Contenu = (is_null($value)?NULL:$value); break;
 			}
 		}
 	}
 	
 	//--- Gestion des ressources ---
-	// Nourriture dans le stock
-	public function AddNourriture($nbNourriture){
-		$this->ResNourriture += abs($nbNourriture);
+	public function AddRessource($Type, $Quantite){
+		switch($Type)
+		{
+			case self::TYPE_RES_NOURRITURE:
+				$this->ResNourriture += abs($Quantite);
+				break;
+			case self::TYPE_RES_BOIS:
+				$this->ResBois += abs($Quantite);
+				break;
+			case self::TYPE_RES_PIERRE:
+				$this->ResPierre += abs($Quantite);
+				break;
+		}
 	}
-	public function MindNourriture($nbNourriture){
-		$this->ResNourriture -= abs($nbNourriture);
+	Public function MindRessource($Type, $Quantite){
+		switch($Type)
+		{
+			case self::TYPE_RES_NOURRITURE:
+				$this->ResNourriture -= abs($Quantite);
+				break;
+			case self::TYPE_RES_BOIS:
+				$this->ResBois -= abs($Quantite);
+				break;
+			case self::TYPE_RES_PIERRE:
+				$this->ResPierre -= abs($Quantite);
+				break;
+		}
 	}
-	
-	// Bois
-	public function AddBois($nbBois){
-		$this->ResBois += abs($nbBois);
-	}
-	public function MindBois($nbBois){
-		$this->ResBois -= abs($nbBois);
-	}
-	
-	// Pierres
-	public function AddPierre($nbPierre){
-		$this->ResPierre += abs($nbPierre);
-	}
-	public function MindPierre($nbPierre){
-		$this->ResPierre -= abs($nbPierre);
-	}
-	
+		
 	//Les Affichages
 	//==============
-	public function AfficheDruide(personnage &$oJoueur){
-		//Si le niveau du joueur est inférieur à 1, pas de druide
-		if($oJoueur->GetNiveau() < 1){return null;}
-		
+	public function AfficheOptions(personnage &$oJoueur){
 		$Key = 0;
-		$txtOptionsDruide = '
-			<table class="druide">';
+		$txtOptions = '
+			<table class="options_maison">';
 		
 		$sqlLstDruide = "SELECT * FROM table_competence_lst WHERE cmp_lst_type='druide' ORDER BY cmp_lst_niveau ASC;";
 		$rqtLstDruide = mysql_query($sqlLstDruide) or die (mysql_error().'<br />'.$sqlLstDruide);
@@ -190,8 +205,27 @@ class maison extends batiment{
 	}
 	//Les GETS
 	//========
-	public function GetRessourcePierre(){		return $this->ResPierre;}
-	public function GetRessourceBois(){			return $this->ResBois;}
-	public function GetRessourceNourriture(){	return $this->ResNourriture;}
+	public function GetRessource($Type){
+		switch(QuelTypeRessource($Type))
+		{
+			case self::TYPE_RES_NOURRITURE:
+				return $this->ResNourriture;
+			case self::TYPE_RES_PIERRE:
+				return $this->ResPierre;
+			case self::TYPE_RES_BOIS:
+				return $this->ResBois;
+		}
+		return NULL;
+	}
+	public function GetNom($Civilisation = NULL){
+		switch($Civilisation)
+		{
+			case personnage::CIVILISATION_GAULOIS:	return self::NOM_GAULOIS;	break;
+			case personnage::CIVILISATION_ROMAIN:	return self::NOM_ROMAIN;	break;
+		}
+		return parent::GetNom();
+	}
+	
+	
 }
 ?>
