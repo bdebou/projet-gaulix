@@ -42,6 +42,9 @@ class personnage{
 	Const VIE_MAX				= 300;			// Limite de vie maximum
 	Const TAUX_ATTAQUANT		= 1.15;			// Taux d'augmentation de l'attaquant
 	
+	const CIVILISATION_ROMAIN	= 'romains';
+	const CIVILISATION_GAULOIS	= 'gaulois';
+	
 	//Initialisation de l'objet
 	public function __construct(array $donnees){
 		$this->hydrate($donnees);
@@ -231,7 +234,7 @@ class personnage{
 			if(is_null($cmp['cmp_niveau'])){
 				$this->lstCompetences[ucfirst($cmp['cmp_nom'])] = NULL;
 			}elseif($this->lstCompetences[ucfirst($cmp['cmp_nom'])] < $cmp['cmp_niveau']){
-				$this->lstCompetences[ucfirst($cmp['cmp_nom'])] = $cmp['cmp_niveau'];
+				$this->lstCompetences[ucfirst($cmp['cmp_nom'])] = (int)$cmp['cmp_niveau'];
 			}
 		}
 	}
