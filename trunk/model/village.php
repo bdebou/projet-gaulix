@@ -341,26 +341,26 @@ function ActionDruide(&$chkErr, $id, personnage &$oJoueur, &$objManager){
 			switch($key){
 				case 'N' :
 					if($value < 0){
-						$maison->MindNourriture(abs($value));
+						$maison->MindRessource(maison::TYPE_RES_NOURRITURE, abs($value));
 					}
 					elseif($value > 0){
-						$maison->AddNourriture(abs($value));
+						$maison->AddRessource(maison::TYPE_RES_NOURRITURE, abs($value));
 					}
 					break;
 				case 'B':
 					if($value < 0){
-						$maison->MindBois(abs($value));
+						$maison->MindRessource(maison::TYPE_RES_BOIS, abs($value));
 					}
 					elseif($value > 0){
-						$maison->AddBois(abs($value));
+						$maison->AddRessource(maison::TYPE_RES_BOIS, abs($value));
 					}
 					break;
 				case 'P':
 					if($value < 0){
-						$maison->MindPierre(abs($value));
+						$maison->MindRessource(maison::TYPE_RES_PIERRE, abs($value));
 					}
 					elseif($value > 0){
-						$maison->AddPierre(abs($value));
+						$maison->AddRessource(maison::TYPE_RES_PIERRE, abs($value));
 					}
 					break;
 				case 'H':
@@ -444,9 +444,9 @@ function ActionAnnulerTransaction(&$chkErr, $id, personnage &$oJoueur, &$objMana
 
 		$maison = $oJoueur->GetObjSaMaison();
 
-		$maison->AddNourriture($row['vente_nourriture']);
-		$maison->AddPierre($row['vente_pierre']);
-		$maison->AddBois($row['vente_bois']);
+		$maison->AddRessource(maison::TYPE_RES_NOURRITURE, $row['vente_nourriture']);
+		$maison->AddRessource(maison::TYPE_RES_PIERRE, $row['vente_pierre']);
+		$maison->AddRessource(maison::TYPE_RES_BOIS, $row['vente_bois']);
 		$oJoueur->AddOr($row['vente_or']);
 
 		$objManager->UpdateBatiment($maison);
@@ -468,15 +468,15 @@ function ActionAccepterTransaction(&$chkErr, $id, personnage &$oJoueur, &$objMan
 		$maisonV = FoundBatiment(1, $row['vendeur']);
 		$vendeur = $objManager->GetPersoLogin($row['vendeur']);
 
-		if($maisonA->GetRessourceNourriture()	>= $row['achat_nourriture']){
+		if($maisonA->GetRessource(maison::TYPE_RES_NOURRITURE)	>= $row['achat_nourriture']){
 			$checka = true;
 		}else{$checka = false;
 		}
-		if($maisonA->GetRessourceBois()			>= $row['achat_bois']){
+		if($maisonA->GetRessource(maison::TYPE_RES_BOIS)		>= $row['achat_bois']){
 			$checkb = true;
 		}else{$checkb = false;
 		}
-		if($maisonA->GetRessourcePierre()		>= $row['achat_pierre']){
+		if($maisonA->GetRessource(maison::TYPE_RES_PIERRE)		>= $row['achat_pierre']){
 			$checkc = true;
 		}else{$checkc = false;
 		}
@@ -488,19 +488,19 @@ function ActionAccepterTransaction(&$chkErr, $id, personnage &$oJoueur, &$objMan
 		if($checka AND $checkb AND $checkc AND $checke){
 			UpdateTransaction($_SESSION['main']['transaction'][$id]['accepter']);
 			//l'acheteur recoit son dû
-			$maisonA->AddNourriture($row['vente_nourriture']);
-			$maisonA->AddBois($row['vente_bois']);
-			$maisonA->AddPierre($row['vente_pierre']);
+			$maisonA->AddRessource(maison::TYPE_RES_NOURRITURE, $row['vente_nourriture']);
+			$maisonA->AddRessource(maison::TYPE_RES_BOIS, $row['vente_bois']);
+			$maisonA->AddRessource(maison::TYPE_RES_PIERRE, $row['vente_pierre']);
 			$oJoueur->AddOr($row['vente_or']);
 			//l'acheteur paie
-			$maisonA->MindNourriture($row['achat_nourriture']);
-			$maisonA->MindBois($row['achat_bois']);
-			$maisonA->MindPierre($row['achat_pierre']);
+			$maisonA->MindRessource(maison::TYPE_RES_NOURRITURE, $row['achat_nourriture']);
+			$maisonA->MindRessource(maison::TYPE_RES_BOIS, $row['achat_bois']);
+			$maisonA->MindRessource(maison::TYPE_RES_PIERRE, $row['achat_pierre']);
 			$oJoueur->MindOr($row['achat_or']);
 			//le vendeur recoit son dû
-			$maisonV->AddNourriture($row['achat_nourriture']);
-			$maisonV->AddBois($row['achat_bois']);
-			$maisonV->AddPierre($row['achat_pierre']);
+			$maisonV->AddRessource(maison::TYPE_RES_NOURRITURE, $row['achat_nourriture']);
+			$maisonV->AddRessource(maison::TYPE_RES_BOIS, $row['achat_bois']);
+			$maisonV->AddRessource(maison::TYPE_RES_PIERRE, $row['achat_pierre']);
 			$vendeur->AddOr($row['achat_or']);
 				
 			$objManager->update($vendeur);
@@ -524,13 +524,13 @@ function ActionTransactionMarche(&$chkErr, personnage &$oJoueur, &$objManager){
 		if($_POST['VOr']			> $oJoueur->GetArgent()){
 			$_SESSION['transaction']['acceptation'] .= 'Transaction annulée : Pas assez d\'or<br />';
 		}
-		if($_POST['VBois']			> $maison->GetRessourceBois()){
+		if($_POST['VBois']			> $maison->GetRessource(maison::TYPE_RES_BOIS)){
 			$_SESSION['transaction']['acceptation'] .= 'Transaction annulée : Pas assez de bois<br />';
 		}
-		if($_POST['VPierre']		> $maison->GetRessourcePierre()){
+		if($_POST['VPierre']		> $maison->GetRessource(maison::TYPE_RES_PIERRE)){
 			$_SESSION['transaction']['acceptation'] .= 'Transaction annulée : Pas assez de pierre<br />';
 		}
-		if($_POST['VNourriture']	> $maison->GetRessourceNourriture()){
+		if($_POST['VNourriture']	> $maison->GetRessource(maison::TYPE_RES_NOURRITURE)){
 			$_SESSION['transaction']['acceptation'] .= 'Transaction annulée : Pas assez de nourriture<br />';
 		}
 
@@ -539,9 +539,9 @@ function ActionTransactionMarche(&$chkErr, personnage &$oJoueur, &$objManager){
 							array('nourriture'=>$_POST['ANourriture'], 'pierre'=>$_POST['APierre'], 'bois'=>$_POST['ABois'], 'or'=>$_POST['AOr']),
 							array('nourriture'=>$_POST['VNourriture'], 'pierre'=>$_POST['VPierre'], 'bois'=>$_POST['VBois'], 'or'=>$_POST['VOr']));
 			
-			$maison->MindNourriture($_POST['VNourriture']);
-			$maison->MindPierre($_POST['VPierre']);
-			$maison->MindBois($_POST['VBois']);
+			$maison->MindRessource(maison::TYPE_RES_NOURRITURE, $_POST['VNourriture']);
+			$maison->MindRessource(maison::TYPE_RES_PIERRE, $_POST['VPierre']);
+			$maison->MindRessource(maison::TYPE_RES_BOIS, $_POST['VBois']);
 			$oJoueur->MindOr($_POST['VOr']);
 			$objManager->UpdateBatiment($maison);
 		}

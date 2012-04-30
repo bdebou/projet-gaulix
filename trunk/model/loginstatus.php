@@ -3,17 +3,16 @@ function AfficheRessource($type, personnage &$oJoueur){
 	$maison = $oJoueur->GetObjSaMaison();
 	
 	if(!is_null($maison)){
-		switch (ucfirst($type)){
-			case 'Nourriture':
-				$nb = $maison->GetRessourceNourriture();
+		$nb = $maison->GetRessource($type);
+		
+		switch ($type){
+			case maison::TYPE_RES_NOURRITURE:
 				$qte = 50;
 				break;
-			case 'Bois':
-				$nb = $maison->GetRessourceBois();
+			case maison::TYPE_RES_BOIS:
 				$qte = 25;
 				break;
-			case 'Pierre':
-				$nb = $maison->GetRessourcePierre();
+			case maison::TYPE_RES_PIERRE:
 				$qte = 25;
 				break;
 		}
@@ -39,7 +38,7 @@ function AfficheRessource($type, personnage &$oJoueur){
 			$txtBt = NULL;
 	}
 	
-	return AfficheIcone(ucfirst($type)) . ' : ' . $nb . $txtBt;
+	return AfficheIcone($type) . ' : ' . $nb . $txtBt;
 }
 
 

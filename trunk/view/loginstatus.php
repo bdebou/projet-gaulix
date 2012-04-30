@@ -28,7 +28,7 @@ $arDef = $oJoueur->GetDefPerso();
 			</td>
 			<?php if(!is_null($oJoueur->GetObjSaMaison())){?>
 			<td style="background-color:<?php echo $arCouleurs['Nourriture'];?>;">
-				<?php echo AfficheRessource('Nourriture', $oJoueur)?>
+				<?php echo AfficheRessource(maison::TYPE_RES_NOURRITURE, $oJoueur)?>
 			</td>
 			<?php }else{?>
 			<td style="background-color: white;">
@@ -48,10 +48,10 @@ $arDef = $oJoueur->GetDefPerso();
 			</td>
 			<?php if(!is_null($oJoueur->GetObjSaMaison())){?>
 			<td style="background-color:<?php echo $arCouleurs['Pierre'];?>;">
-				<?php echo AfficheRessource('Pierre', $oJoueur)?>
+				<?php echo AfficheRessource(maison::TYPE_RES_PIERRE, $oJoueur)?>
 			</td>
 			<td style="background-color:<?php echo $arCouleurs['Bois'];?>;">
-				<?php echo AfficheRessource('Bois', $oJoueur)?>
+				<?php echo AfficheRessource(maison::TYPE_RES_BOIS, $oJoueur)?>
 			</td>
 			<?php }else{?>
 			<td colspan="2" style="background-color: white;">
