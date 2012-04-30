@@ -255,13 +255,13 @@ function DecoupeTemp($intTime) {
 	return array($nbJours, $nbHeures, $nbMinutes, $nbSecondes);
 }
 function UtilisationRessource(array $arRessource, personnage &$Joueur, maison &$Maison){
-	switch($arRessource[0]){
-		case 'ResBois':
-		case 'ResNourriture':
-		case 'ResPierre':
-			$Maison->MindRessource($arRessource[0], $arRessource[1]);
+	switch(QuelTypeRessource($arRessource[0])){
+		case maison::TYPE_RES_BOIS:
+		case maison::TYPE_RES_NOURRITURE:
+		case maison::TYPE_RES_PIERRE:
+			$Maison->MindRessource(QuelTypeRessource($arRessource[0]), $arRessource[1]);
 			break;
-		case 'ResOr':
+		case maison::TYPE_RES_SESTERCE:
 			$Joueur->MindOr($arRessource[1]);
 			break;
 		default:
@@ -270,13 +270,13 @@ function UtilisationRessource(array $arRessource, personnage &$Joueur, maison &$
 	}
 }
 function CheckIfAssezRessource(array $arRessource, personnage &$Joueur, maison &$Maison){
-	switch($arRessource[0]){
-		case 'ResBois':
-		case 'ResNourriture':
-		case 'ResPierre':
-			if($Maison->GetRessource($arRessource[0]) >= $arRessource[1]){return true;}
+	switch(QuelTypeRessource($arRessource[0])){
+		case maison::TYPE_RES_NOURRITURE:
+		case maison::TYPE_RES_BOIS:
+		case maison::TYPE_RES_PIERRE:
+			if($Maison->GetRessource(QuelTypeRessource($arRessource[0])) >= $arRessource[1]){return true;}
 			break;
-		case 'ResOr':
+		case maison::TYPE_RES_SESTERCE:
 			if($Joueur->GetArgent() >= $arRessource[1]){return true;}
 			break;
 		default:
@@ -407,17 +407,29 @@ function AfficheInfoObjet($CodeObjet, $intHeightImg = 50) {
 	. 'height="'.$intHeightImg.'px"'
 	. ' />';
 }
-function QuelTypeRessource($Code) {
-	switch (substr($Code, 0, 5)) {
-		case 'ResNo': return 'nourriture';
-		case 'ResBo': return 'bois';
-		case 'ResPi': return 'pierre';
+function QuelTypeObjet($code){
+	$Ressource = QuelTypeRessource($code);
+	if($code != $Ressource)
+	{
+		return $Ressource;
+	}
+	
+	switch (substr($Code, 0, 5))
+	{
 		case 'ResVi':
 		case 'PotVi': return 'vie';
 		case 'ResDe':
 		case 'PotDe': return 'deplacement';
-		case 'ResOr': return 'argent';
 		default: return 'divers';
+	}
+}
+function QuelTypeRessource($Code) {
+	switch (substr($Code, 0, 5)) {
+		case 'ResNo': return maison::TYPE_RES_NOURRITURE;
+		case 'ResBo': return maison::TYPE_RES_BOIS;
+		case 'ResPi': return maison::TYPE_RES_PIERRE;
+		case 'ResOr': return maison::TYPE_RES_SESTERCE;
+		default: return $Code;
 	}
 }
 function FreeCaseCarte($carte = NULL) {
@@ -538,15 +550,12 @@ function ActionMettreDansBolga(&$check, $type, personnage &$oJoueur, &$objManage
 		}
 		//Si tout OK, alors on transfert
 		$maison = $oJoueur->GetObjSaMaison();
-		switch($type){
-			case 'Nourriture':
-				$maison->MindNourriture($_SESSION['LoginStatus'][$type]);
-				break;
-			case 'Bois':
-				$maison->MindBois($_SESSION['LoginStatus'][$type]);
-				break;
-			case 'Pierre':
-				$maison->MindPierre($_SESSION['LoginStatus'][$type]);
+		switch(QuelTypeRessource($type))
+		{
+			case maison::TYPE_RES_NOURRITURE:
+			case maison::TYPE_RES_BOIS:
+			case maison::TYPE_RES_PIERRE:
+				$maison->MindRessource(QuelTypeRessource($type), $_SESSION['LoginStatus'][$type]);
 				break;
 		}
 		$oJoueur->AddInventaire('Res'.ucfirst(substr($type, 0, 3)).$_SESSION['LoginStatus'][$type], strtolower($type), 1, false);
@@ -615,19 +624,23 @@ function ActionUtiliser(&$check, &$arInfoObject, personnage &$oJoueur, &$objMana
 
 		$maison = $oJoueur->GetObjSaMaison();
 
-		switch($arInfoObject['type']){
-			case 'vie':			$oJoueur->GagnerVie($arInfoObject['value']);							break;
-			case 'deplacement':	$oJoueur->AddDeplacement($arInfoObject['value'],'objet');				break;
-			case 'argent':		$oJoueur->AddOr($arInfoObject['value']);								break;
-			case 'nourriture':	if(!is_null($maison)){
-				$maison->AddNourriture($arInfoObject['value']);
-			}	break;
-			case 'bois':		if(!is_null($maison)){
-				$maison->AddBois($arInfoObject['value']);
-			}		break;
-			case 'pierre':		if(!is_null($maison)){
-				$maison->AddPierre($arInfoObject['value']);
-			}		break;
+		switch(QuelTypeObjet($arInfoObject['code'])){
+			case 'vie':
+				$oJoueur->GagnerVie($arInfoObject['value']);
+				break;
+			case 'deplacement':
+				$oJoueur->AddDeplacement($arInfoObject['value'],'objet');
+				break;
+			case maison::TYPE_RES_SESTERCE:
+				$oJoueur->AddOr($arInfoObject['value']);
+				break;
+			case maison::TYPE_RES_BOIS:
+			case maison::TYPE_RES_NOURRITURE:
+			case maison::TYPE_RES_PIERRE:
+				if(!is_null($maison)){
+					$maison->AddRessource(QuelTypeObjet($arInfoObject['code']), $arInfoObject['value']);
+				}
+				break;
 		}
 
 		if(!is_null($maison)){
