@@ -192,14 +192,15 @@ function AfficheRessourceBesoin($lstRessources, &$ChkRessource, personnage &$oJo
 		$chkFound[$nbRes] = false;
 		$ColorPrix = 'red';
 		if(!is_null($maison)){
-			if(in_array($arRessource['0'], array('ResBoi', 'ResPie', 'ResNou', 'ResOr'))){
-				if(	('ResBoi' == $arRessource['0'] AND $maison->GetRessourceBois() >= ($arRessource['1'] * $nb))
+			$TypeRes = QuelTypeRessource($arRessource['0']);
+			if(in_array($TypeRes, array(maison::TYPE_RES_BOIS, maison::TYPE_RES_NOURRITURE, maison::TYPE_RES_PIERRE, maison::TYPE_RES_SESTERCE))){
+				if(	(maison::TYPE_RES_BOIS == $TypeRes AND $maison->GetRessource(maison::TYPE_RES_BOIS) >= ($arRessource['1'] * $nb))
 					OR
-					('ResPie' == $arRessource['0'] AND $maison->GetRessourcePierre() >= ($arRessource['1'] * $nb))
+					(maison::TYPE_RES_PIERRE == $TypeRes AND $maison->GetRessource(maison::TYPE_RES_PIERRE) >= ($arRessource['1'] * $nb))
 					OR
-					('ResNou' == $arRessource['0'] AND $maison->GetRessourceNourriture() >= ($arRessource['1'] * $nb))
+					(maison::TYPE_RES_NOURRITURE == $TypeRes AND $maison->GetRessource(maison::TYPE_RES_NOURRITURE) >= ($arRessource['1'] * $nb))
 					OR
-					('ResOr' == $arRessource['0'] AND $oJoueur->GetArgent() >= ($arRessource['1'] * $nb)))
+					(maison::TYPE_RES_SESTERCE == $TypeRes AND $oJoueur->GetArgent() >= ($arRessource['1'] * $nb)))
 					{
 						$chkFound[$nbRes] = true;
 						$ColorPrix = 'black';
@@ -246,12 +247,13 @@ function ActionFabriquer(&$check, $id, personnage &$oJoueur, &$objManager){
 					break;
 				}
 
-				if(in_array($arPrix['0'], array('ResBoi', 'ResPie', 'ResNou', 'ResOr'))){
-					switch($arPrix['0']){
-						case 'ResNou':	$maison->MindNourriture($arPrix['1'] * abs($_GET['qte']));	break;
-						case 'ResPie':	$maison->MindPierre($arPrix['1'] * abs($_GET['qte']));		break;
-						case 'ResBoi':	$maison->MindBois($arPrix['1'] * abs($_GET['qte']));		break;
-						case 'ResOr':	$oJoueur->MindOr($arPrix['1'] * abs($_GET['qte']));			break;
+				if(in_array(QuelTypeRessource($arPrix['0']), array(maison::TYPE_RES_BOIS, maison::TYPE_RES_NOURRITURE, maison::TYPE_RES_PIERRE, maison::TYPE_RES_SESTERCE))){
+					switch(QuelTypeRessource($arPrix['0']))
+					{
+						case maison::TYPE_RES_NOURRITURE:	$maison->MindRessource(maison::TYPE_RES_NOURRITURE, $arPrix['1'] * abs($_GET['qte']));	break;
+						case maison::TYPE_RES_PIERRE:		$maison->MindRessource(maison::TYPE_RES_PIERRE, $arPrix['1'] * abs($_GET['qte']));		break;
+						case maison::TYPE_RES_BOIS:			$maison->MindRessource(maison::TYPE_RES_BOIS, $arPrix['1'] * abs($_GET['qte']));		break;
+						case maison::TYPE_RES_SESTERCE:		$oJoueur->MindOr($arPrix['1'] * abs($_GET['qte']));			break;
 					}
 						
 				}else{

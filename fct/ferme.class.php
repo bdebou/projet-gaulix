@@ -90,7 +90,7 @@ class ferme extends batiment{
 		
 		switch($arContenu['0']){
 			case self::CODE_PRODUCTION_NOURRITURE:
-				$maison->AddNourriture($stock);
+				$maison->AddRessource(maison::TYPE_RES_NOURRITURE, $stock);
 				break;
 			case self::CODE_PRODUCTION_MIEL:
 				$joueur->AddInventaire('ResMiel', NULL, $stock, false);

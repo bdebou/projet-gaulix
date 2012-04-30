@@ -25,7 +25,7 @@ function AfficheObjetInventaire($CodeObject, $arInfoObject, $id, $nbObjet, &$oJo
 	$_SESSION['main'][$id]['action'] = false;
 
 	if(in_array($arInfoObject['objet_type'], array('ressource', 'potion'))){
-		$_SESSION['main'][$id]['type'] = QuelTypeRessource($CodeObject);
+		$_SESSION['main'][$id]['type'] = QuelTypeObjet($CodeObject);
 	}else{
 		$_SESSION['main'][$id]['type'] = $arInfoObject['objet_type'];
 	}

@@ -104,10 +104,10 @@ class ressource extends batiment{
 		switch($this->strNom){
 			case self::NOM_RESSOURCE_PIERRE:
 				switch($this->intTypeContenu){
-					case 1:	$oMaison->AddPierre($qte);	break(2);
+					case 1:	$oMaison->AddRessource(maison::TYPE_RES_PIERRE, $qte);	break(2);
 					case 2: $oCollecteur->AddOr($qte);	break(2);
 				}
-			case self::NOM_RESSOURCE_BOIS:	$oMaison->AddBois($qte);	break;
+			case self::NOM_RESSOURCE_BOIS:	$oMaison->AddRessource(maison::TYPE_RES_BOIS, $qte);	break;
 			case self::NOM_RESSOURCE_OR:	$oCollecteur->AddOr($qte);	break;
 		}
 			
