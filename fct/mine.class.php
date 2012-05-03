@@ -1,29 +1,74 @@
 <?php
 class mine extends batiment{
-	private $Contenu,
-			$DateAction;
+	private $Contenu;
+	private $DateAction;
+	
+	const COUT_AMELIORATION_NIVEAU_1	= 'ResBois=5,ResOr=10,ResMinF=150';
+	const COUT_AMELIORATION_NIVEAU_2	= 'ResOr=1000,ResBois=1500,ResPierre=2';
+	const COUT_AMELIORATION_NIVEAU_3	= 'ResOr=150000';
 	
 	const TYPE_COMPETENCE			= 'Mineur';
+	const STOCK_MAX_DEPART			= 500;
 	
-	const CODE_PRODUCTION_PIERRE	= 0;
-	const ICONE_NAME_PIERRE			= 'pierre';
-	const TEMP_PIERRE				= 1800;
+	const GAIN_TEMP_PAR_ESCLAVE		= 7;
+	const DUREE_ESCLAVE				= 604800;
 	
-	const CODE_PRODUCTION_OR		= 1;
-	const NIVEAU_COMPETENCE_OR		= 3;
-	const ICONE_NAME_OR				= 'or';
-	const TEMP_OR					= 2400;
+	const NB_ESCLAVES_NIV_1			= 2;
+	const NB_ESCLAVES_NIV_2			= 4;
+	const NB_ESCLAVES_NIV_3			= 8;
+	const NB_ESCLAVES_NIV_4			= 12;
 	
-	const CODE_PRODUCTION_FER		= 2;
-	const NIVEAU_COMPETENCE_FER		= 4;
-	const ICONE_NAME_FER			= 'ResMinF';
-	const TEMP_FER					= 3000;
+	//Les communs sont :
+	const CODE_PRODUCTION_SABLE		= 'a1';
+	const NOM_PRODUCTION_SABLE		= 'du sable';
+	const NIVEAU_COMPETENCE_SABLE	= 1;
+	const ICONE_NAME_SABLE			= 'ResSable';
+	const TEMP_SABLE				= 900;
 	
-	const CODE_PRODUCTION_CUIVRE	= 3;
-	const NIVEAU_COMPETENCE_CUIVRE	= 5;
+	const CODE_PRODUCTION_CHAUX		= 'a2';
+	const NOM_PRODUCTION_CHAUX		= 'de la chaux';
+	const NIVEAU_COMPETENCE_CHAUX	= 2;
+	const ICONE_NAME_CHAUX			= 'ResChaux';
+	const TEMP_CHAUX				= 900;
+	
+	const CODE_PRODUCTION_GRAVIER	= 'a3';
+	const NOM_PRODUCTION_GRAVIER	= 'du gravier';
+	const NIVEAU_COMPETENCE_GRAVIER	= 3;
+	const ICONE_NAME_GRAVIER		= 'ResGravier';
+	const TEMP_GRAVIER				= 900;
+	
+	const CODE_PRODUCTION_CIMENT	= 'a4';
+	const NOM_PRODUCTION_CIMENT		= 'du ciment';
+	const NIVEAU_COMPETENCE_CIMENT	= 4;
+	const ICONE_NAME_CIMENT			= 'ResCiment';
+	const TEMP_CIMENT				= 900;
+		
+	//Les spécifiques sont :
+	const CODE_PRODUCTION_ETAIN		= 'b1';
+	const NOM_PRODUCTION_ETAIN		= 'de l\'étain';
+	const NIVEAU_COMPETENCE_ETAIN	= 1;
+	const ICONE_NAME_ETAIN			= 'ResEtain';
+	const TEMP_ETAIN				= 2400;
+	
+	const CODE_PRODUCTION_CUIVRE	= 'b2';
+	const NOM_PRODUCTION_CUIVRE		= 'du minerai de cuivre';
+	const NIVEAU_COMPETENCE_CUIVRE	= 2;
 	const ICONE_NAME_CUIVRE			= 'ResMinC';
-	const TEMP_CUIVRE				= 3600;
+	const TEMP_CUIVRE				= 3000;
 	
+	const CODE_PRODUCTION_ARGENT	= 'b3';
+	const NOM_PRODUCTION_ARGENT		= 'du minerai d\'argent';
+	const NIVEAU_COMPETENCE_ARGENT	= 3;
+	const ICONE_NAME_ARGENT			= 'ResMinA';
+	const TEMP_ARGENT				= 3000;
+	
+	const CODE_PRODUCTION_MINOR		= 'b4';
+	const NOM_PRODUCTION_MINOR		= 'du minerai d\'or';
+	const NIVEAU_COMPETENCE_MINOR	= 4;
+	const ICONE_NAME_MINOR			= 'or';
+	const TEMP_MINOR				= 3600;
+	
+		
 	//--- fonction qui est lancer lors de la création de l'objet. ---
 	public function __construct(array $carte, array $batiment){
 		date_default_timezone_set('Europe/Brussels');
@@ -32,22 +77,14 @@ class mine extends batiment{
 		
 		foreach ($carte as $key => $value){
 			switch ($key){
-				case 'contenu_batiment':
-					if(is_null($value)){
-						$this->Contenu = NULL;
-					}else{
-						$this->Contenu = $value;
-					}
-					break;
-				case 'date_action_batiment':
-					$this->DateAction = (is_null($value)?NULL:strtotime($value));
-					break;
+				case 'contenu_batiment':		$this->Contenu = (is_null($value)?array('a1', 0):explode(',', $value));	break;
+				case 'date_action_batiment':	$this->DateAction = (is_null($value)?NULL:strtotime($value));	break;
 			}
 		}
 		
 			//on stock ce qui a été produit
 		if(	$this->GetStockContenu() < $this->GetStockMax()
-			AND (strtotime('now') - parent::GetDateAction()) > $this->GetTempExtraction($this->GetTypeContenu())){
+			AND (strtotime('now') - $this->GetDateAction()) > $this->GetTempExtraction($this->GetTypeContenu())){
 				
 			global $objManager;
 			$Producteur = $objManager->GetPersoLogin(parent::GetLogin());
@@ -56,105 +93,136 @@ class mine extends batiment{
 				
 			unset($Producteur);
 		}
+		
+		for($i = 2; $i <= $this->GetNbMaxEsclave(); $i++)
+		{
+			if(isset($this->Contenu[$i]))
+			{
+				$arEsclave = explode('=', $this->Contenu[$i]);
+				if($arEsclave[0] == parent::CODE_ESCLAVE AND (strtotime('now') - $arEsclave[1]) >= self::DUREE_ESCLAVE)
+				{
+					unset($this->Contenu[$i]);
+				}
+			}else{
+				break;
+			}
+		}
 	}
 	
 	//Quelle quantité maximum on peut prendre maximum par action sur une ressource
 	Private function QuelleQuantite($NiveauCompetence, $CodeProduction){
 	
-		switch($CodeProduction){
-			case self::CODE_PRODUCTION_PIERRE:
-				switch($NiveauCompetence){
+		switch($CodeProduction)
+		{
+			case self::CODE_PRODUCTION_SABLE:
+			case self::CODE_PRODUCTION_ETAIN:
+				switch($NiveauCompetence)
+				{
+					case 0: return 5;
 					case 1: return 10;
 					case 2: return 20;
 					case 3: return 30;
 					case 4: return 40;
 					case 5: return 50;
-					default: return 0;
 				}
 				break;
-			case self::CODE_PRODUCTION_OR:
-				switch($NiveauCompetence){
+			case self::CODE_PRODUCTION_CHAUX:
+			case self::CODE_PRODUCTION_CUIVRE:
+				switch($NiveauCompetence)
+				{
+					case 0:
+					case 1:	return 5;
+					case 2: return 10;
 					case 3: return 10;
 					case 4: return 20;
 					case 5: return 30;
-					default: return 0;
 				}
 				break;
-			case self::CODE_PRODUCTION_FER:
-				switch($NiveauCompetence){
+			case self::CODE_PRODUCTION_GRAVIER:
+			case self::CODE_PRODUCTION_ARGENT:
+				switch($NiveauCompetence)
+				{
+					case 0:
+					case 1:
+					case 2:
+					case 3: return 5;
 					case 4: return 10;
 					case 5: return 20;
-					default: return 0;
 				}
 				break;
-			case self::CODE_PRODUCTION_CUIVRE:
-				switch($NiveauCompetence){
+			case self::CODE_PRODUCTION_CIMENT:
+			case self::CODE_PRODUCTION_MINOR:
+				switch($NiveauCompetence)
+				{
+					case 0:
+					case 1:
+					case 2:
+					case 3:
+					case 4: return 5;
 					case 5: return 10;
-					default: return 0;
 				}
 				break;
 		}
+		
+		return 0;
 	}
 	
 	//--- Gestion du stock  ---
 	public function ViderStock($stock, maison &$maison, personnage &$joueur){
-		$arContenu = explode(',', $this->Contenu);
-		switch(intval($arContenu[0])){
-			case self::CODE_PRODUCTION_PIERRE:
-				$maison->AddPierre($stock);
-				break;
-			case self::CODE_PRODUCTION_OR:
-				$joueur->AddOr($stock);
-				break;
-			case self::CODE_PRODUCTION_FER:
-				$joueur->AddInventaire(self::ICONE_NAME_FER, NULL, $stock, false);
-				break;
+		switch($this->GetTypeContenu()){
+			case self::CODE_PRODUCTION_SABLE:
+			case self::CODE_PRODUCTION_CHAUX:
+			case self::CODE_PRODUCTION_GRAVIER:
+			case self::CODE_PRODUCTION_CIMENT:
+			case self::CODE_PRODUCTION_ETAIN:
 			case self::CODE_PRODUCTION_CUIVRE:
-				$joueur->AddInventaire(self::ICONE_NAME_CUIVRE, NULL, $stock, false);
+			case self::CODE_PRODUCTION_ARGENT:
+			case self::CODE_PRODUCTION_MINOR:
+				$joueur->AddInventaire($this->GetTypeContenu(), NULL, $stock, false);
 				break;
 		}
 
-		$this->Contenu = $arContenu[0].','.($arContenu[1] - $stock);
+		//$this->Contenu = $Contenu[0].','.($Contenu[1] - $stock);
+		$this->Contenu[1] = $this->GetStockContenu() - $stock;
 		if($this->GetStockMax() == $stock){$this->DateAction = strtotime('now');}
 	}
 	public function AddStock($NiveauCompetence){
-		$arContenu = explode(',', $this->Contenu);
+		//$Contenu = explode(',', $this->Contenu);
 		
-		$nb = intval((strtotime('now') - parent::GetDateAction()) / $this->GetTempExtraction($arContenu[0]));
+		$nb = intval((strtotime('now') - parent::GetDateAction()) / $this->GetTempExtraction($this->GetTypeContenu()));
 		
 		for($i=1;$i<=$nb;$i++){
-			if($this->GetStockMax() > $arContenu['1']){
-				$arContenu[1] += $this->QuelleQuantite($NiveauCompetence, $arContenu[0]);
+			if($this->GetStockMax() > $this->Contenu['1']){
+				$this->Contenu[1] += $this->QuelleQuantite($NiveauCompetence, $this->GetTypeContenu());
 			}else{break;}
 		}
 		
-		$this->Contenu = $arContenu[0].','.($arContenu[1] > $this->GetStockMax()?$this->GetStockMax():$arContenu[1]);
+		//$this->Contenu = $this->Contenu[0].','.($this->Contenu[1] > $this->GetStockMax()?$this->GetStockMax():$this->Contenu[1]);
+		$this->Contenu[1] = ($this->GetStockContenu() > $this->GetStockMax()?$this->GetStockMax():$this->GetStockContenu());
 		$this->DateAction = strtotime('now');
 	}
 	//--- On change de type de production ---
 	public function ChangerProductionBatiment($production){
-		$arContenu = explode(',', $this->Contenu);
+		//$Contenu = explode(',', $this->Contenu);
 		
-		$this->Contenu = $production.','.$arContenu['1'];
+		//$this->Contenu = $production.','.$this->Contenu[1];
+		$this->Contenu[0] = $production;
 		$this->DateAction = strtotime('now');
 	}
 	
 	//Les Affichages
 	//==============
-	public function AfficheContenu(personnage &$oJoueur){//OK
-		$stock = explode(',', $this->Contenu);
+	public function AfficheContenu(personnage &$oJoueur){
 
-		if($stock[1] < $this->GetStockMax()){
-			$_SESSION['main'][get_class($this)]['stock'] = 1;
-			$status = '
-							<div style="display:inline;" id="TimeToWait'.ucfirst(strtolower(get_class($this))).'"></div>'
-							.AfficheCompteurTemp(ucfirst(strtolower(get_class($this))), 'index.php?page=villag', ($this->GetTempExtraction($stock[0]) - (strtotime('now') - parent::GetDateAction())));
+		if($this->GetStockContenu() < $this->GetStockMax()){
+			$status = '<div style="display:inline;" id="TimeToWait'.ucfirst(strtolower(get_class($this))).'"></div>'
+						.AfficheCompteurTemp(ucfirst(strtolower(get_class($this))), 'index.php?page=village', ($this->GetTempExtraction($this->GetTypeContenu()) - (strtotime('now') - $this->GetDateAction())));
 		}else{
 			$status = '<p>Votre stock est plein.</p>';
 		}
 		
-		$_SESSION['main'][get_class($this)]['production']	= $stock[0];
-		$_SESSION['main'][get_class($this)]['vider']		= $stock[1];
+		$_SESSION['main'][get_class($this)]['production']	= $this->GetTypeContenu();
+		$_SESSION['main'][get_class($this)]['vider']		= $this->GetStockContenu();
 		
 		$PositionBatiment	= implode(',', array_merge(array(parent::GetCarte()),parent::GetCoordonnee()));
 		$PositionJoueur		= implode(',', array_merge(array($oJoueur->GetCarte()),$oJoueur->GetPosition()));
@@ -170,10 +238,14 @@ class mine extends batiment{
 						.'<input type="hidden" name="anchor" value="'.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'" />'
 						.'<input type="hidden" name="action" value="production'.strtolower(get_class($this)).'" />'
 						.'<select name="type" onclick="document.getElementById(\'BtSubmit\').disabled=false;">'
-							.'<option value="'.self::CODE_PRODUCTION_PIERRE.'"'.(($stock[0] == self::CODE_PRODUCTION_PIERRE)?' disabled="disabled"':'').'>Trouver des Pierres</option>'
-							.'<option value="'.self::CODE_PRODUCTION_OR.'"'.(($stock[0] == self::CODE_PRODUCTION_OR OR $oJoueur->GetNiveauCompetence(self::TYPE_COMPETENCE) < 2)?' disabled="disabled"':'').'>Trouver de l\'Or</option>'
-							.'<option value="'.self::CODE_PRODUCTION_FER.'"'.(($stock[0] == self::CODE_PRODUCTION_FER OR $oJoueur->GetNiveauCompetence(self::TYPE_COMPETENCE) < 3)?' disabled="disabled"':'').'>Trouver du Minerai de Fer</option>'
-							.'<option value="'.self::CODE_PRODUCTION_CUIVRE.'"'.(($stock[0] == self::CODE_PRODUCTION_CUIVRE OR $oJoueur->GetNiveauCompetence(self::TYPE_COMPETENCE) < 4)?' disabled="disabled"':'').'>Trouver du Minerai de Cuivre</option>'
+							.($this->GetNiveau() >= self::NIVEAU_COMPETENCE_SABLE?'<option value="'.self::CODE_PRODUCTION_SABLE.'"'.($this->GetTypeContenu() == self::CODE_PRODUCTION_SABLE?' disabled="disabled"':'').'>'.self::NOM_PRODUCTION_SABLE.'</option>':'')
+							.($this->GetNiveau() >= self::NIVEAU_COMPETENCE_ETAIN?'<option value="'.self::CODE_PRODUCTION_ETAIN.'"'.($this->GetTypeContenu() == self::CODE_PRODUCTION_ETAIN?' disabled="disabled"':'').'>'.self::NOM_PRODUCTION_ETAIN.'</option>':'')
+							.($this->GetNiveau() >= self::NIVEAU_COMPETENCE_CHAUX?'<option value="'.self::CODE_PRODUCTION_CHAUX.'"'.($this->GetTypeContenu() == self::CODE_PRODUCTION_CHAUX?' disabled="disabled"':'').'>'.self::NOM_PRODUCTION_CHAUX.'</option>':'')
+							.($this->GetNiveau() >= self::NIVEAU_COMPETENCE_CUIVRE?'<option value="'.self::CODE_PRODUCTION_CUIVRE.'"'.($this->GetTypeContenu() == self::CODE_PRODUCTION_CUIVRE?' disabled="disabled"':'').'>'.self::NOM_PRODUCTION_CUIVRE.'</option>':'')
+							.($this->GetNiveau() >= self::NIVEAU_COMPETENCE_GRAVIER?'<option value="'.self::CODE_PRODUCTION_GRAVIER.'"'.($this->GetTypeContenu() == self::CODE_PRODUCTION_GRAVIER?' disabled="disabled"':'').'>'.self::NOM_PRODUCTION_GRAVIER.'</option>':'')
+							.($this->GetNiveau() >= self::NIVEAU_COMPETENCE_ARGENT?'<option value="'.self::CODE_PRODUCTION_ARGENT.'"'.($this->GetTypeContenu() == self::CODE_PRODUCTION_ARGENT?' disabled="disabled"':'').'>'.self::NOM_PRODUCTION_ARGENT.'</option>':'')
+							.($this->GetNiveau() >= self::NIVEAU_COMPETENCE_CIMENT?'<option value="'.self::CODE_PRODUCTION_CIMENT.'"'.($this->GetTypeContenu() == self::CODE_PRODUCTION_CIMENT?' disabled="disabled"':'').'>'.self::NOM_PRODUCTION_CIMENT.'</option>':'')
+							.($this->GetNiveau() >= self::NIVEAU_COMPETENCE_MINOR?'<option value="'.self::CODE_PRODUCTION_MINOR.'"'.($this->GetTypeContenu() == self::CODE_PRODUCTION_MINOR?' disabled="disabled"':'').'>'.self::NOM_PRODUCTION_MINOR.'</option>':'')
 						.'</select>'
 						.'<input type="submit" value="Go" id="BtSubmit" disabled="disabled" />'
 					.'</form>'
@@ -184,14 +256,14 @@ class mine extends batiment{
 		}
 		
 		$txt ='
-		<table border style="margin:3px;">
+		<table border style="width:100%;">
 			<tr>
-				<td style="width:60%;">Production de '.$this->QuelleQuantite($oJoueur->GetNiveauCompetence(self::TYPE_COMPETENCE), $stock[0]).'x '.AfficheIcone($this->GetIconeNameProduction($stock[0])).'</td>
+				<td style="width:60%;">Production de '.$this->QuelleQuantite($oJoueur->GetNiveauCompetence(self::TYPE_COMPETENCE), $this->GetTypeContenu()).'x '.AfficheIcone($this->GetIconeNameProduction($this->GetTypeContenu())).'</td>
 				<td>'.$status.'</td>
 			</tr>
 			<tr>
 				<td>Stock</td>
-				<td>'.$stock[1].'/'.$this->GetStockMax().' '.AfficheIcone($this->GetIconeNameProduction($stock[0])).'</td>
+				<td>'.$this->GetStockContenu().'/'.$this->GetStockMax().' '.AfficheIcone($this->GetIconeNameProduction($this->GetTypeContenu())).'</td>
 			</tr>
 			<tr>
 				'.$txtAction.'
@@ -203,33 +275,88 @@ class mine extends batiment{
 	
 	//Les GETS
 	//========
-	public function GetStockMax(){				return 500 + (parent::GetNiveau() * 100);}
+	public function GetAttaque(){
+		if(parent::GetNiveau() >= 4)
+		{
+			return 5;
+		}else{
+			return 0;
+		}
+	}
+	public function GetStockMax(){				return self::STOCK_MAX_DEPART + (parent::GetNiveau() * 100);}
 	public function GetContenu(){				return $this->Contenu;}
-	Public function GetIconeNameProduction($type){
-		switch($type){
-			case self::CODE_PRODUCTION_PIERRE:	return self::ICONE_NAME_PIERRE;
-			case self::CODE_PRODUCTION_OR:		return self::ICONE_NAME_OR;
-			case self::CODE_PRODUCTION_FER:		return self::ICONE_NAME_FER;
+	Public function GetIconeNameProduction($code){
+		switch($code){
+			case self::CODE_PRODUCTION_SABLE:	return self::ICONE_NAME_SABLE;
+			case self::CODE_PRODUCTION_CHAUX:	return self::ICONE_NAME_CHAUX;
+			case self::CODE_PRODUCTION_GRAVIER:	return self::ICONE_NAME_GRAVIER;
+			case self::CODE_PRODUCTION_CIMENT:	return self::ICONE_NAME_CIMENT;
+			case self::CODE_PRODUCTION_ETAIN:	return self::ICONE_NAME_ETAIN;
 			case self::CODE_PRODUCTION_CUIVRE:	return self::ICONE_NAME_CUIVRE;
+			case self::CODE_PRODUCTION_ARGENT:	return self::ICONE_NAME_ARGENT;
+			case self::CODE_PRODUCTION_MINOR:	return self::ICONE_NAME_MINOR;
 		}
 	}
 	public function GetTypeContenu(){
-		$contenu = explode(',', $this->Contenu);
-		return $contenu[0];
+		//$contenu = explode(',', $this->Contenu);
+		return $this->Contenu[0];
 	}
 	public function GetStockContenu(){
-		$contenu = explode(',', $this->Contenu);
-		return $contenu[1];
+		//$contenu = explode(',', $this->Contenu);
+		return $this->Contenu[1];
 	}
 	public function GetDateAction(){			return $this->DateAction;}
 	public function GetTempExtraction($code){
+		$Duree = 0;
+		
 		switch($code){
-			case self::CODE_PRODUCTION_PIERRE:	return self::TEMP_PIERRE;
-			case self::CODE_PRODUCTION_OR:		return self::TEMP_OR;
-			case self::CODE_PRODUCTION_FER:		return self::TEMP_FER;
-			case self::CODE_PRODUCTION_CUIVRE:	return self::TEMP_CUIVRE;
+			case self::CODE_PRODUCTION_SABLE:	$Duree = self::TEMP_SABLE;		break;
+			case self::CODE_PRODUCTION_CHAUX:	$Duree = self::TEMP_CHAUX;		break;
+			case self::CODE_PRODUCTION_GRAVIER:	$Duree = self::TEMP_GRAVIER;	break;
+			case self::CODE_PRODUCTION_CIMENT:	$Duree = self::TEMP_CIMENT;		break;
+			case self::CODE_PRODUCTION_ETAIN:	$Duree = self::TEMP_ETAIN;		break;
+			case self::CODE_PRODUCTION_CUIVRE:	$Duree = self::TEMP_CUIVRE;		break;
+			case self::CODE_PRODUCTION_ARGENT:	$Duree = self::TEMP_ARGENT;		break;
+			case self::CODE_PRODUCTION_MINOR:	$Duree = self::TEMP_MINOR;		break;
 		}
+		
+		$Duree = $Duree * ((100 - (self::GAIN_TEMP_PAR_ESCLAVE * $this->GetNbEsclave())) / 100);
+		
+		return $Duree;
 	}
-	
+	public function GetNbMaxEsclave($Niveau = NULL){
+		if(is_null($Niveau))
+		{
+			$Niveau = $this->GetNiveau();
+		}
+		
+		switch($Niveau)
+		{
+			case 1:	return self::NB_ESCLAVES_NIV_1;
+			case 2:	return self::NB_ESCLAVES_NIV_2;
+			case 3:	return self::NB_ESCLAVES_NIV_3;
+			case 4:	return self::NB_ESCLAVES_NIV_4;
+		}
+		return 0;
+	}
+	public function GetNbEsclave(){
+		$nbEsclave = 0;
+		
+		for($i = 2; $i <= $this->GetNbMaxEsclave(); $i++)
+		{
+			if(isset($this->Contenu[$i]))
+			{
+				$arEsclave = explode('=', $this->Contenu[$i]);
+				if($arEsclave[0] == parent::CODE_ESCLAVE)
+				{
+					$nbEsclave++;
+				}
+			}else{
+				break;
+			}
+		}
+		
+		return $nbEsclave;
+	}
 }
 ?>
