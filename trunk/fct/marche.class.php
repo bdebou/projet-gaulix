@@ -57,7 +57,7 @@ class marche extends batiment{
 								.(!is_null($txtAttaque)?$txtAttaque:'')
 								.'<tr>'
 									.'<td'.(!is_null($txtAttaque)?' colspan="3"':'').'>'
-											.'Prix : '.AfficheListePrix(array('Or'=>intval($result['objet_prix'] * 1.5)), array('Or'=>$oJoueur->GetArgent()))
+											.'Prix : '.AfficheListePrix(explode(',', $result['objet_prix']))
 									.'</td>'
 								.'</tr>'
 							.'</table>';
@@ -177,16 +177,16 @@ class marche extends batiment{
 				$_SESSION['main']['transaction'][$numTransaction]['accepter'] = $row['ID_troc'];
 					
 				if(	$row['achat_or']				<= $oJoueur->GetArgent()
-					AND $row['achat_nourriture']	<= $maison->GetRessourceNourriture()
-					AND $row['achat_bois']			<= $maison->GetRessourceBois()
-					AND $row['achat_pierre']		<= $maison->GetRessourcePierre()
+					AND $row['achat_nourriture']	<= $maison->GetRessource(maison::TYPE_RES_NOURRITURE)
+					AND $row['achat_bois']			<= $maison->GetRessource(maison::TYPE_RES_BOIS)
+					AND $row['achat_pierre']		<= $maison->GetRessource(maison::TYPE_RES_PIERRE)
 				){
 					$checkValid = true;
 				}else{
 					$checkValid = false;
 				}
 					
-				$txt .= '
+				/* $txt .= '
 						<tr>
 							<td>'.AfficheListePrix(	array(	'Or'=>$row['vente_or'],
 															'Nourriture'=>$row['vente_nourriture'],
@@ -221,7 +221,7 @@ class marche extends batiment{
 									.'</button>'
 									:'')
 							.'</td>
-						</tr>';
+						</tr>'; */
 				
 				$numTransaction ++;
 			}
