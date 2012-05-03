@@ -159,6 +159,7 @@ class PersonnagesManager{
 		
 		$q = $this->db->prepare('UPDATE table_carte SET 
 				etat_batiment = :etat_batiment, 
+				login = :login, 
 				contenu_batiment = :contenu_batiment, 
 				date_last_attaque = :date_last_attaque, 
 				res_pierre = :res_pierre, 
@@ -179,28 +180,29 @@ class PersonnagesManager{
 			switch(get_class($batiment)){
 				case 'bank':
 				case 'maison':
-				case 'mine':
 				case 'ferme':
 				case 'ressource':
 					$Contenu = $batiment->GetContenu();
 					break;
+				case 'mine':
 				case 'entrepot':
 					$Contenu = implode(',', $batiment->GetContenu());
 					break;
 			}
 		}
 		$q->bindValue(':contenu_batiment', $Contenu, PDO::PARAM_STR);
+		$q->bindValue(':login', (is_null($batiment->GetLogin())?NULL:$batiment->GetLogin()), PDO::PARAM_STR);
 		$q->bindValue(':date_last_attaque', (!is_null($batiment->GetDateLastAction())?date('Y-m-d H:i:s',$batiment->GetDateLastAction()):NULL), PDO::PARAM_INT);
 		$q->bindValue(':date_action_batiment', (!is_null($batiment->GetDateAction())?date('Y-m-d H:i:s',$batiment->GetDateAction()):NULL), PDO::PARAM_INT);
 		$q->bindValue(':detruit', ($batiment->GetDetruit()?'1':NULL), PDO::PARAM_STR);
-		$q->bindValue(':res_pierre', (is_null($batiment->GetRessourcePierre())?null:$batiment->GetRessourcePierre()), PDO::PARAM_INT);
-		$q->bindValue(':res_bois', (is_null($batiment->GetRessourceBois())?null:$batiment->GetRessourceBois()), PDO::PARAM_INT);
-		$q->bindValue(':res_nourriture', (is_null($batiment->GetRessourceNourriture())?null:$batiment->GetRessourceNourriture()), PDO::PARAM_INT);
+		$q->bindValue(':res_pierre', (is_null($batiment->GetRessource(maison::TYPE_RES_PIERRE))?null:$batiment->GetRessource(maison::TYPE_RES_PIERRE)), PDO::PARAM_INT);
+		$q->bindValue(':res_bois', (is_null($batiment->GetRessource(maison::TYPE_RES_BOIS))?null:$batiment->GetRessource(maison::TYPE_RES_BOIS)), PDO::PARAM_INT);
+		$q->bindValue(':res_nourriture', (is_null($batiment->GetRessource(maison::TYPE_RES_NOURRITURE))?null:$batiment->GetRessource(maison::TYPE_RES_NOURRITURE)), PDO::PARAM_INT);
 		$q->bindValue(':niveau_batiment', $batiment->GetNiveau(), PDO::PARAM_INT);
 		$q->bindValue(':date_amelioration', (!is_null($batiment->GetDateAmelioration())?date('Y-m-d H:i:s',$batiment->GetDateAmelioration()):NULL), PDO::PARAM_INT);
 		$q->bindValue(':tmp_amelioration', (is_null($batiment->GetTmpAmelioration())?NULL:$batiment->GetTmpAmelioration()), PDO::PARAM_INT);
 		
-		return $q->execute();
+		return $q->execute() or die(print_r($q->errorInfo(), true));
 	}
 	/* Public function UpdateRessource(ressource $oRessource){
 		$q = $this->db->prepare("UPDATE table_carte SET 
@@ -216,7 +218,7 @@ class PersonnagesManager{
 		$q->bindValue(':contenu_batiment', (is_null($oRessource->GetTypeContenu())?NULL:$oRessource->GetTypeContenu()), PDO::PARAM_INT);
 		$q->bindValue(':res_pierre', ((in_array($oRessource->GetNomType(), array(ressource::NOM_RESSOURCE_PIERRE, ressource::NOM_RESSOURCE_OR)) AND !is_null($oRessource->GetEtat()))?$oRessource->GetEtat():NULL), PDO::PARAM_INT);
 		$q->bindValue(':res_bois', (($oRessource->GetNomType() == ressource::NOM_RESSOURCE_BOIS AND !is_null($oRessource->GetEtat()))?$oRessource->GetEtat():NULL), PDO::PARAM_INT);
-		$q->bindValue(':detruit', ($oRessource->GetVide()?true:NULL), PDO::PARAM_INT);
+		$q->bindValue(':detruit', ($oRessource->GetDetruit()?true:NULL), PDO::PARAM_INT);
 		$q->bindValue(':date_action_batiment', date('Y-m-d H:i:s', $oRessource->GetDateDebutAction()), PDO::PARAM_STR);
 		$q->bindValue(':coordonnee', $oRessource->GetCoordonnee(), PDO::PARAM_STR);
 		
