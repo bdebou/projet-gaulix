@@ -15,19 +15,16 @@ abstract class batiment{
 			$Detruit,
 			$Niveau,
 			$DateAction,
-			$PrixOr,
-			$PrixBois,
-			$PrixPierre,
+			$LstPrix,
 			$DateAmelioration,
 			$TmpAmelioration,
 			$NbPoints,
-			$ResPierre,
-			$ResBois,
-			$ResNourriture,
 			$Contenu;
 	
 	Const PRIX_REPARATION		= 5;		// Prix des réparation 5or/pts de vie
-	Const NIVEAU_MAX			= 5;		// Niveau Maximum pour chaque batiment.
+	Const NIVEAU_MAX			= 4;		// Niveau Maximum pour chaque batiment.
+	
+	const CODE_ESCLAVE			= 'esclave';
 	
 	//--- fonction qui est lancer lors de la création de l'objet. ---
 	public function __construct(array $carte, array $batiment){
@@ -185,10 +182,7 @@ abstract class batiment{
 				case 'batiment_defense':		$this->Defense = (is_null($value)?NULL:intval($value)); break;
 				case 'batiment_distance':		$this->Distance = (is_null($value)?NULL:intval($value)); break;
 				case 'batiment_vie':			$this->EtatMax = (is_null($value)?NULL:intval($value)); break;
-				case 'prix_or':					$this->PrixOr = (is_null($value)?NULL:intval($value)); break;
-				case 'prix_bois':				$this->PrixBois = (is_null($value)?NULL:intval($value)); break;
-				case 'prix_pierre':				$this->PrixPierre = (is_null($value)?NULL:intval($value)); break;
-				case 'prix_nourriture':			$this->PrixNourriture = (is_null($value)?NULL:intval($value)); break;
+				case 'batiment_prix':			$this->LstPrix = (is_null($value)?NULL:explode(',', $value)); break;
 				case 'batiment_points':			$this->NbPoints = intval($value); break;
 			}
 		}
@@ -202,19 +196,7 @@ abstract class batiment{
 				case 'date_last_attaque':	$this->DateLastAction = (is_null($value)?NULL:strtotime($value)); break;
 				case 'date_action_batiment':$this->DateAction = (is_null($value)?NULL:strtotime($value)); break;
 				case 'detruit':				$this->Detruit = (is_null($value)?false:true); break;
-				case 'contenu_batiment':	if(is_null($value)){
-												$this->Contenu = NULL;
-											}else{
-												switch($this->Type){
-													case 'maison':
-														$this->Contenu = $value;
-														break;
-													case 'entrepot':
-														$this->Contenu = explode(',', $value);
-														break;
-												}
-											}
-											break;
+				case 'contenu_batiment':	$this->Contenu = (is_null($value)?NULL:$value); break;
 				case 'niveau_batiment':		$this->Niveau = (is_null($value)?NULL:intval($value)); break;
 				case 'date_amelioration':	$this->DateAmelioration = (is_null($value)?NULL:strtotime($value)); break;
 				case 'tmp_amelioration':	$this->TmpAmelioration = (is_null($value)?NULL:intval($value)); break;
@@ -224,7 +206,7 @@ abstract class batiment{
 	}
 	
 	//--- Les modules d'affichage ---
-	public function GetInfoBulle($AllCartes = false){
+	public function GetInfoBulle($AllCartes = false, $Civilisation = NULL){
 		return '<table>'
 					.'<tr>'
 						.($AllCartes?
@@ -233,22 +215,21 @@ abstract class batiment{
 						.'</td>'
 						:'')
 						.'<th>'
-							.$this->GetNom().(!is_null($this->GetLogin())?' de '.$this->GetLogin():'')
+							.$this->GetNom($Civilisation).(!is_null($this->GetLogin())?' de '.$this->GetLogin():'')
 						.'</th>'
 					.'</tr>'
 					.'<tr>'
 						.'<td>'
-							.'<img alt="'.$this->GetNom().'" src="./fct/fct_image.php?type=etatcarte&amp;value='.$this->GetEtat().'&amp;max='.$this->GetEtatMax().'" />'
+							.'<img alt="'.self::GetNom().'" src="./fct/fct_image.php?type=etatcarte&amp;value='.$this->GetEtat().'&amp;max='.$this->GetEtatMax().'" />'
 						.'</td>'
 					.'</tr>'
 				.'</table>';
 	}
-	public function AfficheOptionAmeliorer(&$oJoueur){
+	public function AfficheOptionAmeliorer(personnage &$oJoueur){
 		
 		$id = str_replace(',', '_', $this->Coordonnee);
 		
-		
-		if($this->GetNiveau() >= self::NIVEAU_MAX){return '<p>Niveau Maximum atteint.</p>';}
+		if($this->GetNiveau() >= $this->GetNiveauMax()){return '<p>Niveau Maximum atteint.</p>';}
 		
 		if(!is_null($this->DateAmelioration) AND !is_null($this->TmpAmelioration)){
 			
@@ -267,24 +248,30 @@ abstract class batiment{
 			
 		}else{
 			
-			$prixAmelioration['Or']			= $this->PrixOr			+ intval(($this->Niveau / 2) * $this->PrixOr);
-			$prixAmelioration['Bois']		= $this->PrixBois		+ intval(($this->Niveau / 2) * $this->PrixBois);
-			$prixAmelioration['Pierre']		= $this->PrixPierre		+ intval(($this->Niveau / 2) * $this->PrixPierre);
-			$prixAmelioration['Nourriture']	= $this->PrixNourriture	+ intval(($this->Niveau / 2) * $this->PrixNourriture);
-	
+			$prixAmelioration = $this->GetCoutAmelioration();
 			$maison = $oJoueur->GetObjSaMaison();
 			
-			$_SESSION['main'][$id]['prixAmelioration'] = $prixAmelioration;
-	
-			if($prixAmelioration['Or']			> $oJoueur->GetArgent()
-			OR $prixAmelioration['Bois']		> $maison->GetRessourceBois()
-			OR $prixAmelioration['Pierre']		> $maison->GetRessourcePierre()
-			OR $prixAmelioration['Nourriture']	> $maison->GetRessourceNourriture()
-			OR $this->GetCoordonnee() != $oJoueur->GetPosition()){
-				return '<p>Prix de l\'amélioration : <br />'.AfficheListePrix($prixAmelioration, array('Bois'=>$maison->GetRessourceBois(), 'Pierre'=>$maison->GetRessourcePierre(), 'Or'=>$oJoueur->GetArgent(), 'Nourriture'=>$maison->GetRessourceNourriture())).'</p>';
+			$chkPrix = true;
+			if(!is_null($prixAmelioration))
+			{
+				foreach($prixAmelioration as $Prix)
+				{
+					if(!CheckIfAssezRessource(explode('=', $Prix), $oJoueur, $maison))
+					{
+						$chkPrix = false;
+						break;
+					}
+				}
 			}
 			
-			return '<br /><a href="index.php?page=village&action=ameliorer&id='.$id.'&anchor='.str_replace(',', '_', $this->Coordonnee).'" title="Or = '.$prixAmelioration['Or'].'&#13;Bois = '.$prixAmelioration['Bois'].'&#13;Pierre = '.$prixAmelioration['Pierre'].'&#13;Nourriture = '.$prixAmelioration['Nourriture'].'&#13;'.AfficheTempPhrase(DecoupeTemp(intval(3600*exp($this->Niveau)))).'">Améliorer</a> pour '.AfficheListePrix($prixAmelioration, array('Bois'=>$maison->GetRessourceBois(), 'Pierre'=>$maison->GetRessourcePierre(), 'Or'=>$oJoueur->GetArgent(), 'Nourriture'=>$maison->GetRessourceNourriture()));
+			$_SESSION['main'][$id]['prixAmelioration'] = $prixAmelioration;
+			
+			if(!$chkPrix OR $this->GetCoordonnee() != $oJoueur->GetPosition())
+			{
+				return '<p>Prix de l\'amélioration : <br />'.AfficheListePrix($prixAmelioration, $oJoueur, $maison).'</p>';
+			}
+			
+			return '<br /><a href="index.php?page=village&action=ameliorer&id='.$id.'&anchor='.str_replace(',', '_', $this->Coordonnee).'" title="Or = '.$prixAmelioration['Or'].'&#13;Bois = '.$prixAmelioration['Bois'].'&#13;Pierre = '.$prixAmelioration['Pierre'].'&#13;Nourriture = '.$prixAmelioration['Nourriture'].'&#13;'.AfficheTempPhrase(DecoupeTemp(intval(3600*exp($this->Niveau)))).'">Améliorer</a> pour '.AfficheListePrix($prixAmelioration, $oJoueur, $maison);
 		}
 	}
 	public function AfficheOptionReparer(&$oJoueur){
@@ -361,38 +348,34 @@ abstract class batiment{
 	public function GetType(){					return $this->Type;}
 	public function GetNom(){					return $this->Nom;}
 	public function GetDescription(){			return $this->Description;}
+	public function GetRessource($Type){		return NULL;}
 	public function GetAttaque(){
-		if($this->Attaque == 0){return $this->Attaque;}
-		else{return ($this->Attaque + (5 * $this->Niveau));}
+		if(is_null($this->Attaque) AND $this->Niveau <= 1){return 0;}
+		else{return ($this->Attaque + (5 * ($this->Niveau - 1)));}
 	}
 	public function GetDefense(){
-		if($this->Defense==0){return $this->Defense;}
-		else{return ($this->Defense + (5 * $this->Niveau));}
+		if(is_null($this->Defense) AND $this->Niveau <= 1){return 0;}
+		else{return ($this->Defense + (5 * ($this->Niveau - 1)));}
 	}
 	public function GetDistance(){
 		if($this->Distance==0){return $this->Distance;}
 		else{return ($this->Distance + $this->Niveau);}
 	}
 	public function GetEtat(){					return $this->Etat;}
-	public function GetEtatMax(){				return ($this->EtatMax + (50 * $this->Niveau));}
+	public function GetEtatMax(){				return ($this->EtatMax + (50 * ($this->Niveau - 1)));}
 	public function GetDateLastAction(){		return $this->DateLastAction;}
 	public function GetDetruit(){				return $this->Detruit;}
 	public function GetNiveau(){				return $this->Niveau;}
+	public function GetNiveauMax(){				return self::NIVEAU_MAX;}
 	public function GetDateAction(){			return $this->DateAction;}
-	public function GetRessourcePierre(){		return $this->ResPierre;}
-	public function GetRessourceBois(){			return $this->ResBois;}
-	public function GetRessourceNourriture(){	return $this->ResNourriture;}
 	public function GetContenu(){				return $this->Contenu;}
-	public function GetPrixOr(){				return $this->PrixOr;}
-	public function GetPrixBois(){				return $this->PrixBois;}
-	public function GetPrixPierre(){			return $this->PrixPierre;}
-	public function GetPrixNourriture(){		return $this->PrixNourriture;}
+	public function GetListePrix(){				return $this->LstPrix;}
 	public function GetDateAmelioration(){		return $this->DateAmelioration;}
 	public function GetTmpAmelioration(){		return $this->TmpAmelioration;}
 	public function GetImgName(){				return get_class($this).'-'.($this->Login == $_SESSION['joueur']?'a':'b');}
 	public function GetCoordonnee(){
 		$arPosition = explode(',', $this->Coordonnee);
-		return array($arPosition['1'], $arPosition['2']);
+		return array($arPosition[1], $arPosition[2]);
 	}
 	public function GetCarte(){
 		$arPosition = explode(',', $this->Coordonnee);
@@ -407,7 +390,16 @@ abstract class batiment{
 			return 'Finish';
 		}
 	}
-	
+	public function GetCoutAmelioration(){
+		$classBatiment = get_class($this);
+		
+		switch(self::GetNiveau() + 1)
+		{
+			case 2:		return explode(',', $classBatiment::COUT_AMELIORATION_NIVEAU_2);
+			case 3:		return explode(',', $classBatiment::COUT_AMELIORATION_NIVEAU_3);
+			case 4:		return explode(',', $classBatiment::COUT_AMELIORATION_NIVEAU_4);
+		}
+	}
 }
 
 ?>
