@@ -390,8 +390,7 @@ function AfficheInfoObjet($CodeObjet, $intHeightImg = 50) {
 		$txtInfo .= '</tr>';
 	}
 
-	$InfoBulle =
-            '<table class="InfoBulle">'
+	$InfoBulle = '<table class="InfoBulle">'
 	. '<tr><th' . (isset($txtInfo) ? ' colspan="'.$nbInfo.'"' : '') . '>' . $rowObjet['objet_nom'] . '</th></tr>'
 	. ((!is_null($rowObjet['objet_description']))?'<tr><td'.(isset($txtInfo)?' colspan="'.$nbInfo.'"':'').' style="text-align:left;">' . $rowObjet['objet_description'] . '</td></tr>':'')
 	. (isset($txtInfo) ? $txtInfo : '')
@@ -407,9 +406,9 @@ function AfficheInfoObjet($CodeObjet, $intHeightImg = 50) {
 	. 'height="'.$intHeightImg.'px"'
 	. ' />';
 }
-function QuelTypeObjet($code){
-	$Ressource = QuelTypeRessource($code);
-	if($code != $Ressource)
+function QuelTypeObjet($Code){
+	$Ressource = QuelTypeRessource($Code);
+	if($Code != $Ressource)
 	{
 		return $Ressource;
 	}
