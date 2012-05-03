@@ -317,18 +317,16 @@ function AfficheCollecteRessource(personnage &$oJoueur) {
 	}
 
 	//On vérifie si la case est vide, si oui --> Finis
-	if (ChkIfFree($oJoueur->GetPosition(), $oJoueur->GetCarte())) {
+	if (ChkIfFree($oJoueur->GetCoordonnee())) {
 		return null;
 	}
 	
-	$objRessource = FoundBatiment(NULL, NULL, implode(',', array_merge(array($oJoueur->GetCarte()), $oJoueur->GetPosition())));
+	$objRessource = FoundBatiment(NULL, NULL, $oJoueur->GetCoordonnee());
 	
 	if(is_null($objRessource) OR (get_class($objRessource) AND get_class($objRessource) != 'ressource'))
 	{
 		return NULL;
 	}
-	
-	$_SESSION['main']['ressource'] = $objRessource;
 
 	switch ($objRessource->GetNomType()) {
 		case ressource::NOM_RESSOURCE_BOIS:
@@ -382,9 +380,11 @@ function AfficheCollecteRessource(personnage &$oJoueur) {
 		}
 	}
 }
-function ChkIfFree($position, $carte) {
-	$sql = "SELECT id_case_carte FROM table_carte WHERE coordonnee='" . implode(',', array_merge(array($carte), $position)) . "' AND detruit IS NULL;";
+function ChkIfFree($position) {
+	$sql = "SELECT id_case_carte FROM table_carte WHERE coordonnee='".$position."' AND detruit IS NULL;";
+	
 	$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
+	
 	if (mysql_num_rows($requete) > 0) {
 		return false;
 	}
@@ -477,6 +477,7 @@ function AfficheListeBatimentAttaquable($sql, &$chkConstruction) {
 	$txt = null;
 	$chkBatiment = true;
 	$chkBatimentsEnd = false;
+	
 	$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
 	if (isset($_SESSION['retour_attaque'])) {
 		$chkConstruction = false;
@@ -511,7 +512,7 @@ function AfficheListeBatimentAttaquable($sql, &$chkConstruction) {
 						.'<br />'
 						.'<img alt="'.$rstBatiment['batiment_nom'].'" src="./fct/fct_image.php?type=VieCarte&amp;value='.$row['etat_batiment'].'&amp;max='.($rstBatiment['batiment_vie'] + (50 * $row['niveau_batiment'])).'" />';
 					$txt .= '
-				<li><a href="index.php?page=main&amp;action=attaquer&amp;id=' . $nbBatiment . '">Attaquer <img src="img/'.strtolower($rstBatiment['batiment_nom']).'-b.png" alt="'.$rstBatiment['batiment_nom'].'" height="20px" onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulle).'\');" onmouseout="cache();" /></a></li>';
+				<li><a href="index.php?page=main&amp;action=attaquer&amp;id=' . $nbBatiment . '">Attaquer <img src="img/carte/'.strtolower($rstBatiment['batiment_nom']).'-b.png" alt="'.$rstBatiment['batiment_nom'].'" height="20px" onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulle).'\');" onmouseout="cache();" /></a></li>';
 					$chkBatimentsEnd = true;
 					$nbBatiment++;
 				}
@@ -544,25 +545,31 @@ Function AfficheCombatLegionnaire(personnage &$oJoueur) {
 function AfficheMenuConstruction(personnage &$oJoueur, &$chkConstruction) {
 	if (is_null($oJoueur->GetMaisonInstalle())) {
 		//La Maison n'est pas encore installée
-		if (!ChkIfFree($oJoueur->GetPosition(), $oJoueur->GetCarte())) {
+		
+		if (!ChkIfFree($oJoueur->GetCoordonnee())) {
+			
 			return '
 		<p>Ce terrain est déjà occupé.</p>
 		<hr />';
 		} else {
-			$_SESSION['main']['0']['construire'] = 1;
-			$_SESSION['main']['0']['prix_or'] = 0;
-			$_SESSION['main']['0']['prix_bois'] = 0;
-			$_SESSION['main']['0']['prix_pierre'] = 0;
-			$_SESSION['main']['0']['prix_nourriture'] = 0;
+			
+			$_SESSION['main'][0]['construire'] = 1;
+			$_SESSION['main'][0]['prix'] = NULL;
+			
 			return '
 		<p><a href="index.php?page=main&amp;action=construire&amp;id=0">Construire ma Maison ici</a></p>
 		<hr />';
 		}
-	} elseif (ChkIfFree($oJoueur->GetPosition(), $oJoueur->GetCarte())) {
+	} elseif (ChkIfFree($oJoueur->GetCoordonnee())) {
+		
 		//La Maison est installée ET la case est vide.
 		if ($chkConstruction AND MonVillageEstProche($oJoueur->GetCarte(), $oJoueur->GetPosition(), $oJoueur->GetLogin())) {
-			$sqlBatiment = "SELECT * FROM table_batiment WHERE id_batiment!=1 AND batiment_type!='ressource' AND batiment_type!='carte';";
+			
+			global $lstNonBatiment, $lstBatimentsNonConstructible;
+			
+			$sqlBatiment = "SELECT * FROM table_batiment WHERE id_batiment NOT IN (".implode(", ", array_merge($lstNonBatiment, $lstBatimentsNonConstructible)).");";
 			$rqtBatiment = mysql_query($sqlBatiment) or die(mysql_error() . '<br />' . $sqlBatiment);
+			
 			$txt = null;
 			$chkStart = true;
 			$nbBatiment = 0;
@@ -570,37 +577,61 @@ function AfficheMenuConstruction(personnage &$oJoueur, &$chkConstruction) {
 			//on trouve la maison
 			$maison = $oJoueur->GetObjSaMaison();
 
-			while ($row = mysql_fetch_array($rqtBatiment, MYSQL_ASSOC)) {
-				if (ChkIfBatimentDejaConstruit($row['id_batiment'])) {
-					if ($chkStart) {
-						$txt = '
-		<p>Vous pouvez construire les batiments suivants :
-			<ul>';
+			while ($row = mysql_fetch_array($rqtBatiment, MYSQL_ASSOC))
+			{
+				if (!ChkIfBatimentDejaConstruit($row['id_batiment']))
+				{
+					if ($chkStart)
+					{
+						$txt = '<p>Vous pouvez construire les batiments suivants :
+						<ul>';
 						$chkStart = false;
 					}
-					if ($oJoueur->GetArgent() >= $row['prix_or']
-					AND $maison->GetRessourceBois() >= $row['prix_bois']
-					AND $maison->GetRessourcePierre() >= $row['prix_pierre']
-					AND $maison->GetRessourceNourriture() >= $row['prix_nourriture']) {
-						$_SESSION['main'][$nbBatiment]['construire'] = $row['id_batiment'];
-						$_SESSION['main'][$nbBatiment]['prix_or'] = $row['prix_or'];
-						$_SESSION['main'][$nbBatiment]['prix_bois'] = $row['prix_bois'];
-						$_SESSION['main'][$nbBatiment]['prix_pierre'] = $row['prix_pierre'];
-						$_SESSION['main'][$nbBatiment]['prix_nourriture'] = $row['prix_nourriture'];
-						$txt .= '
-				<li>"<a href="index.php?page=main&amp;action=construire&amp;id=' . $nbBatiment . '">' . $row['batiment_nom'] . '</a>" au prix de : ' . AfficheListePrix(array('Bois' => $row['prix_bois'], 'Pierre' => $row['prix_pierre'], 'Or' => $row['prix_or'], 'Nourriture' => $row['prix_nourriture']), array('Bois' => $maison->GetRessourceBois(), 'Pierre' => $maison->GetRessourcePierre(), 'Or' => $oJoueur->GetArgent(), 'Nourriture' => $maison->GetRessourceNourriture())) . '</li>';
-					} else {
-						$txt .= '
-				<li>"' . $row['batiment_nom'] . '" au prix de : ' . AfficheListePrix(array('Bois' => $row['prix_bois'], 'Pierre' => $row['prix_pierre'], 'Or' => $row['prix_or'], 'Nourriture' => $row['prix_nourriture']), array('Bois' => $maison->GetRessourceBois(), 'Pierre' => $maison->GetRessourcePierre(), 'Or' => $oJoueur->GetArgent(), 'Nourriture' => $maison->GetRessourceNourriture())) . '</li>';
+					
+					$txt .= '<li>"';
+					
+					if(is_null($row['batiment_prix']))
+					{
+						$LstPrix = NULL;
+					}else{
+						$LstPrix = explode(',', $row['batiment_prix']);
 					}
+					
+					$chkPrix = true;
+					if(!is_null($LstPrix))
+					{
+						foreach($LstPrix as $Prix)
+						{
+							$arPrix = explode('=', $Prix);
+						
+							//on vérifie si on a assez de ressource
+							if(!CheckIfAssezRessource($arPrix, $oJoueur, $maison))
+							{
+								$chkPrix = false;
+								break;
+							}
+						}
+					}
+					
+					if ($chkPrix)
+					{
+						$_SESSION['main'][$nbBatiment]['construire'] = $row['id_batiment'];
+						//$_SESSION['main'][$nbBatiment]['prix'] = $row['batiment_prix'];
+						$_SESSION['main'][$nbBatiment]['prix'] = $LstPrix;
+						$txt .= '<a href="index.php?page=main&amp;action=construire&amp;id=' . $nbBatiment . '">' . $row['batiment_nom'] . '</a>';
+					} else {
+						$txt .= $row['batiment_nom'];
+					}
+					
+					$txt .= '" au prix de : ' . AfficheListePrix($LstPrix, $oJoueur, $maison) . '</li>';
+					
 					$nbBatiment++;
 				}
 			}
 			if (!is_null($txt)) {
-				return $txt . '
-			</ul>
-		</p>
-		<hr />';
+				return $txt . '</ul>
+				</p>
+				<hr />';
 			} else {
 				return '<p style="text-align:center;">Pas assez de ressources pour construire.</p><hr />';
 			}
@@ -612,12 +643,10 @@ function AfficheMenuConstruction(personnage &$oJoueur, &$chkConstruction) {
 function AfficheQueteAPorteeDeTire(&$lstMonstre) {
 	$txt = null;
 	if (isset($lstMonstre)) {
-		$txt .= '
-		<p>Vous pouvez attaquer :
-			<ul>';
+		$txt .= '<p>Vous pouvez attaquer :
+		<ul>';
 		foreach ($lstMonstre as $Monstre) {
-			$txt .= '
-			<li><a href="index.php?page=main&amp;action=quete&amp;id=' . $Monstre['id'] . '">Attaquer ' . $Monstre['nom'] . '</a></li>';
+			$txt .= '<li><a href="index.php?page=main&amp;action=quete&amp;id=' . $Monstre['id'] . '">Attaquer ' . $Monstre['nom'] . '</a></li>';
 		}
 		$txt .= '</ul>
 		</p>
@@ -710,7 +739,7 @@ function ObjetTrouve(personnage &$oJoueur) {
 function AfficheActionPossible(personnage &$oJoueur, $arData) {
 
 	$_SESSION['main']['objet']['code'] = $arData['objet_code'];
-	$_SESSION['main']['objet']['type'] = QuelTypeRessource($arData['objet_code']);
+	$_SESSION['main']['objet']['type'] = QuelTypeObjet($arData['objet_code']);
 	$_SESSION['main']['objet']['value'] = $arData['objet_nb'];
 	$_SESSION['main']['objet']['action'] = true;
 	$_SESSION['main']['objet']['laisser'] = 'ObjetTrouvé';
@@ -731,7 +760,7 @@ function AfficheActionPossible(personnage &$oJoueur, $arData) {
 		$txt .= '<li style="display:inline;">Votre Bolga est plein.</li>';
 	}
 	//on vérifie le type d'objet
-	if (in_array($_SESSION['main']['objet']['type'], array('deplacement', 'argent', 'nourriture', 'bois', 'pierre', 'vie', 'divers'))) {
+	if (in_array($_SESSION['main']['objet']['type'], array('deplacement', maison::TYPE_RES_SESTERCE, maison::TYPE_RES_NOURRITURE, maison::TYPE_RES_BOIS, maison::TYPE_RES_PIERRE, 'vie', 'divers'))) {
 		if ($_SESSION['main']['objet']['type'] == 'vie' and ($oJoueur->GetVie() + $arData['objet_nb']) > personnage::VIE_MAX) {
 			$txt .= '<li style="display:inline; margin-left:20px;">Limite de ' . personnage::VIE_MAX . ' vie atteinte</li>';
 		} elseif ($_SESSION['main']['objet']['type'] == 'deplacement' and ($oJoueur->GetDepDispo() + $arData['objet_nb']) > personnage::DEPLACEMENT_MAX) {
@@ -834,19 +863,20 @@ function ChkIfBatimentDejaConstruit($IDBatiment) {
 		$sql = "SELECT id_case_carte FROM table_carte WHERE id_type_batiment=$IDBatiment AND detruit IS NULL AND login='" . $_SESSION['joueur'] . "';";
 		$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
 		if (mysql_num_rows($requete) > 0) {
-			return false;
+			return true;
 		}
 	}
-	return true;
+	return false;
 }
-function AddCaseCarte($position, $login, $IDBatiment, $etat, $niveau, $res=array('pierre'=>'NULL', 'bois'=>'NULL', 'nourriture'=>'NULL')){
+function AddCaseCarte($position, $login, $IDBatiment, $etat, $niveau){
 	$sql="INSERT INTO `table_carte` (
 	`id_case_carte`, 
 	`coordonnee`, 
 	`login`, 
 	`id_type_batiment`, 
 	`contenu_batiment`, 
-	`res_pierre`, `res_bois`, `res_nourriture`, `date_action_batiment`, 
+	`res_nourriture`, `res_bois`, `res_pierre`, 
+	`date_action_batiment`, 
 	`etat_batiment`, 
 	`date_last_attaque`, 
 	`detruit`, 
@@ -854,9 +884,10 @@ function AddCaseCarte($position, $login, $IDBatiment, $etat, $niveau, $res=array
 	NULL, 
 	'$position', 
 	'$login', 
-	$IDBatiment,
-	".(($IDBatiment == 6 or $IDBatiment == 18)?"'0,0'":'NULL').", 
-	".$res['pierre'].", ".$res['bois'].", ".$res['nourriture'].", ".(($IDBatiment == '6' or $IDBatiment == '18')?"'".date('Y-m-d H:i:s')."'":'NULL').", 
+	$IDBatiment, "
+	.(in_array($IDBatiment, array(6 /*Ferme*/, 10 /*Mine*/, 16 /*Carrière*/))?"'a1,0'":'NULL').", "
+	.($IDBatiment == 1?"0, 0, 0, ":"NULL, NULL, NULL, ")
+	.(in_array($IDBatiment, array(6 /*Ferme*/, 10 /*Mine*/, 16 /*Carrière*/))?"'".date('Y-m-d H:i:s')."'":'NULL').", 
 	$etat, 
 	NULL, 
 	NULL, 
@@ -962,13 +993,16 @@ function ActionMove(&$check, personnage &$oJoueur, &$objManager){
 	unset($_SESSION['message']);
 
 	//on libère la ressource avant de bouger
-	if(isset($_SESSION['main']['ressource'])){
-		if($_SESSION['main']['ressource']->GetCollecteur() == $oJoueur->GetLogin()){
-			$_SESSION['main']['ressource']->FreeRessource($oJoueur);
+	$objRessource = FoundBatiment(NULL, NULL, $oJoueur->GetCoordonnee());
+	
+	if(!is_null($objRessource) AND get_class($objRessource) == 'ressource')
+	{
+		if($objRessource->GetCollecteur() == $oJoueur->GetLogin())
+		{
+			$objRessource->FreeRessource($oJoueur);
 		}
-		//$objManager->UpdateRessource($_SESSION['main']['ressource']);
-		$objManager->UpdateBatiment($_SESSION['main']['ressource']);
-		unset($_SESSION['main']['ressource']);
+		$objManager->UpdateBatiment($objRessource);
+		unset($objRessource);
 	}
 
 	//on déplace le joueur
@@ -1016,7 +1050,7 @@ function ActionMove(&$check, personnage &$oJoueur, &$objManager){
 function ActionChasser(&$check, personnage &$oJoueur, &$objManager){
 	if(isset($_SESSION['main']['chasser'])){
 		$maison = $oJoueur->GetObjSaMaison();
-		$maison->AddNourriture($_SESSION['main']['chasser']['nourriture']);
+		$maison->AddRessource(maison::TYPE_RES_NOURRITURE, $_SESSION['main']['chasser']['nourriture']);
 		if(!is_null($_SESSION['main']['chasser']['cuir'])){
 			$oJoueur->AddInventaire('ResCuir', NULL, $_SESSION['main']['chasser']['cuir'], false);
 		}
@@ -1099,19 +1133,31 @@ function ActionConstruire(&$check, $id, personnage &$oJoueur, &$objManager){
 	$batiment = mysql_fetch_array($requete, MYSQL_ASSOC);
 
 	// on ajoute le batiment à la carte
-	if($_SESSION['main'][$id]['construire']==1){
+	/* if($_SESSION['main'][$id]['construire']==1){
 		AddCaseCarte($oJoueur->GetCoordonnee(), $oJoueur->GetLogin(), $_SESSION['main'][$id]['construire'], $batiment['batiment_vie'], $batiment['batiment_niveau'], $ressource);
-	}else{
+	}else{ */
 		AddCaseCarte($oJoueur->GetCoordonnee(), $oJoueur->GetLogin(), $_SESSION['main'][$id]['construire'], $batiment['batiment_vie'], $batiment['batiment_niveau']);
-	}
+	//}
+	
 	//on gagne des points
 	$oJoueur->UpdatePoints($batiment['batiment_points']);
+	
 	//on ajoute un historique que le batiment est construit
 	AddHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'Construction', NULL, NULL, 'Batiment construit. ID du batiment = '.$_SESSION['main'][$id]['construire']);
+	
 	//On trouve la maison
 	$maison = $oJoueur->GetObjSaMaison();
+	
 	//on paie le batiment
-	if(isset($_SESSION['main'][$id]['prix_or'])){
+	if(!is_null($_SESSION['main'][$id]['prix']))
+	{
+		foreach($_SESSION['main'][$id]['prix'] as $Prix)
+		{
+			UtilisationRessource(explode('=', $Prix), $oJoueur, $maison);
+		}
+	}
+	
+	/* if(isset($_SESSION['main'][$id]['prix_or'])){
 		$oJoueur->MindOr($_SESSION['main'][$id]['prix_or']);
 	}
 	if(isset($_SESSION['main'][$id]['prix_bois'])){
@@ -1122,7 +1168,8 @@ function ActionConstruire(&$check, $id, personnage &$oJoueur, &$objManager){
 	}
 	if(isset($_SESSION['main'][$id]['prix_nourriture'])){
 		$maison->MindNourriture($_SESSION['main'][$id]['prix_nourriture']);
-	}
+	} */
+	
 
 	$objManager->UpdateBatiment($maison);
 	unset($maison);
@@ -1131,10 +1178,13 @@ function ActionQuete(&$check, $id, personnage &$oJoueur, &$objManager){
 	reset($_SESSION['QueteEnCours']);
 
 	foreach($_SESSION['QueteEnCours'] as $key=>$Quete){
-		if($Quete->GetIDQuete() == $id){
+		if($Quete->GetIDQuete() == $id)
+		{
 			$_SESSION['message'][] = $Quete->ActionSurQueteCombat($oJoueur);
 			$objManager->UpdateQuete($Quete);
-			if($Quete->GetVie() <= 0){
+			
+			if($Quete->GetVie() <= 0)
+			{
 				unset($_SESSION['QueteEnCours'][$key]);
 			}
 			break;
