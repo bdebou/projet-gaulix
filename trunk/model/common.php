@@ -502,7 +502,7 @@ function FinishAllCompetenceEnCours(personnage &$oJoueur) {
 		if ((strtotime('now') - strtotime($cmp['cmp_date'])) >= $cmp['cmp_temp']) {
 			$sql = "UPDATE  `table_competence` SET  `cmp_finish` =  TRUE WHERE `table_competence`.`cmp_id` =" . $cmp['cmp_id'] . ";";
 			mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
-			$oJoueur->UpdatePoints($lstPoints['CmpTerminé'][0]);
+			$oJoueur->UpdatePoints(personnage::POINT_COMPETENCE_TERMINE);
 			AddHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'Competence', NULL, NULL, 'Compétence terminée : '.$cmp['cmp_nom'].' de niveau '.$cmp['cmp_niveau']);
 		}
 	}
