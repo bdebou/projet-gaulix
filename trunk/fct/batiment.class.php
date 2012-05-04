@@ -21,10 +21,16 @@ abstract class batiment{
 			$NbPoints,
 			$Contenu;
 	
-	Const PRIX_REPARATION		= 5;		// Prix des réparation 5or/pts de vie
-	Const NIVEAU_MAX			= 4;		// Niveau Maximum pour chaque batiment.
+	Const PRIX_REPARATION			= 5;		// Prix des réparation 5or/pts de vie
+	Const NIVEAU_MAX				= 4;		// Niveau Maximum pour chaque batiment.
 	
-	const CODE_ESCLAVE			= 'esclave';
+	const CODE_ESCLAVE				= 'esclave';
+	
+	//Les points
+	const POINT_BATIMENT_ATTAQUE	= 3;
+	const POINT_BATIMENT_DETRUIT	= 20;
+	const POINT_BATIMENT_REPARE		= 8;
+	
 	
 	//--- fonction qui est lancer lors de la création de l'objet. ---
 	public function __construct(array $carte, array $batiment){
@@ -90,12 +96,11 @@ abstract class batiment{
 		
 	//--- Fonction pour abimer le batiment ---
 	private function BatimentAbime(personnage $persoC, $degat, personnage $persoA){
-		global $lstPoints;
 			//on déduit les dégats
 		$this->Etat -= $degat;
 			//on gère les points gagnés ou perdus
-		$persoC->UpdatePoints($lstPoints['BatAbimé'][0]);
-		$persoA->UpdatePoints($lstPoints['AttBatAdvers'][0]);
+		$persoC->UpdatePoints((abs(self::POINT_BATIMENT_ATTAQUE) * -1));
+		$persoA->UpdatePoints(abs(self::POINT_BATIMENT_ATTAQUE));
 			//on vérifie si le batiment est détruit
 		if($this->Etat <= 0){$this->BatimentDetruit($persoC, $persoA);}
 	}
@@ -103,12 +108,11 @@ abstract class batiment{
 	
 	//--- Destruction du batiment ---
 	private function BatimentDetruit(personnage &$persoCible, personnage &$persoAttaquant){
-		global $lstPoints;
 			//le batiment est détruit donc on le supprime.
 		$this->Detruit = true;
 			//on gère les points gagnés et perdus
 		$persoCible->UpdatePoints(-$this->NbPoints);
-		$persoAttaquant->UpdatePoints($lstPoints['BatDetruit'][0]);
+		$persoAttaquant->UpdatePoints(self::POINT_BATIMENT_DETRUIT);
 			//Différente actions pour certain type de batiment quand détruit.
 		switch($this->Type){
 				//Quand la maison est détruite, le joueur va devoir reconstruire sa maison quelque part sur la carte
@@ -148,7 +152,7 @@ abstract class batiment{
 		if($this->Etat == $this->GetEtatMax()){
 			global $lstPoints;
 				//on gère les points gagnés ou perdus
-			$Perso->UpdatePoints($lstPoints['BatRéparé'][0]);
+			$Perso->UpdatePoints(self::POINT_BATIMENT_REPARE);
 		}
 	}
 	
