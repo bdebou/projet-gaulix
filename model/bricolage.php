@@ -272,7 +272,7 @@ function ActionFabriquer(&$check, $id, personnage &$oJoueur, &$objManager){
 				//on ajoute le nouvel objet dans son bolga
 				$oJoueur->AddInventaire($_SESSION['main']['bricolage'][$id]['code'], $_SESSION['main']['bricolage'][$id]['type'], abs($_GET['qte']), false);
 				//on gagne des points
-				$oJoueur->UpdatePoints($lstPoints['ObjFabriqué'][0]);
+				$oJoueur->UpdatePoints(abs(personnage::POINT_OBJET_FABRIQUE));
 			}
 
 				
