@@ -678,7 +678,7 @@ function AttaqueTour(personnage &$oJoueur){
 				}
 				if($ptsDegat > 0){
 					$oJoueur->PerdreVie($ptsDegat, 'tour');
-					$oJoueur->UpdatePoints($lstPoints['AttTour'][0]);
+					$oJoueur->UpdatePoints((abs(tour::POINT_TOUR_ATTAQUE) * -1));
 					$ptsViePerduTour += $ptsDegat;
 					AddHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'attaque', $row['login'], NULL, 'La Tour de '.$row['login'].' vous a attaqué et blessé de '.$ptsDegat.'pts de vie.');
 				}
