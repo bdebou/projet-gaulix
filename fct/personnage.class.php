@@ -34,16 +34,23 @@ class personnage{
 			$not_attaque, $not_combat,
 			$nb_points;
 			
-	Const TAILLE_MINIMUM_BOLGA	= 20;			//La taille minimum du bolga
-	Const DUREE_SORT			= 432000;		// Limite de temp pour l'utilisation d'un sort (3600 * 24 *5).
-	Const DEPLACEMENT_MAX		= 300;			// Limite le nombre déplacement maximum
-	Const TEMP_DEPLACEMENT_SUP	= 3600;			// Temp d'attente pour avoir de nouveau du déplacement
-	Const NB_DEPLACEMENT_SUP	= 1;			// Nombre de point de déplacement gagné tout les x temp
-	Const VIE_MAX				= 300;			// Limite de vie maximum
-	Const TAUX_ATTAQUANT		= 1.15;			// Taux d'augmentation de l'attaquant
+	Const TAILLE_MINIMUM_BOLGA		= 20;			//La taille minimum du bolga
+	Const DUREE_SORT				= 432000;		// Limite de temp pour l'utilisation d'un sort (3600 * 24 *5).
+	Const DEPLACEMENT_MAX			= 300;			// Limite le nombre déplacement maximum
+	Const TEMP_DEPLACEMENT_SUP		= 3600;			// Temp d'attente pour avoir de nouveau du déplacement
+	Const NB_DEPLACEMENT_SUP		= 1;			// Nombre de point de déplacement gagné tout les x temp
+	Const VIE_MAX					= 300;			// Limite de vie maximum
+	Const TAUX_ATTAQUANT			= 1.15;			// Taux d'augmentation de l'attaquant
 	
-	const CIVILISATION_ROMAIN	= 'romains';
-	const CIVILISATION_GAULOIS	= 'gaulois';
+	const CIVILISATION_ROMAIN		= 'romains';
+	const CIVILISATION_GAULOIS		= 'gaulois';
+	
+	//Les points
+	const POINT_COMBAT				= 10;
+	const POINT_NIVEAU_TERMINE		= 15;
+	const POINT_COMPETENCE_TERMINE	= 5;
+	const POINT_OBJET_FABRIQUE		= 1;
+	const POINT_PERSO_TUE			= 150;
 	
 	//Initialisation de l'objet
 	public function __construct(array $donnees){
@@ -69,7 +76,6 @@ class personnage{
 	}
 	//Frapper un autre joueur et les conséquances
 	public function frapper(Personnage $persoCible){
-		global $lstPoints;
 		
 		$arAttCible		= $persoCible->GetAttPerso();
 		$arDefCible		= $persoCible->GetDefPerso();
@@ -93,13 +99,13 @@ class personnage{
 			
 			$this->AddExperience(5);
 			$this->UpdateScores(1,0);
-			$this->UpdatePoints($lstPoints['CombatGagné'][0]);
+			$this->UpdatePoints(abs(self::POINT_COMBAT));
 			
 			$persoCible->UpdateScores(0,1);
-			$persoCible->UpdatePoints($lstPoints['CombatPerdu'][0]);
+			$persoCible->UpdatePoints((abs(self::POINT_COMBAT) * -1));
 			
-			return array('Vous avez gagné le combat (+'.$lstPoints['CombatGagné'][0].' points, +5pts d\'expérience et volé '.$montant.' '.AfficheIcone('or').').',
-			'Vous avez perdu un combat ('.$lstPoints['CombatPerdu'][0].' points, -'.(intval($Valeur-$ValeurCible)).'pts '.AfficheIcone('vie').', -'.$montant.' '.AfficheIcone('or').' mais +1pt d\'expérience).');
+			return array('Vous avez gagné le combat (+'.abs(self::POINT_COMBAT).' points, +5pts d\'expérience et volé '.$montant.' '.AfficheIcone('or').').',
+			'Vous avez perdu un combat ('.(abs(self::POINT_COMBAT) * -1).' points, -'.(intval($Valeur-$ValeurCible)).'pts '.AfficheIcone('vie').', -'.$montant.' '.AfficheIcone('or').' mais +1pt d\'expérience).');
 		}elseif($Valeur == $ValeurCible){
 				//Match Null
 			$persoCible->AddExperience(5);
@@ -120,13 +126,13 @@ class personnage{
 			
 			$persoCible->AddExperience(5);
 			$persoCible->UpdateScores(1,0);
-			$persoCible->UpdatePoints($lstPoints['CombatGagné'][0]);
+			$persoCible->UpdatePoints(abs(self::POINT_COMBAT));
 			
 			$this->UpdateScores(0,1);
-			$this->UpdatePoints($lstPoints['CombatPerdu'][0]);
+			$this->UpdatePoints((abs(self::POINT_COMBAT) * -1));
 			
-			return array('Vous avez perdu le combat ('.$lstPoints['CombatPerdu'][0].' points, -'.intval($ValeurCible-$Valeur).'pts '.AfficheIcone('vie').' et -'.$montant.' '.AfficheIcone('or').').',
-			'Vous avez gagné un combat (+'.$lstPoints['CombatGagné'][0].' points, +5pts d\'expérience et volé '.$montant.' '.AfficheIcone('or').').');
+			return array('Vous avez perdu le combat ('.(abs(self::POINT_COMBAT) * -1).' points, -'.intval($ValeurCible-$Valeur).'pts '.AfficheIcone('vie').' et -'.$montant.' '.AfficheIcone('or').').',
+			'Vous avez gagné un combat (+'.abs(self::POINT_COMBAT).' points, +5pts d\'expérience et volé '.$montant.' '.AfficheIcone('or').').');
 		}
 	}
 	
@@ -149,7 +155,6 @@ class personnage{
 		}
 	}
 	private function UpNiveau(){
-		global $lstPoints;
 		if((self::VIE_MAX - $this->vie) >= 10){
 			$tmp = 10;
 		}else{
@@ -157,7 +162,7 @@ class personnage{
 		}
 		$this->GagnerVie($tmp);
 		$this->niveau++;
-		$this->UpdatePoints($lstPoints['NivTerminé'][0]);
+		$this->UpdatePoints(abs(self::POINT_NIVEAU_TERMINE));
 	}
 	public function PerdreVie($nb, $type){
 		switch($type){
@@ -602,7 +607,7 @@ class personnage{
 		$this->tmp_perf_attaque = null;
 		$this->date_perf_defense = null;
 		$this->tmp_perf_defense = null;
-		$this->UpdatePoints($lstPoints['PersoTué'][0]);
+		$this->UpdatePoints((abs(personnage::POINT_PERSO_TUE) * -1));
 		$this->nb_mort++;
 		
 		ResetListeQuetes($this->GetLogin());
