@@ -29,6 +29,27 @@ function FoundBatiment($idType = false, $login = false, $Coordonnees = false) {
 	return null;
 	
 }
+function FoundObjet($CodeObject){
+	$sql = "SELECT * FROM table_objets WHERE objet_code='".strval($CodeObject)."';";
+	$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
+	
+	if (mysql_num_rows($requete) > 0)
+	{
+		$arInfoObject = mysql_fetch_array($requete, MYSQL_ASSOC);
+	
+		global $lstTypeObjets;
+	
+		if(in_array($arInfoObject['objet_type'], $lstTypeObjets))
+		{
+			$ObjetNom = 'obj'.$arInfoObject['objet_type'];
+				
+			return new $ObjetNom($arInfoObject);
+			
+		}
+	}
+	
+	return NULL;
+}
 function AfficheIcone($type, $HeightIcone = 20) {
 	$Name = $type;
 	$FileName = $type;
