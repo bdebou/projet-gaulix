@@ -186,34 +186,6 @@ CREATE TABLE IF NOT EXISTS `table_marche` (
 -- Structure de la table `table_objets`
 --
 
--- phpMyAdmin SQL Dump
--- version 3.4.9
--- http://www.phpmyadmin.net
---
--- Client: localhost
--- Généré le : Sam 05 Mai 2012 à 13:36
--- Version du serveur: 5.1.32
--- Version de PHP: 5.3.9
-
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-
---
--- Base de données: `gaulix_be`
---
-
--- --------------------------------------------------------
-
---
--- Structure de la table `table_objets`
---
-
 CREATE TABLE IF NOT EXISTS `table_objets` (
   `id_objet` int(5) NOT NULL AUTO_INCREMENT,
   `objet_civilisation` varchar(20) COLLATE latin1_general_ci DEFAULT NULL,
@@ -233,7 +205,7 @@ CREATE TABLE IF NOT EXISTS `table_objets` (
   `objet_cout` text COLLATE latin1_general_ci,
   PRIMARY KEY (`id_objet`),
   UNIQUE KEY `objet_code` (`objet_code`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=7 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=1 ;
 
 --
 -- Structure de la table `table_quetes`
