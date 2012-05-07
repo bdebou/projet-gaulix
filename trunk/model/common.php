@@ -383,6 +383,14 @@ function AfficheEquipement($type, &$oJoueur) {
 		. ($chkLink ?'</a>' : '');
 	}
 }
+function CheckIfOnEstSurUnBatiment($NumBatiment, $position){
+	//pour vérifier si on est sur un batiment X ou non
+	if(is_null(FoundBatiment($NumBatiment, NULL, $position))){
+		return false;
+	}
+
+	return true;
+}
 function AfficheInfoObjet($CodeObjet, $intHeightImg = 50) {
 	$sql = "SELECT * FROM table_objets WHERE objet_code='" . $CodeObjet . "';";
 	$rqt = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
