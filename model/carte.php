@@ -25,7 +25,7 @@ function AfficheCarte($numCarte, $AllCartes = false){
 		$size = 8;
 	}else{
 		$txt .= '<table class="carte" style="background-image: url(\'img/carte/gaule-'.$numCarte.'.jpg\');">';
-		$size = 30;
+		$size = 29;
 	}
 	
 	for($i=0;$i<=$nbLigneCarte;$i++){
