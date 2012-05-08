@@ -281,29 +281,40 @@ function AfficheObjetTrouveDansMenuAction(personnage &$oJoueur) {
 	$DebugMode = false;
 	$txt = null;
 	if (!$oJoueur->GetChkObject()) {
-		$CodeObjetTrouve = ObjetTrouve($oJoueur);
+		//$CodeObjetTrouve = ObjetTrouve($oJoueur);
+		
+		$objObjet = FoundObjet(ObjetTrouve($oJoueur));
+		
 		if ($DebugMode) {
-			echo $CodeObjetTrouve;
+			var_dump($objObjet);
 		}
-		if (is_null($CodeObjetTrouve)) {
+		
+		if (is_null($objObjet))
+		{
 			$oJoueur->SetLastObject(true, null);
 		} else {
-			$sql = "SELECT * FROM table_objets WHERE objet_code='$CodeObjetTrouve';";
-			$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
-			$result = mysql_fetch_array($requete, MYSQL_ASSOC);
-			if ($result['objet_niveau'] <= $oJoueur->GetNiveau()) {
-				$oJoueur->SetLastObject(true, $CodeObjetTrouve);
-				$txt .= AfficheActionPossible($oJoueur, $result);
+			//$sql = "SELECT * FROM table_objets WHERE objet_code='".$objObjet->GetCode()."';";
+			//$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
+			//$result = mysql_fetch_array($requete, MYSQL_ASSOC);
+			
+			if ($objObjet->GetNiveau() <= $oJoueur->GetNiveau())
+			{
+				$oJoueur->SetLastObject(true, $objObjet->GetCode());
+				$txt .= AfficheActionPossible($oJoueur, $objObjet);
 			} else {
 				$oJoueur->SetLastObject(true, null);
 			}
 		}
 	} else {
-		if (!is_null($oJoueur->GetLastObject())) {
-			$sql = "SELECT * FROM table_objets WHERE objet_code='" . strval($oJoueur->GetLastObject()) . "';";
+		if (!is_null($oJoueur->GetLastObject()))
+		{
+			/* $sql = "SELECT * FROM table_objets WHERE objet_code='" . strval($oJoueur->GetLastObject()) . "';";
 			$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
-			$result = mysql_fetch_array($requete, MYSQL_ASSOC);
-			$txt .= AfficheActionPossible($oJoueur, $result);
+			$result = mysql_fetch_array($requete, MYSQL_ASSOC); */
+			
+			$objObjet = FoundObjet($oJoueur->GetLastObject());
+			
+			$txt .= AfficheActionPossible($oJoueur, $objObjet);
 		} else {
 			$oJoueur->SetLastObject(true, null);
 		}
@@ -721,17 +732,19 @@ function ZoneAttaqueTour($position, $distance, $carte){
 }
 function ObjetTrouve(personnage &$oJoueur) {
 	//$sqlObj = "SELECT objet_id, objet_niveau FROM table_objets_trouves;";
-	$sqlObj = "SELECT objet_code, objet_niveau FROM table_objets WHERE objet_type='ressource';";
+	$sqlObj = "SELECT objet_code, objet_niveau FROM table_objets WHERE objet_civilisation IN ('".$oJoueur->GetCivilisation()."', 'all');";
 	$requeteObj = mysql_query($sqlObj) or die(mysql_error() . '<br />' . $sqlObj);
+	
 	//on crée une table contenant les infos des objets
 	$arObjets = null;
+	
 	while ($row = mysql_fetch_array($requeteObj, MYSQL_ASSOC)) {
 		$arObjets[] = array('objet_code' => $row['objet_code'], 'objet_niveau' => $row['objet_niveau']);
 	}
 	//on prend un nombre aléatoire
 	$num = mt_rand(1, mysql_num_rows($requeteObj) + intval(exp(($oJoueur->GetNiveau() > 5 ? 5 : $oJoueur->GetNiveau()))));
 
-	if (isset($arObjets[$num]) AND $arObjets[$num]['objet_niveau'] <= $oJoueur->GetNiveau()) {
+	if (isset($arObjets[$num])/*  AND $arObjets[$num]['objet_niveau'] <= $oJoueur->GetNiveau() */) {
 		return $arObjets[$num]['objet_code'];
 	}
 	return null;
@@ -787,7 +800,7 @@ function AfficheActionPossible(personnage &$oJoueur, $arData) {
 }
 Function GibierTrouve($NiveauChasseur) {
 	//$sqlGibier = "SELECT * FROM table_gibier;";
-	$sqlGibier = "SELECT * FROM table_objets WHERE objet_type='gibier';";
+	$sqlGibier = "SELECT * FROM table_objets WHERE objet_civilisation='gibier';";
 	$rqtGibier = mysql_query($sqlGibier) or die(mysql_error() . '<br />' . $sqlGibier);
 	//on crée une table contenant les infos des objets
 	$arGibier = null;
