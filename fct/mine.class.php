@@ -7,6 +7,8 @@ class mine extends batiment{
 	const COUT_AMELIORATION_NIVEAU_2	= 'ResOr=1000,ResBois=1500,ResPierre=2';
 	const COUT_AMELIORATION_NIVEAU_3	= 'ResOr=150000';
 	
+	const ID_BATIMENT				= 10;
+	
 	const TYPE_COMPETENCE			= 'Mineur';
 	const STOCK_MAX_DEPART			= 500;
 	
