@@ -4,6 +4,7 @@ class ferme extends batiment{
 			$DateAction;
 	
 	const TYPE_COMPETENCE				= 'Agriculture';
+	const ID_BATIMENT					= 6;
 	
 	const CODE_PRODUCTION_NOURRITURE	= 0;
 	const NIVEAU_COMPETENCE_NOURRITUE	= 0;
