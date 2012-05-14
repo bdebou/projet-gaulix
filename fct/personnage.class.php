@@ -42,6 +42,8 @@ class personnage{
 	Const VIE_MAX					= 300;			// Limite de vie maximum
 	Const TAUX_ATTAQUANT			= 1.15;			// Taux d'augmentation de l'attaquant
 	
+	const TYPE_RES_SESTERCE			= 'sesterce';
+	
 	const CIVILISATION_ROMAIN		= 'romains';
 	const CIVILISATION_GAULOIS		= 'gaulois';
 	

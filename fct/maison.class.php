@@ -11,7 +11,6 @@ class maison extends batiment{
 	const TYPE_RES_NOURRITURE			= 'nourriture';
 	const TYPE_RES_BOIS					= 'bois';
 	const TYPE_RES_PIERRE				= 'pierre';
-	const TYPE_RES_SESTERCE				= 'sesterce';
 	
 	const NOM_ROMAIN					= 'Villa';
 	const NOM_GAULOIS					= 'Oppidum';
