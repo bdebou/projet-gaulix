@@ -30,10 +30,10 @@ if(isset($_POST['depot'])){
 		case 'ameliorer':				ActionAmeliorerBatiment($chkErr, $oJoueur, $objManager, $_GET['id']); break;
 		case 'reparer':					ActionReparer($chkErr, $_GET['id'], $_GET['num'], $oJoueur, $objManager); break;
 		case 'reprendre':				ActionReprendre($chkErr, $_GET['id'], $oJoueur, $objManager); break;
-		case 'viderstockferme':			ActionViderStock($chkErr, 6, 'ferme', $oJoueur, $objManager); break;
-		case 'productionferme':			ActionProduction($chkErr, 6, 'ferme', $_GET['type'], $oJoueur, $objManager); break;
-		case 'viderstockmine':			ActionViderStock($chkErr, 10, 'mine', $oJoueur, $objManager); break;
-		case 'productionmine':			ActionProduction($chkErr, 10, 'mine', $_GET['type'], $oJoueur, $objManager); break;
+		case 'viderstockferme':			ActionViderStock($chkErr, ferme::ID_BATIMENT, 'ferme', $oJoueur, $objManager); break;
+		case 'productionferme':			ActionProduction($chkErr, ferme::ID_BATIMENT, 'ferme', $_GET['type'], $oJoueur, $objManager); break;
+		case 'viderstockmine':			ActionViderStock($chkErr, mine::ID_BATIMENT, 'mine', $oJoueur, $objManager); break;
+		case 'productionmine':			ActionProduction($chkErr, mine::ID_BATIMENT, 'mine', $_GET['type'], $oJoueur, $objManager); break;
 		case 'druide':					ActionDruide($chkErr, $_GET['id'], $oJoueur, $objManager); break;
 		case 'VenteMarche':				ActionVenteMarche($chkErr, $_GET['id'], $oJoueur, $objManager); break;
 		case 'annulertransaction':		ActionAnnulerTransaction($chkErr, $_GET['id'], $oJoueur, $objManager); break;
