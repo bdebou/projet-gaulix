@@ -5,6 +5,7 @@ $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
 $arAtt = $oJoueur->GetAttPerso();
 $arDef = $oJoueur->GetDefPerso();
+$arDis = $oJoueur->GetDisPerso();
 ?>
 
 <div class="loginstatus">
@@ -15,49 +16,27 @@ $arDef = $oJoueur->GetDefPerso();
 				<span class="login"><?php echo $oJoueur->GetLogin();?></span><?php echo AfficheRecompenses($oJoueur->GetLogin(), $oJoueur->GetClan());?>
 				<br />
 				<?php echo ucfirst(GetInfoCarriere($oJoueur->GetCodeCarriere(),'carriere_nom'));?>
-				
 			</td>
-			<td style="width:150px;">
-				<img alt="Barre de Vie" src="./fct/fct_image.php?type=vie&amp;value=<?php echo $oJoueur->GetVie();?>&amp;max=<?php echo personnage::VIE_MAX;?>" />
+			<td colspan="3" style="width:150px;">
+				<img alt="Barre de Vie" src="./fct/fct_image.php?type=vie&amp;value=<?php echo $oJoueur->GetVie();?>&amp;max=<?php echo personnage::VIE_MAX;?>&amp;taille=270x28" />
 			</td>
-			<td style="background-color:<?php echo $arCouleurs['Attaque'];?>; width:120px;">
-				<?php echo AfficheIcone('attaque');?> : <?php echo $arAtt['0'];?> (<?php echo $arAtt['1'];?>)
+			<td colspan="3" style="width:150px;">
+				<img alt="Barre d'expérience" src="./fct/fct_image.php?type=experience&amp;value=<?php echo $oJoueur->GetExpPerso();?>&amp;max=<?php echo $oJoueur->GetMaxExperience();?>&amp;taille=270x28" />
 			</td>
-			<td style="background-color:<?php echo $arCouleurs['Or'];?>; width:145px;">
-				<?php echo AfficheIcone('or');?> : <?php echo $oJoueur->GetArgent();?>
-			</td>
-			<?php if(!is_null($oJoueur->GetObjSaMaison())){?>
-			<td style="background-color:<?php echo $arCouleurs['Nourriture'];?>;">
-				<?php echo AfficheRessource(maison::TYPE_RES_NOURRITURE, $oJoueur)?>
-			</td>
-			<?php }else{?>
-			<td style="background-color: white;">
-				&nbsp;
-			</td>
-			<?php }?>
 		</tr>
 		<tr>
 			<td>
 				<button type="button" onclick="window.location='./index.php?page=unconnect'" style="width:120px;">Se déconnecter</button>
 			</td>
-			<td style="width:150px;">
-				<img alt="Barre d'expérience" src="./fct/fct_image.php?type=experience&amp;value=<?php echo $oJoueur->GetExpPerso();?>&amp;max=<?php echo $oJoueur->GetMaxExperience();?>" />
+			<td colspan="2" style="background-color:<?php echo $arCouleurs['Attaque'];?>;">
+				<?php echo AfficheIcone('attaque');?> : <?php echo $arAtt['0'];?> (<?php echo $arAtt['1'];?>)
 			</td>
-			<td style="background-color:<?php echo $arCouleurs['Defense'];?>;">
+			<td colspan="2" style="background-color:<?php echo $arCouleurs['Defense'];?>;">
 				<?php echo AfficheIcone('defense');?> : <?php echo $arDef['0'];?> (<?php echo $arDef['1'];?>)
 			</td>
-			<?php if(!is_null($oJoueur->GetObjSaMaison())){?>
-			<td style="background-color:<?php echo $arCouleurs['Pierre'];?>;">
-				<?php echo AfficheRessource(maison::TYPE_RES_PIERRE, $oJoueur)?>
+			<td colspan="2" style="background-color:<?php echo $arCouleurs['Distance'];?>;">
+				<?php echo AfficheIcone('distance');?> : <?php echo $arDis;?>
 			</td>
-			<td style="background-color:<?php echo $arCouleurs['Bois'];?>;">
-				<?php echo AfficheRessource(maison::TYPE_RES_BOIS, $oJoueur)?>
-			</td>
-			<?php }else{?>
-			<td colspan="2" style="background-color: white;">
-				Pas de maison installée.
-			</td>
-			<?php }?>
 		</tr>
 	</table>
 </div>
