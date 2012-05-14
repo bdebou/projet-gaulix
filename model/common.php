@@ -29,7 +29,7 @@ function FoundBatiment($idType = false, $login = false, $Coordonnees = false) {
 	return null;
 	
 }
-function FoundObjet($CodeObject){
+function FoundObjet($CodeObject, $nbObjet = 1){
 	$sql = "SELECT * FROM table_objets WHERE objet_code='".strval($CodeObject)."';";
 	$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
 	
@@ -43,7 +43,7 @@ function FoundObjet($CodeObject){
 		{
 			$ObjetNom = 'obj'.$arInfoObject['objet_type'];
 				
-			return new $ObjetNom($arInfoObject);
+			return new $ObjetNom($arInfoObject, $nbObjet);
 			
 		}
 	}
@@ -282,7 +282,7 @@ function UtilisationRessource(array $arRessource, personnage &$Joueur, maison &$
 		case maison::TYPE_RES_PIERRE:
 			$Maison->MindRessource(QuelTypeRessource($arRessource[0]), $arRessource[1]);
 			break;
-		case maison::TYPE_RES_SESTERCE:
+		case personnage::TYPE_RES_SESTERCE:
 			$Joueur->MindOr($arRessource[1]);
 			break;
 		default:
@@ -297,7 +297,7 @@ function CheckIfAssezRessource(array $arRessource, personnage &$Joueur, maison &
 		case maison::TYPE_RES_PIERRE:
 			if($Maison->GetRessource(QuelTypeRessource($arRessource[0])) >= $arRessource[1]){return true;}
 			break;
-		case maison::TYPE_RES_SESTERCE:
+		case personnage::TYPE_RES_SESTERCE:
 			if($Joueur->GetArgent() >= $arRessource[1]){return true;}
 			break;
 		default:
@@ -456,7 +456,7 @@ function QuelTypeRessource($Code) {
 		case 'ResNo': return maison::TYPE_RES_NOURRITURE;
 		case 'ResBo': return maison::TYPE_RES_BOIS;
 		case 'ResPi': return maison::TYPE_RES_PIERRE;
-		case 'ResOr': return maison::TYPE_RES_SESTERCE;
+		case 'ResOr': return personnage::TYPE_RES_SESTERCE;
 		default: return $Code;
 	}
 }
@@ -659,7 +659,7 @@ function ActionUtiliser(&$check, &$arInfoObject, personnage &$oJoueur, &$objMana
 			case 'deplacement':
 				$oJoueur->AddDeplacement($arInfoObject['value'],'objet');
 				break;
-			case maison::TYPE_RES_SESTERCE:
+			case personnage::TYPE_RES_SESTERCE:
 				$oJoueur->AddOr($arInfoObject['value']);
 				break;
 			case maison::TYPE_RES_BOIS:
