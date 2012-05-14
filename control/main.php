@@ -12,7 +12,7 @@ $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
 FinishAllCompetenceEnCours($oJoueur);
 
-$ChkDebugVar = false;
+$ChkDebugVar = true;
 
 if($chkDebug AND $ChkDebugVar){
 	echo '$_SESSION[\'main\']<br />';var_dump($_SESSION['main']);echo '<br />';
@@ -42,8 +42,8 @@ if(isset($_GET['move']) AND $oJoueur->GetDepDispo() > 0){
 			}else{					ActionUtiliser($chkErr, $_SESSION['main']['objet'], $oJoueur, $objManager);}
 			break;
 		case 'laisser':				ActionLaisser($chkErr, $oJoueur); break;
-		case 'viderstockmine':		ActionViderStock($chkErr, 18, 'mine', $oJoueur, $objManager); break;
-		case 'viderstockferme':		ActionViderStock($chkErr, 6, 'ferme', $oJoueur, $objManager); break;
+		case 'viderstockmine':		ActionViderStock($chkErr, mine::ID_BATIMENT, 'mine', $oJoueur, $objManager); break;
+		case 'viderstockferme':		ActionViderStock($chkErr, ferme::ID_BATIMENT, 'ferme', $oJoueur, $objManager); break;
 	}
 	if(isset($_GET['action'])){unset($_GET['action']);}
 	
