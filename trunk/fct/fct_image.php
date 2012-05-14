@@ -35,7 +35,14 @@ else{
 		case 'vie':
 		case 'experience':
 			if(isset($_GET['max']) AND isset($_GET['value']) AND isset($_GET['type'])){
-				ImageProgression($_GET['type'], $_GET['max'], $_GET['value'], 142, 28);
+				$tailleX = 20;
+				$tailleY = 120;
+				if(isset($_GET['taille'])){
+					$arTemp = explode('x', $_GET['taille']);
+					$tailleX = $arTemp[0];
+					$tailleY = $arTemp[1];
+				}
+				ImageProgression($_GET['type'], $_GET['max'], $_GET['value'], $tailleX, $tailleY);
 			}else{
 				ImageErreur('Erreur03');
 			}
