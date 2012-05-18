@@ -731,18 +731,23 @@ function ZoneAttaqueTour($position, $distance, $carte){
 	return $lstCoordonnee;
 }
 function ObjetTrouve(personnage &$oJoueur) {
-	//$sqlObj = "SELECT objet_id, objet_niveau FROM table_objets_trouves;";
-	$sqlObj = "SELECT objet_code, objet_niveau FROM table_objets WHERE objet_civilisation IN ('".$oJoueur->GetCivilisation()."', 'all');";
+	$sqlObj = 	"SELECT objet_code, objet_niveau, objet_rarete 
+				FROM table_objets 
+				WHERE objet_civilisation IN ('".$oJoueur->GetCivilisation()."', 'all')
+					AND objet_rarete > 0;";
 	$requeteObj = mysql_query($sqlObj) or die(mysql_error() . '<br />' . $sqlObj);
 	
 	//on crée une table contenant les infos des objets
 	$arObjets = null;
 	
 	while ($row = mysql_fetch_array($requeteObj, MYSQL_ASSOC)) {
-		$arObjets[] = array('objet_code' => $row['objet_code'], 'objet_niveau' => $row['objet_niveau']);
+		for($i=1; $i <= $row['objet_rarete']; $i++)
+		{
+			$arObjets[] = array('objet_code' => $row['objet_code'], 'objet_niveau' => $row['objet_niveau']);
+		}
 	}
 	//on prend un nombre aléatoire
-	$num = mt_rand(1, mysql_num_rows($requeteObj) + intval(exp(($oJoueur->GetNiveau() > 5 ? 5 : $oJoueur->GetNiveau()))));
+	$num = mt_rand(1, count($arObjets) + intval(exp(($oJoueur->GetNiveau() > 5 ? 5 : $oJoueur->GetNiveau()))));
 
 	if (isset($arObjets[$num])/*  AND $arObjets[$num]['objet_niveau'] <= $oJoueur->GetNiveau() */) {
 		return $arObjets[$num]['objet_code'];
