@@ -193,14 +193,14 @@ function AfficheRessourceBesoin($lstRessources, &$ChkRessource, personnage &$oJo
 		$ColorPrix = 'red';
 		if(!is_null($maison)){
 			$TypeRes = QuelTypeRessource($arRessource['0']);
-			if(in_array($TypeRes, array(maison::TYPE_RES_BOIS, maison::TYPE_RES_NOURRITURE, maison::TYPE_RES_PIERRE, personnage::TYPE_RES_SESTERCE))){
+			if(in_array($TypeRes, array(maison::TYPE_RES_BOIS, maison::TYPE_RES_NOURRITURE, maison::TYPE_RES_PIERRE, personnage::TYPE_RES_MONNAIE))){
 				if(	(maison::TYPE_RES_BOIS == $TypeRes AND $maison->GetRessource(maison::TYPE_RES_BOIS) >= ($arRessource['1'] * $nb))
 					OR
 					(maison::TYPE_RES_PIERRE == $TypeRes AND $maison->GetRessource(maison::TYPE_RES_PIERRE) >= ($arRessource['1'] * $nb))
 					OR
 					(maison::TYPE_RES_NOURRITURE == $TypeRes AND $maison->GetRessource(maison::TYPE_RES_NOURRITURE) >= ($arRessource['1'] * $nb))
 					OR
-					(personnage::TYPE_RES_SESTERCE == $TypeRes AND $oJoueur->GetArgent() >= ($arRessource['1'] * $nb)))
+					(personnage::TYPE_RES_MONNAIE == $TypeRes AND $oJoueur->GetArgent() >= ($arRessource['1'] * $nb)))
 					{
 						$chkFound[$nbRes] = true;
 						$ColorPrix = 'black';
@@ -247,13 +247,13 @@ function ActionFabriquer(&$check, $id, personnage &$oJoueur, &$objManager){
 					break;
 				}
 
-				if(in_array(QuelTypeRessource($arPrix['0']), array(maison::TYPE_RES_BOIS, maison::TYPE_RES_NOURRITURE, maison::TYPE_RES_PIERRE, personnage::TYPE_RES_SESTERCE))){
+				if(in_array(QuelTypeRessource($arPrix['0']), array(maison::TYPE_RES_BOIS, maison::TYPE_RES_NOURRITURE, maison::TYPE_RES_PIERRE, personnage::TYPE_RES_MONNAIE))){
 					switch(QuelTypeRessource($arPrix['0']))
 					{
 						case maison::TYPE_RES_NOURRITURE:		$maison->MindRessource(maison::TYPE_RES_NOURRITURE, $arPrix['1'] * abs($_GET['qte']));	break;
 						case maison::TYPE_RES_PIERRE:			$maison->MindRessource(maison::TYPE_RES_PIERRE, $arPrix['1'] * abs($_GET['qte']));		break;
 						case maison::TYPE_RES_BOIS:				$maison->MindRessource(maison::TYPE_RES_BOIS, $arPrix['1'] * abs($_GET['qte']));		break;
-						case personnage::TYPE_RES_SESTERCE:		$oJoueur->MindOr($arPrix['1'] * abs($_GET['qte']));			break;
+						case personnage::TYPE_RES_MONNAIE:		$oJoueur->MindOr($arPrix['1'] * abs($_GET['qte']));			break;
 					}
 						
 				}else{
