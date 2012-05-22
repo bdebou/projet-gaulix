@@ -2,6 +2,8 @@
 class entrepot extends batiment{
 	private $Contenu;
 	
+	const ID_BATIMENT			= 4;
+	
 	//--- fonction qui est lancer lors de la création de l'objet. ---
 	public function __construct(array $carte, array $batiment){
 		$this->Hydrate($carte, $batiment);
