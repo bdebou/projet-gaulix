@@ -180,11 +180,13 @@ class PersonnagesManager{
 			switch(get_class($batiment)){
 				case 'bank':
 				case 'maison':
-				case 'ferme':
 				case 'ressource':
 					$Contenu = $batiment->GetContenu();
 					break;
 				case 'mine':
+				case 'carriere':
+				case 'ferme':
+				case 'potager':
 				case 'entrepot':
 					$Contenu = implode(',', $batiment->GetContenu());
 					break;
