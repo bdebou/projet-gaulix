@@ -42,7 +42,7 @@ class personnage{
 	Const VIE_MAX					= 300;			// Limite de vie maximum
 	Const TAUX_ATTAQUANT			= 1.15;			// Taux d'augmentation de l'attaquant
 	
-	const TYPE_RES_SESTERCE			= 'sesterce';
+	const TYPE_RES_MONNAIE			= 'sesterce';
 	
 	const CIVILISATION_ROMAIN		= 'romains';
 	const CIVILISATION_GAULOIS		= 'gaulois';
@@ -106,8 +106,8 @@ class personnage{
 			$persoCible->UpdateScores(0,1);
 			$persoCible->UpdatePoints((abs(self::POINT_COMBAT) * -1));
 			
-			return array('Vous avez gagné le combat (+'.abs(self::POINT_COMBAT).' points, +5pts d\'expérience et volé '.$montant.' '.AfficheIcone('or').').',
-			'Vous avez perdu un combat ('.(abs(self::POINT_COMBAT) * -1).' points, -'.(intval($Valeur-$ValeurCible)).'pts '.AfficheIcone('vie').', -'.$montant.' '.AfficheIcone('or').' mais +1pt d\'expérience).');
+			return array('Vous avez gagné le combat (+'.abs(self::POINT_COMBAT).' points, +5pts d\'expérience et volé '.$montant.' '.AfficheIcone(self::TYPE_RES_MONNAIE).').',
+			'Vous avez perdu un combat ('.(abs(self::POINT_COMBAT) * -1).' points, -'.(intval($Valeur-$ValeurCible)).'pts '.AfficheIcone('vie').', -'.$montant.' '.AfficheIcone(self::TYPE_RES_MONNAIE).' mais +1pt d\'expérience).');
 		}elseif($Valeur == $ValeurCible){
 				//Match Null
 			$persoCible->AddExperience(5);
@@ -133,8 +133,8 @@ class personnage{
 			$this->UpdateScores(0,1);
 			$this->UpdatePoints((abs(self::POINT_COMBAT) * -1));
 			
-			return array('Vous avez perdu le combat ('.(abs(self::POINT_COMBAT) * -1).' points, -'.intval($ValeurCible-$Valeur).'pts '.AfficheIcone('vie').' et -'.$montant.' '.AfficheIcone('or').').',
-			'Vous avez gagné un combat (+'.abs(self::POINT_COMBAT).' points, +5pts d\'expérience et volé '.$montant.' '.AfficheIcone('or').').');
+			return array('Vous avez perdu le combat ('.(abs(self::POINT_COMBAT) * -1).' points, -'.intval($ValeurCible-$Valeur).'pts '.AfficheIcone('vie').' et -'.$montant.' '.AfficheIcone(self::TYPE_RES_MONNAIE).').',
+			'Vous avez gagné un combat (+'.abs(self::POINT_COMBAT).' points, +5pts d\'expérience et volé '.$montant.' '.AfficheIcone(self::TYPE_RES_MONNAIE).').');
 		}
 	}
 	
