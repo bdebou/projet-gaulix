@@ -37,13 +37,12 @@ if(isset($_GET['move']) AND $oJoueur->GetDepDispo() > 0){
 		case 'legionnaire':			ActionLegionnaire($chkErr, $oJoueur); break;
 		case 'construire':			ActionConstruire($chkErr, $_GET['id'], $oJoueur, $objManager); break;
 		case 'quete':				ActionQuete($chkErr, $_GET['id'], $oJoueur, $objManager); break;
-		case 'utiliser':
-			if(isset($_GET['id'])){	ActionUtiliser($chkErr, $_SESSION['main'][$_GET['id']], $oJoueur, $objManager);
-			}else{					ActionUtiliser($chkErr, $_SESSION['main']['objet'], $oJoueur, $objManager);}
-			break;
+		case 'utiliser':			ActionUtiliser($chkErr, $_SESSION['main']['objet']['code'], $oJoueur, $objManager); break;
 		case 'laisser':				ActionLaisser($chkErr, $oJoueur); break;
 		case 'viderstockmine':		ActionViderStock($chkErr, mine::ID_BATIMENT, 'mine', $oJoueur, $objManager); break;
 		case 'viderstockferme':		ActionViderStock($chkErr, ferme::ID_BATIMENT, 'ferme', $oJoueur, $objManager); break;
+		case 'viderstockcarriere':	ActionViderStock($chkErr, carriere::ID_BATIMENT, 'carriere', $oJoueur, $objManager); break;
+		case 'viderstockpotager':	ActionViderStock($chkErr, potager::ID_BATIMENT, 'potager', $oJoueur, $objManager); break;
 	}
 	if(isset($_GET['action'])){unset($_GET['action']);}
 	
