@@ -5,10 +5,12 @@ global $objManager, $chkDebug;
 
 $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
-if($chkDebug){
-	echo '$_SESSION[\'main\']<br />';print_r($_SESSION['main']);echo '<br />';
-	echo '$_GET<br />';print_r($_GET);echo '<br />';
-	echo '$_POST<br />';print_r($_POST);echo '<br />';
+$ChkDebugVar = false;
+
+if($chkDebug AND $ChkDebugVar){
+	echo '$_SESSION[\'inventaire\']<br />';var_dump($_SESSION['inventaire']);echo '<br />';
+	echo '$_GET<br />';var_dump($_GET);echo '<br />';
+	echo '$_POST<br />';var_dump($_POST);echo '<br />';
 	echo '<hr />';
 }
 
@@ -17,25 +19,27 @@ $CheckRetour = false;
 
 if(isset($_GET['action'])){
 	switch($_GET['action']){
-		case 'utiliser':
-			if(isset($_GET['id'])){	ActionUtiliser($chkErr, $_SESSION['main'][$_GET['id']], $oJoueur, $objManager);
-			}else{					ActionUtiliser($chkErr, $_SESSION['main']['objet'], $oJoueur, $objManager);}
-			break;
-		case 'equiper':
-			if(isset($_GET['id'])){	ActionEquiper($chkErr, $_SESSION['main'][$_GET['id']], $oJoueur);
-			}else{					ActionEquiper($chkErr, $_SESSION['main']['objet'], $oJoueur);}
-			break;
-		case 'entreposer':			ActionEntreposer($chkErr, $objManager, $_GET['id'], $oJoueur); break;
-		case 'vendre':				ActionVendre($chkErr, $_GET['id'], $oJoueur, $objManager); break;
-		case 'laisser':				ActionLaisser($chkErr, $oJoueur); break;
 		case 'sort':				ActionSorts($chkErr, $oJoueur); break;
 	}
 	unset($_GET['action']);
 	$CheckRetour = true;
+}elseif(isset($_POST['action'])){
+	switch($_POST['action'])
+	{
+		case 'Vendre':				ActionVendre($chkErr, $_POST['id'], $oJoueur, $objManager, abs($_POST['qte'])); break;
+		case 'Entreposer':			ActionEntreposer($chkErr, $objManager, $_GET['id'], $oJoueur); break;
+		case 'Convertir':			ActionConvertir($chkErr, $_POST['id'], $oJoueur, $objManager, abs($_POST['qte'])); break;
+		case 'Utiliser':			ActionUtiliser($chkErr, $_SESSION['inventaire'][$_POST['id']]['code'], $oJoueur, $objManager, abs($_POST['qte'])); break;
+		case 'Abandonner':			ActionAbandonner($chkErr, $oJoueur, $_POST['id'], abs($_POST['qte'])); break;
+		case 'Equiper':				ActionEquiper($chkErr, $_POST['id'], $oJoueur); break;
+		case 'Sort':				ActionSorts($chkErr, $oJoueur); break;
+	}
+	unset($_POST['action']);
+	$CheckRetour = true;
 }
 
-if($chkDebug){
-	print_r($_SESSION['main']);
+if($chkDebug AND $ChkDebugVar){
+	var_dump($_SESSION['inventaire']);
 }
 
 $objManager->update($oJoueur);

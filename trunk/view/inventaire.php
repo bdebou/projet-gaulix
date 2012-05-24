@@ -1,73 +1,179 @@
 <div class="main">
+
+<script>
+	function printValue(ValueFrom, ValueTo) {
+		var x = document.getElementById(ValueTo);
+		var y = document.getElementById(ValueFrom);
+		x.value = y.value;
+	}
+	
+</script>
+
 <h1>Votre Bolga <dfn>(Sac)</dfn></h1>
 <?php
-global $objManager;
-$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
+	global $arCouleurs, $objManager;
+
+	$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 ?>
-<table class="inventaire">
-	<tr>
-	<td rowspan="4" class="corp">
-		<table class="corps">
-			<tr><td colspan="2"></td><td class="membre" style="height:30px;"><?php echo AfficheEquipement(1, $oJoueur);?></td><td colspan="2">&nbsp;</td></tr>
-			<tr><td class="membre" style="height:80px; width: 15px;"><?php echo AfficheEquipement(5, $oJoueur);?></td><td colspan="3" class="membre" style=""><?php echo AfficheEquipement(4, $oJoueur);?></td><td class="membre" style="height:80px; width: 15px;"><?php echo AfficheEquipement(2, $oJoueur);?></td></tr>
-			<tr><td>&nbsp;</td><td class="membre" style="height: 80px;"><?php echo AfficheEquipement(3, $oJoueur);?></td><td>&nbsp;</td><td class="membre" style="height: 80px;"><?php echo AfficheEquipement(3, $oJoueur);?></td><td>&nbsp;</td></tr>
-			<tr><td colspan="5">&nbsp;</td></tr>
-			<tr><td class="membre"><?php echo AfficheEquipement(7, $oJoueur);?></td><td colspan="3">&nbsp;</td><td class="membre"><?php echo AfficheEquipement(6, $oJoueur);?></td></tr>
-		</table>
-	</td>
-	</tr>
+<div class="Main_Ressources">
+<h2>Ressources de base</h2>
+	<table class="Main_Ressources">
+		<tr>
+			<td style="background-color:<?php echo $arCouleurs['Or'];?>;">
+				<?php echo AfficheIcone(personnage::TYPE_RES_MONNAIE);?> : <?php echo $oJoueur->GetArgent();?>
+			</td>
+			<?php if(!is_null($oJoueur->GetObjSaMaison())){?>
+			<td style="background-color:<?php echo $arCouleurs['Nourriture'];?>;">
+				<?php echo AfficheRessource(maison::TYPE_RES_NOURRITURE, $oJoueur)?>
+			</td>
+			<td style="background-color:<?php echo $arCouleurs['Pierre'];?>;">
+				<?php echo AfficheRessource(maison::TYPE_RES_PIERRE, $oJoueur)?>
+			</td>
+			<td style="background-color:<?php echo $arCouleurs['Bois'];?>;">
+				<?php echo AfficheRessource(maison::TYPE_RES_BOIS, $oJoueur)?>
+			</td>
+			<?php }else{?>
+			<td colspan="3" style="background-color: white;">
+				Pas de maison installée.
+			</td>
+			<?php }?>
+		</tr>
+	</table>
+</div>
 <?php
+/* global $objManager;
+$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']); */
+
+$lstObjetParCategory = NULL;
+if(!is_null($oJoueur->GetLstInventaire()))
+{
+	$lstObjetParCategory = CreateListObjet($oJoueur->GetLstInventaire());
+}
+
 $id = 0;
-$numC = 0;
-$numL = 0;
-if(!is_null($oJoueur->GetLstInventaire())){
-	foreach($oJoueur->GetLstInventaire() as $Objet){
-		$arObjet = explode('=', $Objet);
-		
-		if(substr($arObjet['0'], 0, 5) == 'Tissu'){$arObjet['0'] = 'Tissu';}
-		
-		$sql = "SELECT * FROM table_objets WHERE objet_code='".strval($arObjet['0'])."';";
-		$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
-		$result = mysql_fetch_array($requete, MYSQL_ASSOC);
-		
-		if($numC == 0){
-			echo '<tr style="vertical-align:top;"><td>'.AfficheObjetInventaire($arObjet['0'], $result, $id, $arObjet['1'], $oJoueur).'</td>';
-			$numC=1;
-			$numL++;
-		}elseif($numC == 1){
-			echo '<td>'.AfficheObjetInventaire($arObjet['0'], $result, $id, $arObjet['1'], $oJoueur).'</td>';
-			if($numL < 4){
-				$numC = 0;
-				echo '</tr>';
-			}else{$numC = 2;}
-		}elseif($numC == 2){
-			echo '<td>'.AfficheObjetInventaire($arObjet['0'], $result, $id, $arObjet['1'], $oJoueur).'</td></tr>';
-			$numC = 0;
+
+foreach($lstTypeObjets as $Category)
+{
+	echo '<div class="'.$Category.'">
+			<h2>'.$Category.'</h2>';
+	if(isset($lstObjetParCategory['obj'.$Category]))
+	{
+		//echo '<table class="objets">';
+				
+		foreach($lstObjetParCategory['obj'.$Category] as $objObjet)
+		{
+			$_SESSION['inventaire'][$id]['code'] = $objObjet->GetCode();
+			
+			$txtUtiliser		= NULL;
+			$txtVendre			= '<input type="submit" name="action" value="Vendre" />';
+			$txtEntreposer		= NULL;
+			$txtInfoArmement	= NULL;
+			$txtEquiper			= NULL;
+			$txtConvertir		= NULL;
+			$txtConvertion		= NULL;
+			$txtAbandonner		= '<input style="float:right; width:20px; height:20px;" type="image" src="./img/icones/ic_croix.png" name="action" value="Abandonner" alt="Abandonner" />';
+			$nbLigne			= 4;
+			$nbColonne			= 2;
+			
+			//On crée le boutton "entreposer" si on est bien sur un entrepot
+			if(CheckIfOnEstSurUnBatiment(entrepot::ID_BATIMENT, $oJoueur->GetCoordonnee()))
+			{
+				$txtEntreposer = '<input type="submit" name="action" value="Entreposer" />';
+				$nbLigne = 5;
+			}
+			
+			if(in_array(QuelTypeObjet($objObjet->GetCode()), array(objDivers::TYPE_RES_DEP, objDivers::TYPE_RES_VIE)))
+			{
+				$txtValideUtiliser = NULL;
+				if(	(QuelTypeObjet($objObjet->GetCode()) == objDivers::TYPE_RES_VIE AND ($oJoueur->GetVie() + $objObjet->GetNb(objDivers::TYPE_RES_VIE)) > personnage::VIE_MAX)
+						OR
+					(QuelTypeObjet($objObjet->GetCode()) == objDivers::TYPE_RES_DEP AND ($oJoueur->GetDepDispo() + $objObjet->GetNb(objDivers::TYPE_RES_DEP)) > personnage::DEPLACEMENT_MAX)
+				   )
+				{
+					$txtValideUtiliser = ' disabled="disabled"';
+				}
+				
+				$txtUtiliser = '<input '.$txtValideUtiliser.'type="submit" name="action" value="Utiliser" />';
+				$nbLigne = 5;
+				
+			}else{
+				if(!is_null($objObjet->GetRessource()))
+				{
+					$txtConvertion = AfficheListePrix($objObjet->GetRessource());
+					$nbLigne++;
+				
+					$txtValideUtiliser = NULL;
+					if(!CheckIfOnEstSurUnBatiment(maison::ID_BATIMENT, $oJoueur->GetCoordonnee()))
+					{
+						$txtValideUtiliser = ' disabled="disabled"';
+					}
+					$txtConvertir = '<input '.$txtValideUtiliser.'type="submit" name="action" value="Convertir" />';
+				}
+			}
+			
+			
+			switch($Category)
+			{
+				case 'Construction':
+					
+					break;
+				case 'Divers':
+					
+					break;
+				case 'Ressource':
+					
+					break;
+				case 'Armement':
+					$txtInfoArmement = '<tr>'
+											.'<td>'.$objObjet->GetAttaque().' '.AfficheIcone(objArmement::TYPE_ATTAQUE).'</td>'
+											.'<td>'.$objObjet->GetDefense().' '.AfficheIcone(objArmement::TYPE_DEFENSE).'</td>'
+											.'<td>'.$objObjet->GetDistance().' '.AfficheIcone(objArmement::TYPE_DISTANCE).'</td>'
+										.'</tr>';
+					$nbColonne = 3;
+					$nbLigne = 5;
+					$nbLigne++;
+					$txtEquiper = '<input type="submit" name="action" value="Equiper" />';
+					break;
+			}
+			
+			echo '<form class="inventaire" action="index.php?page=inventaire" formmethod="post" method="post">'
+	.'<table class="objet">
+		<tr><td rowspan="'.$nbLigne.'" style="width:105px; margin:auto;">
+					<img src="./img/objets/'.$objObjet->GetCode().'.png" alt="'.$objObjet->GetNom().'" width="100px" onmouseover="montre(\''.CorrectDataInfoBulle($objObjet->GetInfoBulle()).'\');" onmouseout="cache();" style="vertical-align:middle;" />
+					</td></tr>'
+					.'<tr><th colspan="'.$nbColonne.'">'.($objObjet->GetQuantite() > 1?'<b>'.$objObjet->GetQuantite().'x</b> ':'').$objObjet->GetNom().$txtAbandonner.'</th></tr>'
+					.'<tr><td colspan="'.$nbColonne.'" style="text-align:center;">
+						<input style="width:150px;" id="Slider'.$objObjet->GetCode().'" type="range" min="1" max="'.$objObjet->GetQuantite().'" step="1" value="1" onchange="printValue(\'Slider'.$objObjet->GetCode().'\',\'RangeValue'.$objObjet->GetCode().'\');" />
+						<input style="width:50px;" name="qte" id="RangeValue'.$objObjet->GetCode().'" onchange="printValue(\'RangeValue'.$objObjet->GetCode().'\',\'Slider'.$objObjet->GetCode().'\');" type="number" min="1" max="'.$objObjet->GetQuantite().'" step="1" value ="1" size="15" />
+						<script>printValue(\'Slider'.$objObjet->GetCode().'\',\'RangeValue'.$objObjet->GetCode().'\');</script>
+					</td></tr>'
+					.'<tr><td class="action_inventaire">'.$txtVendre.'</td><td style="text-align:center;">'.AfficheListePrix(array(personnage::TYPE_RES_MONNAIE.'='.$objObjet->GetPrix())).' par unité</td></tr>'
+					.(!is_null($txtConvertion)?'<tr><td class="action_inventaire">'.$txtConvertir.'</td><td style="text-align:center;">'.$txtConvertion.' par unité</td>':'')
+					.'<input type="hidden" name="id" value="'.$id.'" />'
+					.$txtInfoArmement
+					.((!is_null($txtEntreposer) OR !is_null($txtUtiliser) OR !is_null($txtEquiper))?'<tr><td colspan="'.$nbColonne.'" class="action_inventaire">'.$txtEntreposer.$txtUtiliser.$txtEquiper.'</td></tr>':NULL)
+	.'</table>'
+	.'</form>';
+			$id++;
 		}
-		$id++;
+		
+		//echo '</table>';
+	}else{
+		echo 'Aucun objet de cette catégorie.';
 	}
+	echo '</div>';
 }
-For($i=$id; $i<=($oJoueur->QuelCapaciteMonBolga() -1);$i++){
-	if($numC == 0){
-		echo '<tr style="vertical-align:top;"><td>'.AffichePlaceVide().'</td>';
-		$numC = 1;
-		$numL++;
-	}elseif($numC == 1){
-		echo '<td>'.AffichePlaceVide().'</td>';
-		if($numL < 4){
-			$numC = 0;
-			echo '</tr>';
-		}else{$numC = 2;}
-	}elseif($numC == 2){
-		echo '<td>'.AffichePlaceVide().'</td></tr>';
-		$numC = 0;
-	}
-}
-if($numC <= 2){
-	echo '</tr>';
-}
+
 $objManager->update($oJoueur);
 unset($oJoueur);
 ?>
-</table>
+<script>
+	window.onload = function() { 
+		var i=0;
+		
+		for(i = 0; i<=lstCursors.length; i++){
+			printValue(lstCursors[i].SliderName, lstCursors[i].RangeValue);
+		}
+	}
+</script>
 </div>
