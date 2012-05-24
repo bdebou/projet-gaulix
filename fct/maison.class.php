@@ -8,9 +8,11 @@ class maison extends batiment{
 	const COUT_AMELIORATION_NIVEAU_2	= 'ResOr=1000,ResBois=1500,ResPierre=2';
 	const COUT_AMELIORATION_NIVEAU_3	= 'ResOr=150000';
 	
-	const TYPE_RES_NOURRITURE			= 'nourriture';
-	const TYPE_RES_BOIS					= 'bois';
-	const TYPE_RES_PIERRE				= 'pierre';
+	const ID_BATIMENT					= 1;
+	
+	const TYPE_RES_NOURRITURE			= 'Nourriture';
+	const TYPE_RES_BOIS					= 'Bois';
+	const TYPE_RES_PIERRE				= 'Pierre';
 	
 	const NOM_ROMAIN					= 'Villa';
 	const NOM_GAULOIS					= 'Oppidum';
