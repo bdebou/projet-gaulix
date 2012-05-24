@@ -270,7 +270,7 @@ function AfficheActionViderStock(personnage &$oJoueur){
 		
 		return '<p>Votre stock de la '.strtolower(get_class($batiment))
 				.'<img src="img/carte/'.strtolower(get_class($batiment)).'-a.png" alt="'.strtolower(get_class($batiment)).'" title="Votre '.strtolower(get_class($batiment)).'" height="20px" />'
-				.' est plein ('.$batiment->GetStockContenu().'x '.AfficheIcone($batiment->GetIconeNameProduction($batiment->GetTypeContenu())).'): 
+				.' est plein ('.$batiment->GetStockContenu().'x '.AfficheIcone($batiment->GetCodeRessource($batiment->GetTypeContenu())).'): 
 				<a href="index.php?page=main&amp;action=viderstock'.strtolower(get_class($batiment)).'">Vider</a> ou 
 				<a href="index.php?page=village&amp;anchor='.implode('_', array_merge(array($batiment->GetCarte()), $batiment->GetCoordonnee())).'">Changer de production</a></p>';
 	}else{
@@ -754,52 +754,64 @@ function ObjetTrouve(personnage &$oJoueur) {
 	}
 	return null;
 }
-function AfficheActionPossible(personnage &$oJoueur, $arData) {
+function AfficheActionPossible(personnage &$oJoueur, objMain &$objObjet) {
 
-	$_SESSION['main']['objet']['code'] = $arData['objet_code'];
-	$_SESSION['main']['objet']['type'] = QuelTypeObjet($arData['objet_code']);
-	$_SESSION['main']['objet']['value'] = $arData['objet_nb'];
-	$_SESSION['main']['objet']['action'] = true;
+	$_SESSION['main']['objet']['code'] = $objObjet->GetCode();
+	$Type = QuelTypeObjet($objObjet->GetCode());
+	//$_SESSION['main']['objet']['value'] = $arData['objet_nb'];
+	//$_SESSION['main']['objet']['action'] = true;
 	$_SESSION['main']['objet']['laisser'] = 'ObjetTrouvé';
 
-	$txt = null;
+	$txtRamasser	= '<li style="display:inline;"><a href="index.php?page=main&amp;action=stock">Ramasser</a></li>';
+	$txtUtiliser	= '<li style="display:inline; margin-left:20px;"><a href="index.php?page=main&amp;action=utiliser">Utiliser</a></li>';
+	$txtLaisser		= '<li style="display:inline; margin-left:20px;"><a href="index.php?page=main&amp;action=laisser&amp;type=objet">Laisser</a></li>';
+	$txtEquiper		= '<li style="display:inline; margin-left:20px;"><a href="index.php?page=main&amp;action=equiper">Equiper</a></li>';
+	$txtPlein		= '<li style="display:inline;">Votre Bolga est plein.</li>';
+	
+	//$txt = <div;
 
 	//$nbObjetDansSac = count($_SESSION['joueur']->GetLstInventaire());
 
-	$txt .= '
-		<p>Vous avez trouvé l\'objet suivant : ' . $arData['objet_nom']
-	. (substr($arData['objet_code'], 0, 3) == 'Res' ?
-                    ' (' . $arData['objet_nb'] . 'x ' . AfficheIcone($arData['objet_code']) . ')' : '')
-	. '<ul style="list-style-type:none; padding:0px; text-align:center;">';
+	$txt = '<p>Vous avez trouvé l\'objet suivant : ' . $objObjet->GetNom().' '.AfficheIcone($objObjet->GetCode())
+			.'<ul style="list-style-type:none; padding:0px; text-align:center;">';
+	
 	//on vérifie si le bolga n'est pas plein
-	if (count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga()) {
-		$txt .= '<li style="display:inline;"><a href="index.php?page=main&amp;action=stock">Ramasser</a></li>';
-	} else {
-		$txt .= '<li style="display:inline;">Votre Bolga est plein.</li>';
+	if (count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga())
+	{
+		$txt .= $txtRamasser;
+	}else{
+		$txt .= $txtPlein;
 	}
+	
 	//on vérifie le type d'objet
-	if (in_array($_SESSION['main']['objet']['type'], array('deplacement', maison::TYPE_RES_SESTERCE, maison::TYPE_RES_NOURRITURE, maison::TYPE_RES_BOIS, maison::TYPE_RES_PIERRE, 'vie', 'divers'))) {
-		if ($_SESSION['main']['objet']['type'] == 'vie' and ($oJoueur->GetVie() + $arData['objet_nb']) > personnage::VIE_MAX) {
+	if (in_array($Type, array(personnage::TYPE_RES_MONNAIE, maison::TYPE_RES_NOURRITURE, maison::TYPE_RES_BOIS, maison::TYPE_RES_PIERRE, objDivers::TYPE_RES_VIE, objDivers::TYPE_RES_DEP)))
+	{
+		if($Type == objDivers::TYPE_RES_VIE AND ($oJoueur->GetVie() + $objObjet->GetNb(objDivers::TYPE_RES_VIE)) > personnage::VIE_MAX)
+		{
 			$txt .= '<li style="display:inline; margin-left:20px;">Limite de ' . personnage::VIE_MAX . ' vie atteinte</li>';
-		} elseif ($_SESSION['main']['objet']['type'] == 'deplacement' and ($oJoueur->GetDepDispo() + $arData['objet_nb']) > personnage::DEPLACEMENT_MAX) {
+		}elseif ($Type == objDivers::TYPE_RES_DEP AND ($oJoueur->GetDepDispo() + $objObjet->GetNb(objDivers::TYPE_RES_DEP)) > personnage::DEPLACEMENT_MAX)
+		{
 			$txt .= '<li style="display:inline; margin-left:20px;">Limite de ' . personnage::DEPLACEMENT_MAX . ' déplacements atteint</li>';
-		} else {
+		}else{
 			//on vérifie si on a déja une maison ou pas
-			if (in_array($_SESSION['main']['objet']['type'], array('nourriture', 'bois', 'pierre'))
-			AND is_null($oJoueur->GetMaisonInstalle())) {
+			if (in_array($Type, array(maison::TYPE_RES_NOURRITURE, maison::TYPE_RES_BOIS, maison::TYPE_RES_PIERRE))
+				AND is_null($oJoueur->GetMaisonInstalle()))
+			{
 				$txt .= '<li style="display:inline; margin-left:20px;">Pas Encore de Maison</li>';
-			} elseif (!in_array($_SESSION['main']['objet']['type'], array('divers'))) {
-				$txt .= '<li style="display:inline; margin-left:20px;"><a href="index.php?page=main&amp;action=utiliser">Utiliser</a></li>';
+			}elseif(!in_array($Type, array('divers')))
+			{
+				$txt .= $txtUtiliser;
 			}
 		}
+		
+	}/*  elseif(count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga())
+	{
 		//Si le bolga n'est pas plein, on peut s'équiper.
-	} elseif (count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga()) {
-		$txt .= '<li style="display:inline; margin-left:20px;"><a href="index.php?page=main&amp;action=equiper">Equiper</a></li>';
-	}
+		$txt .= $txtEquiper;
+	} */
+
 	//on affiche la possibilité de laisser l'objet
-	$txt .= '
-			<li style="display:inline; margin-left:20px;"><a href="index.php?page=main&amp;action=laisser&amp;type=objet">Laisser</a></li>
-		</ul></p>';
+	$txt .= $txtLaisser.'</ul></p>';
 
 	return $txt;
 }
@@ -997,8 +1009,8 @@ function AfficheHistory(personnage &$oJoueur){
 //+---------------------------------+
 //|				ACTIONS				|
 //+---------------------------------+
-function ActionStock(&$check, &$oJoueur){
-	if(isset($_SESSION['main']['objet'])){
+function ActionStock(&$check, personnage &$oJoueur){
+	if(isset($_SESSION['main']['objet']['code'])){
 		$oJoueur->AddInventaire($_SESSION['main']['objet']['code'], null, 1);
 		unset($_SESSION['main']['objet']);
 	}else{
