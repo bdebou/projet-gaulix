@@ -98,7 +98,8 @@ div.pion{
 }
 div.actions{
 	height: 170px;
-	overflow: auto;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 div.pub{
 	width: 300px;
@@ -121,6 +122,32 @@ div.statistiques{
 div.loginstatus span.login{
 	 font-weight: bold;
 	 text-transform: uppercase;
+}
+
+div.Main_Ressources,
+div.Ressource,
+div.Divers,
+div.Armement,
+div.Construction{
+	border: 3px double black;
+	overflow-x: hidden;
+	float: left;
+	margin: 2px;
+	padding: 3px;
+}
+div.Main_Ressources{
+	border: none;
+	width: 778px;
+	/* height: 150px; */
+	overflow-y: hidden;
+}
+div.Ressource,
+div.Divers,
+div.Armement,
+div.Construction{
+	width: 378px;
+	height: 250px;
+	overflow-y: auto; 
 }
 
 /*  Les Onglets */
@@ -188,7 +215,9 @@ table.loginstatus,
 table.statistiques,
 table.lst_village,
 table.lst_carriere,
-table.inscription{
+table.inscription,
+table.objet,
+table.Main_Ressources{
 	width: 100%;
 }
 table.village, table.village td, table.village th, 
@@ -219,7 +248,9 @@ table.loginstatus td,
 table.statistiques, table.statistiques td,
 table.inscription td.info
 table.lst_village, table.lst_village td,
-table.lst_carriere, table.lst_carriere td{
+table.lst_carriere, table.lst_carriere td,
+table.objet, table.objet td, table.objet th,
+table.Main_Ressources, table.Main_Ressources td{
 	border-collapse: collapse;
 	border: 1px solid black;
 }
@@ -241,14 +272,17 @@ table.quetes td,
 table.fiche_quete td,
 table.InfoBulle th, table.InfoBulle td,
 table.loginstatus td,
-table.statistiques td{
+table.statistiques td,
+table.objet td.action_inventaire,
+table.Main_Ressources td{
 	text-align: center;
 }
 table.fiche_quete td.description{
 	text-align: left;
 }
 table.notification td,
-table.quetes td{
+table.quetes td,
+table.Main_Ressources td{
 	padding: 5px;
 }
 table.regles_competences th{
@@ -314,6 +348,12 @@ table.carte_petite td{
 	border: none;
 	
 }
+table.objet{
+	margin-bottom: 3px;
+}
+table.objet td.action_inventaire{
+	width: 90px;
+}
 table.inventaire th{
 	text-decoration: underline;
 }
@@ -350,6 +390,7 @@ table.competence{
 	font-family: Verdana, Arial;
 	font-size: 10px;
 	background-color: #FFFFCC;
+	max-width: 250px;
 	z-index: 5;
 }
 
@@ -370,6 +411,9 @@ form.nouveau_troc fieldset.donner{
 }
 form.nouveau_troc fieldset.recevoir{
 	background:lightcoral;
+}
+form.inventaire input{
+	width: 85px;
 }
 
 /* Les BUTTON */
