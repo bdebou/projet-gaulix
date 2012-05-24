@@ -1,26 +1,4 @@
 <?php
-function AffichePlaceVide(){
-	return '
-<table width="100%">
-	<tr style="background:lightgrey; line-height:5px;"><td colspan="8">&nbsp;</td></tr>
-	<tr>
-		<td rowspan="4" style="width:80px;">Vide</td>
-		<td colspan="6" class="tdtitre" title="Libre">Libre</td>
-	</tr>
-	<tr>
-		<td colspan="2">&nbsp;</td>
-		<td colspan="2">&nbsp;</td>
-		<td colspan="2">&nbsp;</td>
-	</tr>
-	<tr>
-		<td colspan="3">&nbsp;</td>
-		<td colspan="3">&nbsp;</td>
-	</tr>
-	<tr>
-		<td colspan="6">&nbsp;</td>
-	</tr>
-</table>';
-}
 function AfficheObjetInventaire($CodeObject, $arInfoObject, $id, $nbObjet, &$oJoueur){
 	$_SESSION['main'][$id]['action'] = false;
 
@@ -202,36 +180,57 @@ function AfficheObjetInventaire($CodeObject, $arInfoObject, $id, $nbObjet, &$oJo
 </table>';
 	return $txt;
 }
+function CreateListObjet($Bolga){
+	$lst = null;
+	foreach($Bolga as $InfoObjet)
+	{
+		$arInfoObjet = explode('=', $InfoObjet);
+		
+		$objObjet = FoundObjet($arInfoObjet[0], $arInfoObjet[1]);
+		
+		if(!is_null($objObjet))
+		{
+			$lst[get_class($objObjet)][] = $objObjet;
+		}
+	}
+	
+	return $lst;
+}
 
 //+---------------------------------+
 //|				ACTIONS				|
 //+---------------------------------+
-function ActionVendre(&$check, $id, &$oJoueur, &$objManager){
-	if(isset($_SESSION['main'][$id]['code'])){
+function ActionVendre(&$check, $id, &$oJoueur, &$objManager, $qte){
+	if(isset($_SESSION['inventaire'][$id]['code'])){
 
-		$sql = "SELECT contenu_vendeur FROM table_marche WHERE type_vendeur='marchant'";
-		$requete = mysql_query($sql) or die (mysql_error());
+		/* $sql = "SELECT contenu_vendeur FROM table_marche WHERE type_vendeur='marchant'";
+		$requete = mysql_query($sql) or die (mysql_error()); */
 
-		$objMarche = new marchant(mysql_fetch_array($requete, MYSQL_ASSOC));
+		//$objMarche = new marchant(mysql_fetch_array($requete, MYSQL_ASSOC));
+		
+		$objObjet = FoundObjet($_SESSION['inventaire'][$id]['code']);
 
-		if($oJoueur->GetCombienElementDansBolga($_SESSION['main'][$id]['code']) == 0){
+		if($oJoueur->GetCombienElementDansBolga($objObjet->GetCode()) <= 0)
+		{
 			$check = false;
 			echo 'Erreur GLX0003: Fonction ActionVendre : Pas assez d\'éléments';
-		}elseif (abs($_GET['qte']) > $oJoueur->GetCombienElementDansBolga($_SESSION['main'][$id]['code'])){
-			$_GET['qte'] = $oJoueur->GetCombienElementDansBolga($_SESSION['main'][$id]['code']);
+			
+		}elseif ($qte > $oJoueur->GetCombienElementDansBolga($objObjet->GetCode()))
+		{
+			$_qte = $oJoueur->GetCombienElementDansBolga($objObjet->GetCode());
 		}
 
 		if($check){
-			for ($i = 1; $i <= $_GET['qte']; $i++) {
-				$oJoueur->VendreObjet($_SESSION['main'][$id]['code'], $_SESSION['main'][$id]['prix']);
-				$objMarche->AddMarchandise($_SESSION['main'][$id]['code']);
+			for ($i = 1; $i <= $qte; $i++) {
+				$oJoueur->VendreObjet($objObjet->GetCode(), $objObjet->GetPrix());
+				//$objMarche->AddMarchandise($_SESSION['inventaire'][$id]['code']);
 			}
 				
-			$objManager->UpdateMarche($objMarche);
+			//$objManager->UpdateMarche($objMarche);
 				
 		}
 
-		unset($_SESSION['main'][$id]['code']);
+		unset($_SESSION['inventaire'][$id]['code']);
 	}else{
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionVendre';
@@ -275,12 +274,12 @@ function ActionEntreposer(&$check, $objManager, $id, &$oJoueur){
 		echo 'Erreur GLX0002: Fonction ActionEntreposer';
 	}
 }
-function ActionEquiper(&$check, &$arInfoObject, &$oJoueur){
-	if(!is_null($arInfoObject['code'])){
-		if($arInfoObject['action']){
-			$oJoueur->AddInventaire($arInfoObject['code'], $arInfoObject['type']);
-		}
-		$oJoueur->EquiperPerso($arInfoObject['code'], $arInfoObject['type']);
+function ActionEquiper(&$check, $id, &$oJoueur){
+	if(isset($_SESSION['inventaire'][$id]['code'])){
+		
+		$objObjet = FoundObjet($_SESSION['inventaire'][$id]['code']);
+		
+		$oJoueur->EquiperPerso($objObjet->GetCode(), $objObjet->GetType());
 		$arInfoObject['code'] = null;
 	}else{
 		$check = false;
@@ -326,4 +325,67 @@ function ActionSorts(&$check, &$oJoueur){
 			print_r($_SESSION['main']);
 	}
 }
+function ActionConvertir(&$check, $id, personnage &$oJoueur, &$objManager, $Qte){
+	if(isset($_SESSION['inventaire'][$id]['code'])){
+
+		//on trouve sa maison
+		$maison = $oJoueur->GetObjSaMaison();
+		
+		//on crée l'objet Objet
+		$objObjet = FoundObjet($_SESSION['inventaire'][$id]['code']);
+		
+		for($i=1; $i <= $Qte; $i++)
+		{
+			foreach($objObjet->GetRessource() as $Ressource)
+			{
+				$arRessource = explode('=', $Ressource);
+				
+				switch(QuelTypeObjet($arRessource[0])){
+					case objDivers::TYPE_RES_VIE:
+						$oJoueur->GagnerVie($arRessource[1]);
+						break;
+					case objDivers::TYPE_RES_DEP:
+						$oJoueur->AddDeplacement($arRessource[1],'objet');
+						break;
+					case maison::TYPE_RES_BOIS:
+					case maison::TYPE_RES_NOURRITURE:
+					case maison::TYPE_RES_PIERRE:
+						if(!is_null($maison)){
+							$maison->AddRessource(QuelTypeObjet($arRessource[0]), $arRessource[1]);
+						}
+						break;
+					default:
+						$oJoueur->AddInventaire($arRessource[0], false, $arRessource[1]);
+					break;
+				}
+			}
+			
+			//on enlève un objet de l'inventaire
+			$oJoueur->CleanInventaire($objObjet->GetCode());
+		}
+		
+		if(!is_null($maison)){
+			$objManager->UpdateBatiment($maison);
+			unset($maison);
+		}
+
+		
+		unset($_SESSION['inventaire'][$id]['code']);
+	}else{
+		$check = false;
+		echo 'Erreur GLX0002: Fonction ActionConvertir';
+	}
+}
+function ActionAbandonner(&$check, personnage &$oJoueur, $id, $qte){
+	if(isset($_SESSION['inventaire'][$id]['code'])){
+		for($i=1; $i <= $qte; $i++)
+		{
+			$oJoueur->CleanInventaire($_SESSION['inventaire'][$id]['code']);
+		}
+	}else{
+		$check = false;
+		echo 'Erreur GLX0002: Fonction ActionAbandonner';
+	}
+}
+
 ?>

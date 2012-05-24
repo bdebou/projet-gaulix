@@ -78,8 +78,10 @@ function AfficheIcone($type, $HeightIcone = 20) {
 		case 'ResPi':	$Name = 'Pierre';					$FileName = substr($type, 0, 6);	break;
 		case 'ResNo':	$Name = 'Nourriture';				$FileName = substr($type, 0, 6);	break;
 		case 'ResOr':	$Name = 'Or';						$FileName = substr($type, 0, 5);	break;
-		case 'ResDe':	$Name = 'Déplacements';				$FileName = 'deplacement';			break;
-		case 'ResVi':	$Name = 'Vie';						$FileName = 'vie';					break;
+		case 'ResDe':
+		case 'Depla':	$Name = 'Déplacements';				$FileName = 'deplacement';			break;
+		case 'ResVi':
+		case 'Vie':		$Name = 'Vie';						$FileName = 'vie';					break;
 		case 'ResHy':	$Name = 'Hydromel';					$FileName = 'hydromel';				break;
 		case 'ResGu':	$Name = 'Gui';															break;
 		case 'ResAb':	$Name = 'Absinthe';														break;
@@ -282,7 +284,7 @@ function UtilisationRessource(array $arRessource, personnage &$Joueur, maison &$
 		case maison::TYPE_RES_PIERRE:
 			$Maison->MindRessource(QuelTypeRessource($arRessource[0]), $arRessource[1]);
 			break;
-		case personnage::TYPE_RES_SESTERCE:
+		case personnage::TYPE_RES_MONNAIE:
 			$Joueur->MindOr($arRessource[1]);
 			break;
 		default:
@@ -297,7 +299,7 @@ function CheckIfAssezRessource(array $arRessource, personnage &$Joueur, maison &
 		case maison::TYPE_RES_PIERRE:
 			if($Maison->GetRessource(QuelTypeRessource($arRessource[0])) >= $arRessource[1]){return true;}
 			break;
-		case personnage::TYPE_RES_SESTERCE:
+		case personnage::TYPE_RES_MONNAIE:
 			if($Joueur->GetArgent() >= $arRessource[1]){return true;}
 			break;
 		default:
@@ -445,9 +447,9 @@ function QuelTypeObjet($Code){
 	switch (substr($Code, 0, 5))
 	{
 		case 'ResVi':
-		case 'PotVi': return 'vie';
+		case 'PotVi': return objDivers::TYPE_RES_VIE;
 		case 'ResDe':
-		case 'PotDe': return 'deplacement';
+		case 'PotDe': return objDivers::TYPE_RES_DEP;
 		default: return 'divers';
 	}
 }
@@ -456,7 +458,7 @@ function QuelTypeRessource($Code) {
 		case 'ResNo': return maison::TYPE_RES_NOURRITURE;
 		case 'ResBo': return maison::TYPE_RES_BOIS;
 		case 'ResPi': return maison::TYPE_RES_PIERRE;
-		case 'ResOr': return personnage::TYPE_RES_SESTERCE;
+		case 'ResSe': return personnage::TYPE_RES_MONNAIE;
 		default: return $Code;
 	}
 }
@@ -644,40 +646,52 @@ function ActionDeplacement(&$check, &$oJoueur){
 		echo 'Erreur GLX0002: Fonction ActionDeplacement';
 	}
 }
-function ActionUtiliser(&$check, &$arInfoObject, personnage &$oJoueur, &$objManager){
-	if(!is_null($arInfoObject['code'])){
-		if($arInfoObject['action']){
-			$oJoueur->AddInventaire($arInfoObject['code'], $arInfoObject['type']);
+function ActionUtiliser(&$check, &$code = null, personnage &$oJoueur, &$objManager, $Qte = 1){
+	if(!is_null($code)){
+		if(!isset($_GET['page']) OR $_GET['page'] == 'main'){
+			$oJoueur->AddInventaire($code, QuelTypeObjet($code));
 		}
 
-		$maison = $oJoueur->GetObjSaMaison();
-
-		switch(QuelTypeObjet($arInfoObject['code'])){
-			case 'vie':
-				$oJoueur->GagnerVie($arInfoObject['value']);
-				break;
-			case 'deplacement':
-				$oJoueur->AddDeplacement($arInfoObject['value'],'objet');
-				break;
-			case personnage::TYPE_RES_SESTERCE:
-				$oJoueur->AddOr($arInfoObject['value']);
-				break;
-			case maison::TYPE_RES_BOIS:
-			case maison::TYPE_RES_NOURRITURE:
-			case maison::TYPE_RES_PIERRE:
-				if(!is_null($maison)){
-					$maison->AddRessource(QuelTypeObjet($arInfoObject['code']), $arInfoObject['value']);
+		$objObjet = FoundObjet($code);
+		
+		//$maison = $oJoueur->GetObjSaMaison();
+	
+		for($i=1; $i <= $Qte; $i++)
+		{
+			foreach($objObjet->GetRessource() as $Ressource)
+			{
+				$arTmp = explode('=', $Ressource);
+				
+				switch(QuelTypeObjet($arTmp[0])){
+					case objDivers::TYPE_RES_VIE:
+						if(($oJoueur->GetVie() + $arTmp[1]) <= personnage::VIE_MAX)
+						{
+							$oJoueur->GagnerVie($arTmp[1]);
+						}else{
+							break(3);
+						}
+						break;
+					case objDivers::TYPE_RES_DEP:
+						if(($oJoueur->GetDepDispo() + $arTmp[1]) <= personnage::DEPLACEMENT_MAX)
+						{
+							$oJoueur->AddDeplacement($arTmp[1],'objet');
+						}else{
+							break(3);
+						}
+						break;
 				}
-				break;
+			}
+			
+			$oJoueur->CleanInventaire($code);
 		}
+		
 
-		if(!is_null($maison)){
+		/* if(!is_null($maison)){
 			$objManager->UpdateBatiment($maison);
 			unset($maison);
-		}
+		} */
 
-		$oJoueur->CleanInventaire($arInfoObject['code']);
-		$arInfoObject['code'] = null;
+		unset($code);
 	}else{
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionUtiliser';
