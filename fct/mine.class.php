@@ -3,9 +3,9 @@ class mine extends batiment{
 	private $Contenu;
 	private $DateAction;
 	
-	const COUT_AMELIORATION_NIVEAU_1	= 'ResBois=5,ResOr=10,ResMinF=150';
-	const COUT_AMELIORATION_NIVEAU_2	= 'ResOr=1000,ResBois=1500,ResPierre=2';
-	const COUT_AMELIORATION_NIVEAU_3	= 'ResOr=150000';
+	const COUT_AMELIORATION_NIVEAU_1	= 'ResBois=5,Sesterce=10,ResMinF=150';
+	const COUT_AMELIORATION_NIVEAU_2	= 'Sesterce=1000,ResBois=1500,ResPierre=2';
+	const COUT_AMELIORATION_NIVEAU_3	= 'Sesterce=150000';
 	
 	const ID_BATIMENT				= 10;
 	
@@ -20,55 +20,55 @@ class mine extends batiment{
 	const NB_ESCLAVES_NIV_3			= 8;
 	const NB_ESCLAVES_NIV_4			= 12;
 	
-	//Les communs sont :
-	const CODE_PRODUCTION_SABLE		= 'a1';
-	const NOM_PRODUCTION_SABLE		= 'du sable';
-	const NIVEAU_COMPETENCE_SABLE	= 1;
-	const ICONE_NAME_SABLE			= 'ResSable';
-	const TEMP_SABLE				= 900;
+	//Les valeurs communes de production avec la carrière sont :
+	const A1_CODE				= 'a1';
+	const A1_NOM				= 'du sable';
+	const A1_NIVEAU_COMPETENCE	= 1;
+	const A1_CODE_OBJET			= 'ResSable';
+	const A1_TEMP				= 900;
 	
-	const CODE_PRODUCTION_CHAUX		= 'a2';
-	const NOM_PRODUCTION_CHAUX		= 'de la chaux';
-	const NIVEAU_COMPETENCE_CHAUX	= 2;
-	const ICONE_NAME_CHAUX			= 'ResChaux';
-	const TEMP_CHAUX				= 900;
+	const A2_CODE				= 'a2';
+	const A2_NOM				= 'de la chaux';
+	const A2_NIVEAU_COMPETENCE	= 2;
+	const A2_CODE_OBJET			= 'ResChaux';
+	const A2_TEMP				= 900;
 	
-	const CODE_PRODUCTION_GRAVIER	= 'a3';
-	const NOM_PRODUCTION_GRAVIER	= 'du gravier';
-	const NIVEAU_COMPETENCE_GRAVIER	= 3;
-	const ICONE_NAME_GRAVIER		= 'ResGravier';
-	const TEMP_GRAVIER				= 900;
+	const A3_CODE				= 'a3';
+	const A3_NOM				= 'du gravier';
+	const A3_NIVEAU_COMPETENCE	= 3;
+	const A3_CODE_OBJET			= 'ResGravier';
+	const A3_TEMP				= 900;
 	
-	const CODE_PRODUCTION_CIMENT	= 'a4';
-	const NOM_PRODUCTION_CIMENT		= 'du ciment';
-	const NIVEAU_COMPETENCE_CIMENT	= 4;
-	const ICONE_NAME_CIMENT			= 'ResCiment';
-	const TEMP_CIMENT				= 900;
+	const A4_CODE				= 'a4';
+	const A4_NOM				= 'du ciment';
+	const A4_NIVEAU_COMPETENCE	= 4;
+	const A4_CODE_OBJET			= 'ResCiment';
+	const A4_TEMP				= 900;
 		
-	//Les spécifiques sont :
-	const CODE_PRODUCTION_ETAIN		= 'b1';
-	const NOM_PRODUCTION_ETAIN		= 'de l\'étain';
-	const NIVEAU_COMPETENCE_ETAIN	= 1;
-	const ICONE_NAME_ETAIN			= 'ResEtain';
-	const TEMP_ETAIN				= 2400;
+	//Les valeurs de production spécifique à la mine
+	const B1_CODE				= 'b1';
+	const B1_NOM				= 'de l\'étain';
+	const B1_NIVEAU_COMPETENCE	= 1;
+	const B1_CODE_OBJET			= 'ResEtain';
+	const B1_TEMP				= 2400;
 	
-	const CODE_PRODUCTION_CUIVRE	= 'b2';
-	const NOM_PRODUCTION_CUIVRE		= 'du minerai de cuivre';
-	const NIVEAU_COMPETENCE_CUIVRE	= 2;
-	const ICONE_NAME_CUIVRE			= 'ResMinC';
-	const TEMP_CUIVRE				= 3000;
+	const B2_CODE				= 'b2';
+	const B2_NOM				= 'du minerai de cuivre';
+	const B2_NIVEAU_COMPETENCE	= 2;
+	const B2_CODE_OBJET			= 'ResMinC';
+	const B2_TEMP				= 3000;
 	
-	const CODE_PRODUCTION_ARGENT	= 'b3';
-	const NOM_PRODUCTION_ARGENT		= 'du minerai d\'argent';
-	const NIVEAU_COMPETENCE_ARGENT	= 3;
-	const ICONE_NAME_ARGENT			= 'ResMinA';
-	const TEMP_ARGENT				= 3000;
+	const B3_CODE				= 'b3';
+	const B3_NOM				= 'du minerai d\'argent';
+	const B3_NIVEAU_COMPETENCE	= 3;
+	const B3_CODE_OBJET			= 'ResMinA';
+	const B3_TEMP				= 3000;
 	
-	const CODE_PRODUCTION_MINOR		= 'b4';
-	const NOM_PRODUCTION_MINOR		= 'du minerai d\'or';
-	const NIVEAU_COMPETENCE_MINOR	= 4;
-	const ICONE_NAME_MINOR			= 'or';
-	const TEMP_MINOR				= 3600;
+	const B4_CODE				= 'b4';
+	const B4_NOM				= 'du minerai d\'or';
+	const B4_NIVEAU_COMPETENCE	= 4;
+	const B4_CODE_OBJET			= 'or';
+	const B4_TEMP				= 3600;
 	
 		
 	//--- fonction qui est lancer lors de la création de l'objet. ---
@@ -116,8 +116,8 @@ class mine extends batiment{
 	
 		switch($CodeProduction)
 		{
-			case self::CODE_PRODUCTION_SABLE:
-			case self::CODE_PRODUCTION_ETAIN:
+			case self::A1_CODE:
+			case self::B1_CODE:
 				switch($NiveauCompetence)
 				{
 					case 0: return 5;
@@ -128,8 +128,8 @@ class mine extends batiment{
 					case 5: return 50;
 				}
 				break;
-			case self::CODE_PRODUCTION_CHAUX:
-			case self::CODE_PRODUCTION_CUIVRE:
+			case self::A2_CODE:
+			case self::B2_CODE:
 				switch($NiveauCompetence)
 				{
 					case 0:
@@ -140,8 +140,8 @@ class mine extends batiment{
 					case 5: return 30;
 				}
 				break;
-			case self::CODE_PRODUCTION_GRAVIER:
-			case self::CODE_PRODUCTION_ARGENT:
+			case self::A3_CODE:
+			case self::B3_CODE:
 				switch($NiveauCompetence)
 				{
 					case 0:
@@ -152,8 +152,8 @@ class mine extends batiment{
 					case 5: return 20;
 				}
 				break;
-			case self::CODE_PRODUCTION_CIMENT:
-			case self::CODE_PRODUCTION_MINOR:
+			case self::A4_CODE:
+			case self::B4_CODE:
 				switch($NiveauCompetence)
 				{
 					case 0:
@@ -170,17 +170,17 @@ class mine extends batiment{
 	}
 	
 	//--- Gestion du stock  ---
-	public function ViderStock($stock, maison &$maison, personnage &$joueur){
+	public function ViderStock($stock, personnage &$joueur){
 		switch($this->GetTypeContenu()){
-			case self::CODE_PRODUCTION_SABLE:
-			case self::CODE_PRODUCTION_CHAUX:
-			case self::CODE_PRODUCTION_GRAVIER:
-			case self::CODE_PRODUCTION_CIMENT:
-			case self::CODE_PRODUCTION_ETAIN:
-			case self::CODE_PRODUCTION_CUIVRE:
-			case self::CODE_PRODUCTION_ARGENT:
-			case self::CODE_PRODUCTION_MINOR:
-				$joueur->AddInventaire($this->GetTypeContenu(), NULL, $stock, false);
+			case self::A1_CODE:
+			case self::A2_CODE:
+			case self::A3_CODE:
+			case self::A4_CODE:
+			case self::B1_CODE:
+			case self::B2_CODE:
+			case self::B3_CODE:
+			case self::B4_CODE:
+				$joueur->AddInventaire($this->GetCodeRessource($this->GetTypeContenu()), NULL, $stock, false);
 				break;
 		}
 
@@ -214,6 +214,16 @@ class mine extends batiment{
 	
 	//Les Affichages
 	//==============
+	Public function AfficheAchatEsclave(personnage &$oJoueur){
+		$txt = NULL;
+		
+		if($this->GetNbEsclave() < $this->GetNbMaxEsclave())
+		{
+			
+		}
+		
+		return $txt;
+	}
 	public function AfficheContenu(personnage &$oJoueur){
 
 		if($this->GetStockContenu() < $this->GetStockMax()){
@@ -240,14 +250,14 @@ class mine extends batiment{
 						.'<input type="hidden" name="anchor" value="'.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'" />'
 						.'<input type="hidden" name="action" value="production'.strtolower(get_class($this)).'" />'
 						.'<select name="type" onclick="document.getElementById(\'BtSubmit\').disabled=false;">'
-							.($this->GetNiveau() >= self::NIVEAU_COMPETENCE_SABLE?'<option value="'.self::CODE_PRODUCTION_SABLE.'"'.($this->GetTypeContenu() == self::CODE_PRODUCTION_SABLE?' disabled="disabled"':'').'>'.self::NOM_PRODUCTION_SABLE.'</option>':'')
-							.($this->GetNiveau() >= self::NIVEAU_COMPETENCE_ETAIN?'<option value="'.self::CODE_PRODUCTION_ETAIN.'"'.($this->GetTypeContenu() == self::CODE_PRODUCTION_ETAIN?' disabled="disabled"':'').'>'.self::NOM_PRODUCTION_ETAIN.'</option>':'')
-							.($this->GetNiveau() >= self::NIVEAU_COMPETENCE_CHAUX?'<option value="'.self::CODE_PRODUCTION_CHAUX.'"'.($this->GetTypeContenu() == self::CODE_PRODUCTION_CHAUX?' disabled="disabled"':'').'>'.self::NOM_PRODUCTION_CHAUX.'</option>':'')
-							.($this->GetNiveau() >= self::NIVEAU_COMPETENCE_CUIVRE?'<option value="'.self::CODE_PRODUCTION_CUIVRE.'"'.($this->GetTypeContenu() == self::CODE_PRODUCTION_CUIVRE?' disabled="disabled"':'').'>'.self::NOM_PRODUCTION_CUIVRE.'</option>':'')
-							.($this->GetNiveau() >= self::NIVEAU_COMPETENCE_GRAVIER?'<option value="'.self::CODE_PRODUCTION_GRAVIER.'"'.($this->GetTypeContenu() == self::CODE_PRODUCTION_GRAVIER?' disabled="disabled"':'').'>'.self::NOM_PRODUCTION_GRAVIER.'</option>':'')
-							.($this->GetNiveau() >= self::NIVEAU_COMPETENCE_ARGENT?'<option value="'.self::CODE_PRODUCTION_ARGENT.'"'.($this->GetTypeContenu() == self::CODE_PRODUCTION_ARGENT?' disabled="disabled"':'').'>'.self::NOM_PRODUCTION_ARGENT.'</option>':'')
-							.($this->GetNiveau() >= self::NIVEAU_COMPETENCE_CIMENT?'<option value="'.self::CODE_PRODUCTION_CIMENT.'"'.($this->GetTypeContenu() == self::CODE_PRODUCTION_CIMENT?' disabled="disabled"':'').'>'.self::NOM_PRODUCTION_CIMENT.'</option>':'')
-							.($this->GetNiveau() >= self::NIVEAU_COMPETENCE_MINOR?'<option value="'.self::CODE_PRODUCTION_MINOR.'"'.($this->GetTypeContenu() == self::CODE_PRODUCTION_MINOR?' disabled="disabled"':'').'>'.self::NOM_PRODUCTION_MINOR.'</option>':'')
+							.($this->GetNiveau() >= self::A1_NIVEAU_COMPETENCE?'<option value="'.self::A1_CODE.'"'.($this->GetTypeContenu() == self::A1_CODE?' disabled="disabled"':'').'>'.self::A1_NOM.'</option>':'')
+							.($this->GetNiveau() >= self::B1_NIVEAU_COMPETENCE?'<option value="'.self::B1_CODE.'"'.($this->GetTypeContenu() == self::B1_CODE?' disabled="disabled"':'').'>'.self::B1_NOM.'</option>':'')
+							.($this->GetNiveau() >= self::A2_NIVEAU_COMPETENCE?'<option value="'.self::A2_CODE.'"'.($this->GetTypeContenu() == self::A2_CODE?' disabled="disabled"':'').'>'.self::A2_NOM.'</option>':'')
+							.($this->GetNiveau() >= self::B2_NIVEAU_COMPETENCE?'<option value="'.self::B2_CODE.'"'.($this->GetTypeContenu() == self::B2_CODE?' disabled="disabled"':'').'>'.self::B2_NOM.'</option>':'')
+							.($this->GetNiveau() >= self::A3_NIVEAU_COMPETENCE?'<option value="'.self::A3_CODE.'"'.($this->GetTypeContenu() == self::A3_CODE?' disabled="disabled"':'').'>'.self::A3_NOM.'</option>':'')
+							.($this->GetNiveau() >= self::B3_NIVEAU_COMPETENCE?'<option value="'.self::B3_CODE.'"'.($this->GetTypeContenu() == self::B3_CODE?' disabled="disabled"':'').'>'.self::B3_NOM.'</option>':'')
+							.($this->GetNiveau() >= self::A4_NIVEAU_COMPETENCE?'<option value="'.self::A4_CODE.'"'.($this->GetTypeContenu() == self::A4_CODE?' disabled="disabled"':'').'>'.self::A4_NOM.'</option>':'')
+							.($this->GetNiveau() >= self::B4_NIVEAU_COMPETENCE?'<option value="'.self::B4_CODE.'"'.($this->GetTypeContenu() == self::B4_CODE?' disabled="disabled"':'').'>'.self::B4_NOM.'</option>':'')
 						.'</select>'
 						.'<input type="submit" value="Go" id="BtSubmit" disabled="disabled" />'
 					.'</form>'
@@ -260,12 +270,12 @@ class mine extends batiment{
 		$txt ='
 		<table border style="width:100%;">
 			<tr>
-				<td style="width:60%;">Production de '.$this->QuelleQuantite($oJoueur->GetNiveauCompetence(self::TYPE_COMPETENCE), $this->GetTypeContenu()).'x '.AfficheIcone($this->GetIconeNameProduction($this->GetTypeContenu())).'</td>
+				<td style="width:60%;">Production de '.$this->QuelleQuantite($oJoueur->GetNiveauCompetence(self::TYPE_COMPETENCE), $this->GetTypeContenu()).'x '.AfficheIcone($this->GetCodeRessource($this->GetTypeContenu())).'</td>
 				<td>'.$status.'</td>
 			</tr>
 			<tr>
 				<td>Stock</td>
-				<td>'.$this->GetStockContenu().'/'.$this->GetStockMax().' '.AfficheIcone($this->GetIconeNameProduction($this->GetTypeContenu())).'</td>
+				<td>'.$this->GetStockContenu().'/'.$this->GetStockMax().' '.AfficheIcone($this->GetCodeRessource($this->GetTypeContenu())).'</td>
 			</tr>
 			<tr>
 				'.$txtAction.'
@@ -287,18 +297,6 @@ class mine extends batiment{
 	}
 	public function GetStockMax(){				return self::STOCK_MAX_DEPART + (parent::GetNiveau() * 100);}
 	public function GetContenu(){				return $this->Contenu;}
-	Public function GetIconeNameProduction($code){
-		switch($code){
-			case self::CODE_PRODUCTION_SABLE:	return self::ICONE_NAME_SABLE;
-			case self::CODE_PRODUCTION_CHAUX:	return self::ICONE_NAME_CHAUX;
-			case self::CODE_PRODUCTION_GRAVIER:	return self::ICONE_NAME_GRAVIER;
-			case self::CODE_PRODUCTION_CIMENT:	return self::ICONE_NAME_CIMENT;
-			case self::CODE_PRODUCTION_ETAIN:	return self::ICONE_NAME_ETAIN;
-			case self::CODE_PRODUCTION_CUIVRE:	return self::ICONE_NAME_CUIVRE;
-			case self::CODE_PRODUCTION_ARGENT:	return self::ICONE_NAME_ARGENT;
-			case self::CODE_PRODUCTION_MINOR:	return self::ICONE_NAME_MINOR;
-		}
-	}
 	public function GetTypeContenu(){
 		//$contenu = explode(',', $this->Contenu);
 		return $this->Contenu[0];
@@ -307,19 +305,31 @@ class mine extends batiment{
 		//$contenu = explode(',', $this->Contenu);
 		return $this->Contenu[1];
 	}
+	public function GetCodeRessource($CodeType){
+		switch($CodeType){
+			case self::A1_CODE:	return self::A1_CODE_OBJET;		break;
+			case self::B1_CODE:	return self::B1_CODE_OBJET;		break;
+			case self::A2_CODE:	return self::A2_CODE_OBJET;		break;
+			case self::B2_CODE:	return self::B2_CODE_OBJET;		break;
+			case self::A3_CODE:	return self::A3_CODE_OBJET;		break;
+			case self::B3_CODE:	return self::B3_CODE_OBJET;		break;
+			case self::A4_CODE:	return self::A4_CODE_OBJET;		break;
+			case self::B4_CODE:	return self::B4_CODE_OBJET;		break;
+		}
+	}
 	public function GetDateAction(){			return $this->DateAction;}
 	public function GetTempExtraction($code){
 		$Duree = 0;
 		
 		switch($code){
-			case self::CODE_PRODUCTION_SABLE:	$Duree = self::TEMP_SABLE;		break;
-			case self::CODE_PRODUCTION_CHAUX:	$Duree = self::TEMP_CHAUX;		break;
-			case self::CODE_PRODUCTION_GRAVIER:	$Duree = self::TEMP_GRAVIER;	break;
-			case self::CODE_PRODUCTION_CIMENT:	$Duree = self::TEMP_CIMENT;		break;
-			case self::CODE_PRODUCTION_ETAIN:	$Duree = self::TEMP_ETAIN;		break;
-			case self::CODE_PRODUCTION_CUIVRE:	$Duree = self::TEMP_CUIVRE;		break;
-			case self::CODE_PRODUCTION_ARGENT:	$Duree = self::TEMP_ARGENT;		break;
-			case self::CODE_PRODUCTION_MINOR:	$Duree = self::TEMP_MINOR;		break;
+			case self::A1_CODE:	$Duree = self::A1_TEMP;	break;
+			case self::B1_CODE:	$Duree = self::B1_TEMP;	break;
+			case self::A2_CODE:	$Duree = self::A2_TEMP;	break;
+			case self::B2_CODE:	$Duree = self::B2_TEMP;	break;
+			case self::A3_CODE:	$Duree = self::A3_TEMP;	break;
+			case self::B3_CODE:	$Duree = self::B3_TEMP;	break;
+			case self::A4_CODE:	$Duree = self::A4_TEMP;	break;
+			case self::B4_CODE:	$Duree = self::B4_TEMP;	break;
 		}
 		
 		$Duree = $Duree * ((100 - (self::GAIN_TEMP_PAR_ESCLAVE * $this->GetNbEsclave())) / 100);
