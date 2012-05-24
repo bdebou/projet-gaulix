@@ -171,18 +171,7 @@ class mine extends batiment{
 	
 	//--- Gestion du stock  ---
 	public function ViderStock($stock, personnage &$joueur){
-		switch($this->GetTypeContenu()){
-			case self::A1_CODE:
-			case self::A2_CODE:
-			case self::A3_CODE:
-			case self::A4_CODE:
-			case self::B1_CODE:
-			case self::B2_CODE:
-			case self::B3_CODE:
-			case self::B4_CODE:
-				$joueur->AddInventaire($this->GetCodeRessource($this->GetTypeContenu()), NULL, $stock, false);
-				break;
-		}
+		$joueur->AddInventaire($this->GetCodeRessource($this->GetTypeContenu()), NULL, $stock, false);
 
 		//$this->Contenu = $Contenu[0].','.($Contenu[1] - $stock);
 		$this->Contenu[1] = $this->GetStockContenu() - $stock;
