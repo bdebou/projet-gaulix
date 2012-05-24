@@ -1,30 +1,31 @@
 <?php
 abstract class batiment{
-	private $IDCaseCarte,
-			$Login, 
-			$Type,
-			$Nom,
-			$Description,
-			$Coordonnee,
-			$Attaque,
-			$Defense,
-			$Distance,
-			$Etat,
-			$EtatMax,
-			$DateLastAction,
-			$Detruit,
-			$Niveau,
-			$DateAction,
-			$LstPrix,
-			$DateAmelioration,
-			$TmpAmelioration,
-			$NbPoints,
-			$Contenu;
+	private $IDCaseCarte;
+	private $Login;
+	private $Type;
+	private $Nom;
+	private $Description;
+	private $Coordonnee;
+	private $Attaque;
+	private $Defense;
+	private $Distance;
+	private $Etat;
+	private $EtatMax;
+	private $DateLastAction;
+	private $Detruit;
+	private $Niveau;
+	private $DateAction;
+	private $LstPrix;
+	private $DateAmelioration;
+	private $TmpAmelioration;
+	private $NbPoints;
+	private $Contenu;
+	private $IDType;
 	
 	Const PRIX_REPARATION			= 5;		// Prix des réparation 5or/pts de vie
 	Const NIVEAU_MAX				= 4;		// Niveau Maximum pour chaque batiment.
 	
-	const CODE_ESCLAVE				= 'esclave';
+	const CODE_ESCLAVE				= 'Esclave';
 	
 	//Les points
 	const POINT_BATIMENT_ATTAQUE	= 3;
@@ -132,12 +133,13 @@ abstract class batiment{
 				//$objManager = new PersonnagesManager($db);
 				
 				$arContenu = explode(',', $this->Contenu);
-				$this->AddStock($persoCible);
+				$nomClass = get_class($this);
+				$this->AddStock($persoCible->GetNiveauCompetence($nomClass::TYPE_COMPETENCE));
 				$arContenu = explode(',', $this->Contenu);
-				$maison = FoundBatiment(1, $persoAttaquant->GetLogin());
-				$this->ViderStock($arContenu['1'], $maison, $persoAttaquant);
-				$objManager->UpdateBatiment($maison);
-				unset($maison);
+				//$maison = FoundBatiment(1, $persoAttaquant->GetLogin());
+				$this->ViderStock($arContenu['1'], $persoAttaquant);
+				//$objManager->UpdateBatiment($maison);
+				//unset($maison);
 				//unset($objManager);
 				break;
 		}
@@ -188,6 +190,7 @@ abstract class batiment{
 				case 'batiment_vie':			$this->EtatMax = (is_null($value)?NULL:intval($value)); break;
 				case 'batiment_prix':			$this->LstPrix = (is_null($value)?NULL:explode(',', $value)); break;
 				case 'batiment_points':			$this->NbPoints = intval($value); break;
+				case 'id_batiment':				$this->IDType = (int)$value; break;
 			}
 		}
 		
@@ -347,6 +350,7 @@ abstract class batiment{
 	}
 	
 	//--- Renvoie de valeur ---
+	public function GetIDType(){				return $this->IDType;}
 	public function GetIDCase(){				return $this->IDCaseCarte;}
 	public function GetLogin(){					return $this->Login;}
 	public function GetType(){					return $this->Type;}
