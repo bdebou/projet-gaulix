@@ -165,6 +165,7 @@ class PersonnagesManager{
 				res_pierre = :res_pierre, 
 				res_bois = :res_bois, 
 				res_nourriture = :res_nourriture, 
+				res_eau = :res_eau, 
 				niveau_batiment = :niveau_batiment, 
 				date_amelioration = :date_amelioration, 
 				tmp_amelioration = :tmp_amelioration, 
