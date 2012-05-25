@@ -197,24 +197,23 @@ class PersonnagesManager{
 		$q->bindValue(':date_last_attaque', (!is_null($batiment->GetDateLastAction())?date('Y-m-d H:i:s',$batiment->GetDateLastAction()):NULL), PDO::PARAM_INT);
 		$q->bindValue(':date_action_batiment', (!is_null($batiment->GetDateAction())?date('Y-m-d H:i:s',$batiment->GetDateAction()):NULL), PDO::PARAM_INT);
 		$q->bindValue(':detruit', ($batiment->GetDetruit()?'1':NULL), PDO::PARAM_STR);
+		
+		$q->bindValue(':res_pierre', null, PDO::PARAM_INT);
+		$q->bindValue(':res_bois', null, PDO::PARAM_INT);
+		$q->bindValue(':res_nourriture', null, PDO::PARAM_INT);
+		$q->bindValue(':res_eau', null, PDO::PARAM_INT);
 		switch(get_class($batiment))
 		{
 			case 'maison':
-				$q->bindValue(':res_pierre', $batiment->GetRessource(maison::TYPE_RES_PIERRE), PDO::PARAM_INT);
-				$q->bindValue(':res_bois', $batiment->GetRessource(maison::TYPE_RES_BOIS), PDO::PARAM_INT);
+				$q->bindValue(':res_eau', $batiment->GetRessource(maison::TYPE_RES_EAU_POTABLE), PDO::PARAM_INT);
 				$q->bindValue(':res_nourriture', $batiment->GetRessource(maison::TYPE_RES_NOURRITURE), PDO::PARAM_INT);
 				break;
 			case 'ressource':
 				$q->bindValue(':res_pierre', ((in_array($batiment->GetNomType(), array(ressource::NOM_RESSOURCE_PIERRE, ressource::NOM_RESSOURCE_OR)) AND !is_null($batiment->GetEtatRessource()))?$batiment->GetEtatRessource():NULL), PDO::PARAM_INT);
 				$q->bindValue(':res_bois', (($batiment->GetNomType() == ressource::NOM_RESSOURCE_BOIS AND !is_null($batiment->GetEtatRessource()))?$batiment->GetEtatRessource():NULL), PDO::PARAM_INT);
-				$q->bindValue(':res_nourriture', null, PDO::PARAM_INT);
-				break;
-			default:
-				$q->bindValue(':res_pierre', null, PDO::PARAM_INT);
-				$q->bindValue(':res_bois', null, PDO::PARAM_INT);
-				$q->bindValue(':res_nourriture', null, PDO::PARAM_INT);
 				break;
 		}
+		
 		$q->bindValue(':niveau_batiment', $batiment->GetNiveau(), PDO::PARAM_INT);
 		$q->bindValue(':date_amelioration', (!is_null($batiment->GetDateAmelioration())?date('Y-m-d H:i:s',$batiment->GetDateAmelioration()):NULL), PDO::PARAM_INT);
 		$q->bindValue(':tmp_amelioration', (is_null($batiment->GetTmpAmelioration())?NULL:$batiment->GetTmpAmelioration()), PDO::PARAM_INT);
