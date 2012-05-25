@@ -19,24 +19,24 @@
 <h2>Ressources de base</h2>
 	<table class="Main_Ressources">
 		<tr>
-			<td style="background-color:<?php echo $arCouleurs['Or'];?>;">
+			<td style="background-color:<?php echo $arCouleurs[personnage::TYPE_RES_MONNAIE];?>; width:20%;">
 				<?php echo AfficheIcone(personnage::TYPE_RES_MONNAIE);?> : <?php echo $oJoueur->GetArgent();?>
 			</td>
 			<?php if(!is_null($oJoueur->GetObjSaMaison())){?>
-			<td style="background-color:<?php echo $arCouleurs['Nourriture'];?>;">
+			<td style="width:20%; background-color:<?php echo $arCouleurs[maison::TYPE_RES_NOURRITURE];?>;">
 				<?php echo AfficheRessource(maison::TYPE_RES_NOURRITURE, $oJoueur)?>
 			</td>
-			<td style="background-color:<?php echo $arCouleurs['Pierre'];?>;">
-				<?php echo AfficheRessource(maison::TYPE_RES_PIERRE, $oJoueur)?>
-			</td>
-			<td style="background-color:<?php echo $arCouleurs['Bois'];?>;">
-				<?php echo AfficheRessource(maison::TYPE_RES_BOIS, $oJoueur)?>
+			<td style="width:20%; background-color:<?php echo $arCouleurs[maison::TYPE_RES_EAU_POTABLE];?>;">
+				<?php echo AfficheRessource(maison::TYPE_RES_EAU_POTABLE, $oJoueur)?>
 			</td>
 			<?php }else{?>
-			<td colspan="3" style="background-color: white;">
+			<td colspan="2" style="background-color:white; width:40%;">
 				Pas de maison installée.
 			</td>
 			<?php }?>
+			<td style="width:40%;">
+				Capacité du Bolga : <?php echo count($oJoueur->GetLstInventaire())?> / <?php echo $oJoueur->QuelCapaciteMonBolga()?>
+			</td>
 		</tr>
 	</table>
 </div>
