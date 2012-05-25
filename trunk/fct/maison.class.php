@@ -1,18 +1,16 @@
 <?php
 class maison extends batiment{
-	private $ResPierre;
-	private $ResBois;
 	private $ResNourriture;
+	private $ResEau;
 	
-	const COUT_AMELIORATION_NIVEAU_1	= 'ResBois=5,ResOr=10,ResMinF=150';
-	const COUT_AMELIORATION_NIVEAU_2	= 'ResOr=1000,ResBois=1500,ResPierre=2';
-	const COUT_AMELIORATION_NIVEAU_3	= 'ResOr=150000';
+	const COUT_AMELIORATION_NIVEAU_1	= 'Sesterce=10,ResMinF=150';
+	const COUT_AMELIORATION_NIVEAU_2	= 'Sesterce=1000';
+	const COUT_AMELIORATION_NIVEAU_3	= 'Sesterce=150000';
 	
 	const ID_BATIMENT					= 1;
 	
 	const TYPE_RES_NOURRITURE			= 'Nourriture';
-	const TYPE_RES_BOIS					= 'Bois';
-	const TYPE_RES_PIERRE				= 'Pierre';
+	const TYPE_RES_EAU_POTABLE			= 'Eau';
 	
 	const NOM_ROMAIN					= 'Villa';
 	const NOM_GAULOIS					= 'Oppidum';
@@ -27,10 +25,10 @@ class maison extends batiment{
 		parent::Hydrate($carte, $batiment);
 		
 		foreach ($carte as $key => $value){
-			switch ($key){
-				case 'res_bois': 			$this->ResBois = (is_null($value)?NULL:intval($value)); break;
-				case 'res_pierre':			$this->ResPierre = (is_null($value)?NULL:intval($value)); break;
-				case 'res_nourriture':		$this->ResNourriture = (is_null($value)?NULL:intval($value)); break;
+			switch ($key)
+			{
+				case 'res_nourriture':		$this->ResNourriture = (is_null($value)?0:intval($value)); break;
+				case 'res_eau':				$this->ResEau = (is_null($value)?0:intval($value)); break;
 				case 'contenu_batiment':	$this->Contenu = (is_null($value)?NULL:$value); break;
 			}
 		}
@@ -43,11 +41,8 @@ class maison extends batiment{
 			case self::TYPE_RES_NOURRITURE:
 				$this->ResNourriture += abs($Quantite);
 				break;
-			case self::TYPE_RES_BOIS:
-				$this->ResBois += abs($Quantite);
-				break;
-			case self::TYPE_RES_PIERRE:
-				$this->ResPierre += abs($Quantite);
+			case self::TYPE_RES_EAU_POTABLE:
+				$this->ResEau += abs($Quantite);
 				break;
 		}
 	}
@@ -57,11 +52,8 @@ class maison extends batiment{
 			case self::TYPE_RES_NOURRITURE:
 				$this->ResNourriture -= abs($Quantite);
 				break;
-			case self::TYPE_RES_BOIS:
-				$this->ResBois -= abs($Quantite);
-				break;
-			case self::TYPE_RES_PIERRE:
-				$this->ResPierre -= abs($Quantite);
+			case self::TYPE_RES_EAU_POTABLE:
+				$this->ResEau -= abs($Quantite);
 				break;
 		}
 	}
@@ -211,10 +203,8 @@ class maison extends batiment{
 		{
 			case self::TYPE_RES_NOURRITURE:
 				return $this->ResNourriture;
-			case self::TYPE_RES_PIERRE:
-				return $this->ResPierre;
-			case self::TYPE_RES_BOIS:
-				return $this->ResBois;
+			case self::TYPE_RES_EAU_POTABLE:
+				return $this->ResEau;
 		}
 		return NULL;
 	}
