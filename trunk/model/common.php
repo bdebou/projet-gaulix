@@ -467,7 +467,7 @@ function QuelTypeRessource(&$Code) {
 	{
 		case 'nourriture':	return maison::TYPE_RES_NOURRITURE;
 		case 'h2o':			return maison::TYPE_RES_EAU_POTABLE;
-		case 'sesterce':	return personnage::TYPE_RES_MONNAIE;
+		case 'monnaie':		return personnage::TYPE_RES_MONNAIE;
 	}
 	return $Code;
 }
@@ -570,13 +570,17 @@ function GetInfoCarriere($code, $info = null){
 	}
 }
 function CheckCout(array $lstPrix, personnage &$oJoueur, maison &$maison){
-	foreach($lstPrix as $Prix)
+	if(!is_null($lstPrix))
 	{
-		if(!CheckIfAssezRessource(explode('=',$Prix), $oJoueur, $maison))
+		foreach($lstPrix as $Prix)
 		{
-			return false;
+			if(!CheckIfAssezRessource(explode('=',$Prix), $oJoueur, $maison))
+			{
+				return false;
+			}
 		}
 	}
+	
 	
 	return true;
 }
