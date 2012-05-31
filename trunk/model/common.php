@@ -50,6 +50,7 @@ function FoundObjet($CodeObject, $nbObjet = 1){
 	
 	return NULL;
 }
+
 function AfficheIcone($type, $HeightIcone = 20) {
 	$Name = $type;
 	$FileName = $type;
@@ -279,9 +280,8 @@ function DecoupeTemp($intTime) {
 }
 function UtilisationRessource(array $arRessource, personnage &$Joueur, maison &$Maison){
 	switch(QuelTypeRessource($arRessource[0])){
-		case maison::TYPE_RES_BOIS:
+		case maison::TYPE_RES_EAU_POTABLE:
 		case maison::TYPE_RES_NOURRITURE:
-		case maison::TYPE_RES_PIERRE:
 			$Maison->MindRessource(QuelTypeRessource($arRessource[0]), $arRessource[1]);
 			break;
 		case personnage::TYPE_RES_MONNAIE:
@@ -293,14 +293,17 @@ function UtilisationRessource(array $arRessource, personnage &$Joueur, maison &$
 	}
 }
 function CheckIfAssezRessource(array $arRessource, personnage &$Joueur, maison &$Maison){
-	switch(QuelTypeRessource($arRessource[0])){
+	switch(QuelTypeObjet($arRessource[0])){
 		case maison::TYPE_RES_NOURRITURE:
-		case maison::TYPE_RES_BOIS:
-		case maison::TYPE_RES_PIERRE:
+		case maison::TYPE_RES_EAU_POTABLE:
 			if($Maison->GetRessource(QuelTypeRessource($arRessource[0])) >= $arRessource[1]){return true;}
+			return $Joueur->AssezElementDansBolga($arRessource[0], $arRessource[1]);
 			break;
 		case personnage::TYPE_RES_MONNAIE:
 			if($Joueur->GetArgent() >= $arRessource[1]){return true;}
+			break;
+		case personnage::TYPE_COMPETENCE;
+			
 			break;
 		default:
 			return $Joueur->AssezElementDansBolga($arRessource[0], $arRessource[1]);
@@ -439,7 +442,7 @@ function AfficheInfoObjet($CodeObjet, $intHeightImg = 50) {
 }
 function QuelTypeObjet($Code){
 	$Ressource = QuelTypeRessource($Code);
-	if($Code != $Ressource)
+	if($Ressource != $Code)
 	{
 		return $Ressource;
 	}
@@ -450,17 +453,23 @@ function QuelTypeObjet($Code){
 		case 'PotVi': return objDivers::TYPE_RES_VIE;
 		case 'ResDe':
 		case 'PotDe': return objDivers::TYPE_RES_DEP;
-		default: return 'divers';
 	}
+	
+	switch (substr($Code, 0, 3))
+	{
+		case 'cmp' : return personnage::TYPE_COMPETENCE;
+	}
+	
+	return 'Divers';
 }
-function QuelTypeRessource($Code) {
-	switch (substr($Code, 0, 5)) {
-		case 'ResNo': return maison::TYPE_RES_NOURRITURE;
-		case 'ResBo': return maison::TYPE_RES_BOIS;
-		case 'ResPi': return maison::TYPE_RES_PIERRE;
-		case 'ResSe': return personnage::TYPE_RES_MONNAIE;
-		default: return $Code;
+function QuelTypeRessource(&$Code) {
+	switch (strtolower($Code))
+	{
+		case 'nourriture':	return maison::TYPE_RES_NOURRITURE;
+		case 'h2o':			return maison::TYPE_RES_EAU_POTABLE;
+		case 'sesterce':	return personnage::TYPE_RES_MONNAIE;
 	}
+	return $Code;
 }
 function FreeCaseCarte($carte = NULL) {
 	$sql = "SELECT coordonnee FROM table_carte WHERE detruit IS NULL AND id_type_batiment NOT IN (11);";
@@ -560,44 +569,21 @@ function GetInfoCarriere($code, $info = null){
 		return null;
 	}
 }
+function CheckCout(array $lstPrix, personnage &$oJoueur, maison &$maison){
+	foreach($lstPrix as $Prix)
+	{
+		if(!CheckIfAssezRessource(explode('=',$Prix), $oJoueur, $maison))
+		{
+			return false;
+		}
+	}
+	
+	return true;
+}
 
 //+---------------------------------+
 //|				ACTIONS				|
 //+---------------------------------+
-function ActionMettreDansBolga(&$check, $type, personnage &$oJoueur, &$objManager){
-	if(isset($_SESSION['LoginStatus'])){
-		//On vérifie si le bolga est plein ou pas
-		if(count($oJoueur->GetLstInventaire()) >= $oJoueur->QuelCapaciteMonBolga()){
-			$check = false;
-			echo 'Erreur GLX0003: Fonction ActionMettreDansBolga - Bolga plein';
-			return;
-		}
-		//on vérifie si on a bien la quantitée
-		if(!isset($_SESSION['LoginStatus'][$type])){
-			$check = false;
-			echo 'Erreur GLX0003: Fonction ActionMettreDansBolga - Pas assez de ressource';
-			return;
-		}
-		//Si tout OK, alors on transfert
-		$maison = $oJoueur->GetObjSaMaison();
-		switch(QuelTypeRessource($type))
-		{
-			case maison::TYPE_RES_NOURRITURE:
-			case maison::TYPE_RES_BOIS:
-			case maison::TYPE_RES_PIERRE:
-				$maison->MindRessource(QuelTypeRessource($type), $_SESSION['LoginStatus'][$type]);
-				break;
-		}
-		$oJoueur->AddInventaire('Res'.ucfirst(substr($type, 0, 3)).$_SESSION['LoginStatus'][$type], strtolower($type), 1, false);
-
-		$objManager->UpdateBatiment($maison);
-
-		unset($_SESSION['LoginStatus']);
-	}else{
-		$check = false;
-		echo 'Erreur GLX0002: Fonction ActionMettreDansBolga';
-	}
-}
 function ActionRessource(&$check, personnage &$oJoueur, &$objManager, $id = NULL){
 	
 	$objRessource = FoundBatiment(NULL, NULL, $oJoueur->GetCoordonnee());
