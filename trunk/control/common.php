@@ -19,7 +19,6 @@ $CheckRetour = false;
 
 if(isset($_GET['action'])){
 	switch($_GET['action']){
-		case 'MettreBolga':			ActionMettreDansBolga($chkErr, $_GET['type'], $oJoueur, $objManager); break;
 		case 'deplacement':			ActionDeplacement($chkErr, $oJoueur); break;
 	}
 	unset($_GET['action']);

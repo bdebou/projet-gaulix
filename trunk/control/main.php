@@ -12,7 +12,7 @@ $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
 FinishAllCompetenceEnCours($oJoueur);
 
-$ChkDebugVar = true;
+$ChkDebugVar = false;
 
 if($chkDebug AND $ChkDebugVar){
 	echo '$_SESSION[\'main\']<br />';var_dump($_SESSION['main']);echo '<br />';
