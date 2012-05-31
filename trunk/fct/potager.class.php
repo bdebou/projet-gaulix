@@ -1,76 +1,73 @@
 <?php
-class mine extends batiment{
+class potager extends batiment{
 	private $Contenu;
-	private $DateAction;
+	Private $DateAction;
+	
+	const TYPE_COMPETENCE				= 'Agriculture';
 	
 	const COUT_AMELIORATION_NIVEAU_1	= 'ResBois=5,Sesterce=10,ResMinF=150';
 	const COUT_AMELIORATION_NIVEAU_2	= 'Sesterce=1000,ResBois=1500,ResPierre=2';
 	const COUT_AMELIORATION_NIVEAU_3	= 'Sesterce=150000';
 	
-	const ID_BATIMENT				= 10;
+	const ID_BATIMENT					= 6;
+	const STOCK_MAX_DEPART				= 500;
 	
-	const TYPE_COMPETENCE			= 'Mineur';
-	const STOCK_MAX_DEPART			= 500;
+	const GAIN_TEMP_PAR_ESCLAVE			= 7;
+	const DUREE_ESCLAVE					= 604800;
 	
-	const GAIN_TEMP_PAR_ESCLAVE		= 7;
-	const DUREE_ESCLAVE				= 604800;
+	const NB_ESCLAVES_NIV_1				= 2;
+	const NB_ESCLAVES_NIV_2				= 4;
+	const NB_ESCLAVES_NIV_3				= 8;
+	const NB_ESCLAVES_NIV_4				= 12;
 	
-	const NB_ESCLAVES_NIV_1			= 2;
-	const NB_ESCLAVES_NIV_2			= 4;
-	const NB_ESCLAVES_NIV_3			= 8;
-	const NB_ESCLAVES_NIV_4			= 12;
+	const A1_CODE						= 'a1';
+	const A1_NOM						= 'des Légumes';
+	const A1_NIVEAU_COMPETENCE			= 1;
+	const A1_CODE_OBJET					= 'LEG';
+	const A1_TEMP						= 3600;
 	
-	//Les valeurs communes de production avec la carrière sont :
-	const A1_CODE				= 'a1';
-	const A1_NOM				= 'du sable';
-	const A1_NIVEAU_COMPETENCE	= 1;
-	const A1_CODE_OBJET			= 'SA';
-	const A1_TEMP				= 3600;
+	const A2_CODE						= 'a2';
+	const A2_NOM						= 'du Miel';
+	const A2_NIVEAU_COMPETENCE			= 2;
+	const A2_CODE_OBJET					= 'MI';
+	const A2_TEMP						= 3600;
 	
-	const A2_CODE				= 'a2';
-	const A2_NOM				= 'de la chaux';
-	const A2_NIVEAU_COMPETENCE	= 2;
-	const A2_CODE_OBJET			= 'CH';
-	const A2_TEMP				= 3600;
+	const A3_CODE						= 'a3';
+	const A3_NOM						= 'du Raisin';
+	const A3_NIVEAU_COMPETENCE			= 3;
+	const A3_CODE_OBJET					= 'RAI';
+	const A3_TEMP						= 3600;
 	
-	const A3_CODE				= 'a3';
-	const A3_NOM				= 'du gravier';
-	const A3_NIVEAU_COMPETENCE	= 3;
-	const A3_CODE_OBJET			= 'GRA';
-	const A3_TEMP				= 3600;
+	const A4_CODE						= 'a4';
+	const A4_NOM						= 'des Epices';
+	const A4_NIVEAU_COMPETENCE			= 4;
+	const A4_CODE_OBJET					= 'EP';
+	const A4_TEMP						= 3600;
 	
-	const A4_CODE				= 'a4';
-	const A4_NOM				= 'du ciment';
-	const A4_NIVEAU_COMPETENCE	= 4;
-	const A4_CODE_OBJET			= 'CIM';
-	const A4_TEMP				= 3600;
-		
-	//Les valeurs de production spécifique à la mine
-	const B1_CODE				= 'b1';
-	const B1_NOM				= 'de l\'étain';
-	const B1_NIVEAU_COMPETENCE	= 1;
-	const B1_CODE_OBJET			= 'E';
-	const B1_TEMP				= 3600;
+	const B1_CODE						= 'b1';
+	const B1_NOM						= 'du Gui';
+	const B1_NIVEAU_COMPETENCE			= 1;
+	const B1_CODE_OBJET					= 'G';
+	const B1_TEMP						= 3600;
 	
-	const B2_CODE				= 'b2';
-	const B2_NOM				= 'du minerai de cuivre';
-	const B2_NIVEAU_COMPETENCE	= 2;
-	const B2_CODE_OBJET			= 'CUI';
-	const B2_TEMP				= 3600;
+	const B2_CODE						= 'b2';
+	const B2_NOM						= 'de l\'Absynthe';
+	const B2_NIVEAU_COMPETENCE			= 2;
+	const B2_CODE_OBJET					= 'ABS';
+	const B2_TEMP						= 3600;
 	
-	const B3_CODE				= 'b3';
-	const B3_NOM				= 'du minerai d\'argent';
-	const B3_NIVEAU_COMPETENCE	= 3;
-	const B3_CODE_OBJET			= 'AG';
-	const B3_TEMP				= 3600;
+	const B3_CODE						= 'b3';
+	const B3_NOM						= 'de la Verveine';
+	const B3_NIVEAU_COMPETENCE			= 3;
+	const B3_CODE_OBJET					= 'VER';
+	const B3_TEMP						= 3600;
 	
-	const B4_CODE				= 'b4';
-	const B4_NOM				= 'du minerai d\'or';
-	const B4_NIVEAU_COMPETENCE	= 4;
-	const B4_CODE_OBJET			= 'OR';
-	const B4_TEMP				= 3600;
+	const B4_CODE						= 'b4';
+	const B4_NOM						= 'de la Petite Centaurée';
+	const B4_NIVEAU_COMPETENCE			= 4;
+	const B4_CODE_OBJET					= 'PC';
+	const B4_TEMP						= 3600;
 	
-		
 	//--- fonction qui est lancer lors de la création de l'objet. ---
 	public function __construct(array $carte, array $batiment){
 		date_default_timezone_set('Europe/Brussels');
@@ -79,23 +76,22 @@ class mine extends batiment{
 		
 		foreach ($carte as $key => $value){
 			switch ($key){
+				case 'date_action_batiment':	$this->DateAction = (is_null($value)?NULL:strtotime($value)); break;
 				case 'contenu_batiment':		$this->Contenu = (is_null($value)?array('a1', 0):explode(',', $value));	break;
-				case 'date_action_batiment':	$this->DateAction = (is_null($value)?NULL:strtotime($value));	break;
 			}
 		}
 		
 			//on stock ce qui a été produit
 		if(	$this->GetStockContenu() < $this->GetStockMax()
-			AND (strtotime('now') - $this->GetDateAction()) > $this->GetTempExtraction($this->GetTypeContenu())){
-				
+			AND (strtotime('now') - parent::GetDateAction()) > $this->GetTempCulture($this->GetTypeContenu())){
+			
 			global $objManager;
 			$Producteur = $objManager->GetPersoLogin(parent::GetLogin());
-				
+			
 			$this->AddStock($Producteur->GetNiveauCompetence(self::TYPE_COMPETENCE));
-				
+			
 			unset($Producteur);
 		}
-		
 		for($i = 2; $i <= $this->GetNbMaxEsclave(); $i++)
 		{
 			if(isset($this->Contenu[$i]))
@@ -113,17 +109,25 @@ class mine extends batiment{
 	
 	//Quelle quantité maximum on peut prendre maximum par action sur une ressource
 	Private function QuelleQuantite($CodeProduction){
-	
+		
 		switch($CodeProduction)
 		{
 			case self::A1_CODE:
-			case self::B1_CODE:
 				switch($this->GetNiveau())
 				{
-					case 1:	return 2;
+					case 1: return 2;
 					case 2: return 4;
 					case 3: return 6;
 					case 4: return 8;
+				}
+				break;
+			case self::B1_CODE:
+				switch($this->GetNiveau())
+				{
+					case 1: return 1;
+					case 2: return 2;
+					case 3: return 3;
+					case 4: return 4;
 				}
 				break;
 			case self::A2_CODE:
@@ -145,8 +149,8 @@ class mine extends batiment{
 			case self::A3_CODE:
 				switch($this->GetNiveau())
 				{
-					case 3: return 4;
-					case 4: return 8;
+					case 3: return 2;
+					case 4: return 4;
 				}
 				break;
 			case self::B3_CODE:
@@ -159,17 +163,14 @@ class mine extends batiment{
 			case self::A4_CODE:
 				switch($this->GetNiveau())
 				{
-					case 4: return 3;
+					case 4: return 2;
 				}
-				break;
 			case self::B4_CODE:
 				switch($this->GetNiveau())
 				{
 					case 4: return 1;
 				}
-				break;
 		}
-		
 		return 0;
 	}
 	
@@ -179,53 +180,52 @@ class mine extends batiment{
 		{
 			$joueur->AddInventaire($this->GetCodeRessource($this->GetTypeContenu()), NULL, $this->GetStockContenu(), false);
 		}
-
-		//$this->Contenu = $Contenu[0].','.($Contenu[1] - $stock);
+		
 		$this->Contenu[1] -= $this->GetStockContenu();
 		if($this->GetStockMax() == $this->GetStockContenu()){$this->DateAction = strtotime('now');}
 	}
 	public function AddStock($NiveauCompetence){
-		//$Contenu = explode(',', $this->Contenu);
+		//$arContenu = explode(',', $this->Contenu);
 		
-		$nb = intval((strtotime('now') - parent::GetDateAction()) / $this->GetTempExtraction($this->GetTypeContenu()));
+		$nb = intval((strtotime('now') - parent::GetDateAction()) / $this->GetTempCulture($this->GetTypeContenu()));
 		
 		for($i=1;$i<=$nb;$i++){
-			if($this->GetStockMax() > $this->Contenu['1']){
+			if($this->GetStockMax() > $this->Contenu[1]){
 				$this->Contenu[1] += $this->QuelleQuantite($this->GetTypeContenu());
 			}else{break;}
 		}
 		
-		//$this->Contenu = $this->Contenu[0].','.($this->Contenu[1] > $this->GetStockMax()?$this->GetStockMax():$this->Contenu[1]);
 		$this->Contenu[1] = ($this->GetStockContenu() > $this->GetStockMax()?$this->GetStockMax():$this->GetStockContenu());
 		$this->DateAction = strtotime('now');
 	}
 	//--- On change de type de production ---
 	public function ChangerProductionBatiment($production){
-		//$Contenu = explode(',', $this->Contenu);
+		//$arContenu = explode(',', $this->Contenu);
 		
-		//$this->Contenu = $production.','.$this->Contenu[1];
 		$this->Contenu[0] = $production;
 		$this->DateAction = strtotime('now');
 	}
-	
 	
 	//Les Affichages
 	//==============
 	Public function AfficheAchatEsclave(personnage &$oJoueur){
 		$txt = NULL;
-		
+	
 		if($this->GetNbEsclave() < $this->GetNbMaxEsclave())
 		{
-			
+				
 		}
-		
+	
 		return $txt;
 	}
-	public function AfficheContenu(personnage &$oJoueur){
-
+	public function AfficheContenu(personnage &$oJoueur){//OK
+		//$stock = explode(',', $this->Contenu);
+		
 		if($this->GetStockContenu() < $this->GetStockMax()){
-			$status = '<div style="display:inline;" id="TimeToWait'.ucfirst(strtolower(get_class($this))).'"></div>'
-						.AfficheCompteurTemp(ucfirst(strtolower(get_class($this))), 'index.php?page=village', ($this->GetTempExtraction($this->GetTypeContenu()) - (strtotime('now') - $this->GetDateAction())));
+			$_SESSION['main'][get_class($this)]['stock'] = 1;
+			$status = '
+							<div style="display:inline;" id="TimeToWait'.ucfirst(strtolower(get_class($this))).'"></div>'
+							.AfficheCompteurTemp(ucfirst(strtolower(get_class($this))), 'index.php?page=village', ($this->GetTempCulture($this->GetTypeContenu()) - (strtotime('now') - parent::GetDateAction())));
 		}else{
 			$status = '<p>Votre stock est plein.</p>';
 		}
@@ -233,8 +233,8 @@ class mine extends batiment{
 		$_SESSION['main'][get_class($this)]['production']	= $this->GetTypeContenu();
 		//$_SESSION['main'][get_class($this)]['vider']		= $this->GetStockContenu();
 		
-		$PositionBatiment	= implode(',', array_merge(array(parent::GetCarte()),parent::GetCoordonnee()));
-		$PositionJoueur		= implode(',', array_merge(array($oJoueur->GetCarte()),$oJoueur->GetPosition()));
+		$PositionBatiment	= implode(',', array_merge(array(parent::GetCarte()), parent::GetCoordonnee()));
+		$PositionJoueur		= implode(',', array_merge(array($oJoueur->GetCarte()), $oJoueur->GetPosition()));
 		
 		if($PositionBatiment == $PositionJoueur){
 			$txtAction = '
@@ -246,7 +246,7 @@ class mine extends batiment{
 					</form>
 				</td>
 				<td>'
-					.'<form method="get" action="index.php" class="production">'
+					.'<form method="post" action="index.php" class="production">'
 						.'<input type="hidden" name="page" value="village" />'
 						.'<input type="hidden" name="anchor" value="'.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'" />'
 						.'<input type="hidden" name="action" value="production'.strtolower(get_class($this)).'" />'
@@ -268,8 +268,10 @@ class mine extends batiment{
 				<td colspan="2">Vous ne pouvez rien exécuter car vous n\'êtes pas à votre '.strtolower(get_class($this)).'.</td>';
 		}
 		
+		
+		
 		$txt ='
-		<table border style="width:100%;">
+		<table border style="margin:3px;">
 			<tr>
 				<td style="width:60%;">Production de '.$this->QuelleQuantite($this->GetTypeContenu()).'x '.AfficheIcone($this->GetCodeRessource($this->GetTypeContenu())).'</td>
 				<td>'.$status.'</td>
@@ -282,33 +284,16 @@ class mine extends batiment{
 				'.$txtAction.'
 			</tr>
 		</table>';
-		
 		return $txt;
 	}
 	
 	//Les GETS
 	//========
-	
-	public function GetAttaque(){
-		if(parent::GetNiveau() >= 4)
-		{
-			return 5;
-		}else{
-			return 0;
-		}
-	}
-	public function GetStockMax(){				return self::STOCK_MAX_DEPART + (parent::GetNiveau() * 100);}
+	public function GetStockMax(){				return 500 + (parent::GetNiveau() * 100);}
 	public function GetContenu(){				return $this->Contenu;}
-	public function GetTypeContenu(){
-		//$contenu = explode(',', $this->Contenu);
-		return $this->Contenu[0];
-	}
-	public function GetStockContenu(){
-		//$contenu = explode(',', $this->Contenu);
-		return $this->Contenu[1];
-	}
-	public function GetCodeRessource($CodeType){
-		switch($CodeType){
+	public function GetDateAction(){			return $this->DateAction;}
+	Public function GetCodeRessource($type){
+		switch($type){
 			case self::A1_CODE:	return self::A1_CODE_OBJET;		break;
 			case self::B1_CODE:	return self::B1_CODE_OBJET;		break;
 			case self::A2_CODE:	return self::A2_CODE_OBJET;		break;
@@ -319,8 +304,15 @@ class mine extends batiment{
 			case self::B4_CODE:	return self::B4_CODE_OBJET;		break;
 		}
 	}
-	public function GetDateAction(){			return $this->DateAction;}
-	public function GetTempExtraction($code){
+	public function GetTypeContenu(){
+		//$contenu = explode(',', $this->Contenu);
+		return $this->Contenu[0];
+	}
+	public function GetStockContenu(){
+		//$contenu = explode(',', $this->Contenu);
+		return $this->Contenu[1];
+	}
+	public function GetTempCulture($code){
 		$Duree = 0;
 		
 		switch($code){
@@ -343,7 +335,7 @@ class mine extends batiment{
 		{
 			$Niveau = $this->GetNiveau();
 		}
-		
+	
 		switch($Niveau)
 		{
 			case 1:	return self::NB_ESCLAVES_NIV_1;
@@ -355,22 +347,23 @@ class mine extends batiment{
 	}
 	public function GetNbEsclave(){
 		$nbEsclave = 0;
-		
+	
 		for($i = 2; $i <= $this->GetNbMaxEsclave(); $i++)
 		{
-			if(isset($this->Contenu[$i]))
-			{
-				$arEsclave = explode('=', $this->Contenu[$i]);
-				if($arEsclave[0] == parent::CODE_ESCLAVE)
-				{
-					$nbEsclave++;
-				}
-			}else{
-				break;
-			}
+		if(isset($this->Contenu[$i]))
+		{
+		$arEsclave = explode('=', $this->Contenu[$i]);
+		if($arEsclave[0] == parent::CODE_ESCLAVE)
+		{
+		$nbEsclave++;
 		}
-		
+		}else{
+		break;
+		}
+		}
+	
 		return $nbEsclave;
-	}
+		}
 }
+
 ?>
