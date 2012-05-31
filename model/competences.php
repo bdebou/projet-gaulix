@@ -157,17 +157,7 @@ function AfficheInfoCompetence($competence, personnage &$oJoueur){
 	
 	if(	!is_null($maison))
 	{
-		$chkPrix = true;
-		foreach(explode(',', $competence['cmp_lst_prix']) as $Prix)
-		{
-			if(!CheckIfAssezRessource(explode('=',$Prix), $oJoueur, $maison))
-			{
-				$chkPrix = false;
-				break;
-			}
-		}
-		
-		if($chkPrix
+		if(CheckCout(explode(',', $competence['cmp_lst_prix']), $oJoueur, $maison)
 			AND (
 				$oJoueur->GetNiveauCompetence(ucfirst($competence['cmp_lst_nom'])) == ($competence['cmp_lst_niveau'] - 1)
 				OR (

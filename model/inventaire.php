@@ -196,10 +196,89 @@ function CreateListObjet($Bolga){
 	
 	return $lst;
 }
+function AfficheRessource($type, personnage &$oJoueur){
+	$maison = $oJoueur->GetObjSaMaison();
+
+	$txtBt = NULL;
+	
+	if(!is_null($maison)){
+		$nb = $maison->GetRessource($type);
+
+		switch ($type){
+			case maison::TYPE_RES_NOURRITURE:
+				$qte = 50;
+				break;
+			case maison::TYPE_RES_EAU_POTABLE:
+				$qte = 25;
+				break;
+		}
+		if ($nb > 500) {
+			$_SESSION['inventaire'][$type] = $qte;
+				
+			$InfoBulle = '<table class="equipement"><tr><td>Mettre ' . $qte . 'pts ' . AfficheIcone($type, 15) . ' dans votre Bolga</td></tr></table>';
+			$txtBt = '	<form method="post" action="index.php?page=inventaire">
+							<input type="hidden" name="action" value="MettreBolga" />
+							<input type="hidden" name="type" name="'.$type.' />'
+							.(isset($_GET['page'])?'<input type="hidden" name="retour" value="'.$_GET['page'].'" />':NULL)
+							.'<input type="submit" 
+								name="submit" 
+								value="-'.$qte.'x" 
+								onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulle).'\');"
+								onmouseout="cache();" 
+								 />
+						</form>';
+			/* <button '
+			. 'type="button" '
+			. (count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga() ? '' : 'disabled="disabled" ')
+			. 'class="LoginStatus" '
+			. 'onmouseover="montre(\'' . CorrectDataInfoBulle($InfoBulle) . '\');" '
+			. 'onmouseout="cache();" '
+			. 'onclick="window.location=\'index.php?page=common&amp;action=MettreBolga&amp;type='.$type.(isset($_GET['page'])?'&amp;retour='.$_GET['page']:'').'\'" '
+			. 'alt="Mettre ' . $qte . 'pts de ' . $type . ' dans votre Bolga">'
+			. '-' . $qte . 'x'
+			. '</button>'; */
+		}
+	}
+
+	return AfficheIcone($type) . ' : ' . $nb . $txtBt;
+}
 
 //+---------------------------------+
 //|				ACTIONS				|
 //+---------------------------------+
+function ActionMettreDansBolga(&$check, $type, personnage &$oJoueur, &$objManager){
+	if(isset($_SESSION['inventaire'])){
+		//On vérifie si le bolga est plein ou pas
+		if(count($oJoueur->GetLstInventaire()) >= $oJoueur->QuelCapaciteMonBolga()){
+			$check = false;
+			echo 'Erreur GLX0003: Fonction ActionMettreDansBolga - Bolga plein';
+			return;
+		}
+		//on vérifie si on a bien la quantitée
+		if(!isset($_SESSION['inventaire'][$type])){
+			$check = false;
+			echo 'Erreur GLX0003: Fonction ActionMettreDansBolga - Pas assez de ressource';
+			return;
+		}
+		//Si tout OK, alors on transfert
+		$maison = $oJoueur->GetObjSaMaison();
+		switch($type)
+		{
+			case maison::TYPE_RES_NOURRITURE:
+			case maison::TYPE_RES_EAU_POTABLE:
+				$maison->MindRessource($maison->GetCodeRessource($type), $_SESSION['inventaire'][$type]);
+				break;
+		}
+		$oJoueur->AddInventaire($maison->GetCodeRessource($type), NULL, 1, false);
+
+		$objManager->UpdateBatiment($maison);
+
+		unset($_SESSION['inventaire'][$type]);
+	}else{
+		$check = false;
+		echo 'Erreur GLX0002: Fonction ActionMettreDansBolga';
+	}
+}
 function ActionVendre(&$check, $id, &$oJoueur, &$objManager, $qte){
 	if(isset($_SESSION['inventaire'][$id]['code'])){
 
@@ -280,13 +359,13 @@ function ActionEquiper(&$check, $id, &$oJoueur){
 		$objObjet = FoundObjet($_SESSION['inventaire'][$id]['code']);
 		
 		$oJoueur->EquiperPerso($objObjet->GetCode(), $objObjet->GetType());
-		$arInfoObject['code'] = null;
+		unset($_SESSION['inventaire'][$id]['code']);
 	}else{
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionEquiper';
 	}
 }
-function ActionSorts(&$check, &$oJoueur){
+function ActionSorts(&$check, personnage &$oJoueur){
 	switch($_SESSION['main'][$_GET['id']]['code']){
 		case 'SrtMaison':
 			$oJoueur->UpdatePosition($oJoueur->GetMaisonInstalle());
@@ -295,10 +374,10 @@ function ActionSorts(&$check, &$oJoueur){
 		case 'SrtDefense10':
 		case 'SrtAttaque10':
 		case 'SrtDistance1':
-			$oJoueur->EquiperPerso($_SESSION['main'][$_GET['id']]['code'], 'sort');
+			$oJoueur->EquiperPerso($_SESSION['main'][$_GET['id']]['code'], objDivers::TYPE_SORT);
 			break;
 		case 'LvrDruides':
-			$oJoueur->EquiperPerso($_SESSION['main'][$_GET['id']]['code'], 'livre');
+			$oJoueur->EquiperPerso($_SESSION['main'][$_GET['id']]['code'], objDivers::TYPE_LIVRE);
 			break;
 		case 'SrtQuete':
 			$sqlQ = "SELECT quete_position FROM table_quetes WHERE  quete_login='".$oJoueur->GetLogin()."' AND quete_reussi IS NULL;";
@@ -341,15 +420,8 @@ function ActionConvertir(&$check, $id, personnage &$oJoueur, &$objManager, $Qte)
 				$arRessource = explode('=', $Ressource);
 				
 				switch(QuelTypeObjet($arRessource[0])){
-					case objDivers::TYPE_RES_VIE:
-						$oJoueur->GagnerVie($arRessource[1]);
-						break;
-					case objDivers::TYPE_RES_DEP:
-						$oJoueur->AddDeplacement($arRessource[1],'objet');
-						break;
-					case maison::TYPE_RES_BOIS:
+					case maison::TYPE_RES_EAU_POTABLE:
 					case maison::TYPE_RES_NOURRITURE:
-					case maison::TYPE_RES_PIERRE:
 						if(!is_null($maison)){
 							$maison->AddRessource(QuelTypeObjet($arRessource[0]), $arRessource[1]);
 						}
