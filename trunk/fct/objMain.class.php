@@ -1,0 +1,77 @@
+<?php
+abstract class objMain{
+	
+	private $ID;
+	private $Quantite;
+	private $Civilisation;
+	private $Rarete;
+	private $IDQuete;
+	private $Code;
+	private $Nom;
+	private $Description;
+	private $Ressource;
+	private $Prix;
+	private $Cout;
+	private $Niveau;
+	
+	public function __construct($DataObjet, $nbObjet){
+		$this->Hydrate($DataObjet, $nbObjet);
+	}
+	
+	public function Hydrate($data, $nb){
+		date_default_timezone_set('Europe/Brussels');
+		
+		$this->Quantite = (int)$nb;
+		
+		foreach ($data as $key => $value){
+			switch ($key){
+				case 'id_objet':			$this->ID				= intval($value); break;
+				case 'objet_civilisation':	$this->Civilisation		= strval($value); break;
+				case 'objet_rarete':		$this->Rarete			= intval($value); break;
+				case 'objet_quete':			$this->IDQuete			= (is_null($value)?NULL:intval($value)); break;
+				case 'objet_code':			$this->Code				= strval($value); break;
+				case 'objet_nom':			$this->Nom				= strval($value); break;
+				case 'objet_description':	$this->Description		= (is_null($value)?NULL:strval($value)); break;
+				//case 'objet_competence':	$this->NbPoints = intval($value); break;
+				case 'objet_niveau':		$this->Niveau			= intval($value); break;
+				case 'objet_ressource':		$this->Ressource		= (is_null($value)?NULL:explode(',', $value)); break;
+				case 'objet_prix':			$this->Prix				= intval($value); break;
+				case 'objet_cout':			$this->Cout				= (is_null($value)?NULL:explode(',', $value)); break;
+			}
+		}
+		
+	}
+	
+	//Les GET
+	//=======
+	public function GetRessource(){
+		return $this->Ressource;
+	}
+	public function GetNiveau(){
+		return $this->Niveau;
+	}
+	public function GetQuantite(){
+		return $this->Quantite;
+	}
+	public function GetCode(){
+		return $this->Code;
+	}
+	public function GetPrix(){
+		return $this->Prix;
+	}
+	public function GetNom(){
+		return $this->Nom;
+	}
+	public function GetDescription(){
+		return $this->Description;
+	}
+	public function GetInfoBulle(){
+		return '<table>'
+				.'<tr><th colspan="2">'.$this->Nom.'</th></tr>'
+				.'<tr><td>Prix</td><td>'.$this->Prix.AfficheIcone(personnage::TYPE_RES_MONNAIE).'</td></tr>'
+				.'</table>';
+	}
+	public function GetType(){
+		return NULL;
+	}
+}
