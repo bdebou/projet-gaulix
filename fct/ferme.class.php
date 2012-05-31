@@ -1,26 +1,72 @@
 <?php
 class ferme extends batiment{
-	private $Contenu,
-			$DateAction;
+	private $Contenu;
+	Private $DateAction;
 	
 	const TYPE_COMPETENCE				= 'Agriculture';
+	
+	const COUT_AMELIORATION_NIVEAU_1	= 'ResBois=5,Sesterce=10,ResMinF=150';
+	const COUT_AMELIORATION_NIVEAU_2	= 'Sesterce=1000,ResBois=1500,ResPierre=2';
+	const COUT_AMELIORATION_NIVEAU_3	= 'Sesterce=150000';
+	
 	const ID_BATIMENT					= 6;
+	const STOCK_MAX_DEPART				= 500;
 	
-	const CODE_PRODUCTION_NOURRITURE	= 0;
-	const NIVEAU_COMPETENCE_NOURRITUE	= 0;
-	const ICONE_NAME_NOURRITURE			= 'nourriture';
-	const TEMP_CULTURE_NOURRITURE		= 1800;
+	const GAIN_TEMP_PAR_ESCLAVE			= 7;
+	const DUREE_ESCLAVE					= 604800;
 	
+	const NB_ESCLAVES_NIV_1				= 2;
+	const NB_ESCLAVES_NIV_2				= 4;
+	const NB_ESCLAVES_NIV_3				= 8;
+	const NB_ESCLAVES_NIV_4				= 12;
 	
-	const CODE_PRODUCTION_COTTON		= 1;
-	const NIVEAU_COMPETENCE_COTTON		= 2;
-	const ICONE_NAME_COTTON				= 'ResFibC';
-	const TEMP_CULTURE_COTTON			= 2400;
+	const A1_CODE						= 'a1';
+	const A1_NOM						= 'de l\'Orge';
+	const A1_NIVEAU_COMPETENCE			= 1;
+	const A1_CODE_OBJET					= 'O';
+	const A1_TEMP						= 3600;
 	
-	const CODE_PRODUCTION_MIEL			= 2;
-	const NIVEAU_COMPETENCE_MIEL		= 3;
-	const ICONE_NAME_MIEL				= 'ResMiel';
-	const TEMP_CULTURE_MIEL				= 3600;
+	const A2_CODE						= 'a2';
+	const A2_NOM						= 'Epéautre';
+	const A2_NIVEAU_COMPETENCE			= 2;
+	const A2_CODE_OBJET					= 'EP';
+	const A2_TEMP						= 3600;
+	
+	const A3_CODE						= 'a3';
+	const A3_NOM						= 'Froment';
+	const A3_NIVEAU_COMPETENCE			= 3;
+	const A3_CODE_OBJET					= 'FR';
+	const A3_TEMP						= 3600;
+	
+	const A4_CODE						= 'a4';
+	const A4_NOM						= 'Blé';
+	const A4_NIVEAU_COMPETENCE			= 4;
+	const A4_CODE_OBJET					= 'BL';
+	const A4_TEMP						= 3600;
+	
+	const B1_CODE						= 'b1';
+	const B1_NOM						= 'Poule';
+	const B1_NIVEAU_COMPETENCE			= 1;
+	const B1_CODE_OBJET					= 'PO';
+	const B1_TEMP						= 3600;
+	
+	const B2_CODE						= 'b2';
+	const B2_NOM						= 'Mouton';
+	const B2_NIVEAU_COMPETENCE			= 2;
+	const B2_CODE_OBJET					= 'MO';
+	const B2_TEMP						= 3600;
+	
+	const B3_CODE						= 'b3';
+	const B3_NOM						= 'Cheval';
+	const B3_NIVEAU_COMPETENCE			= 3;
+	const B3_CODE_OBJET					= 'CH';
+	const B3_TEMP						= 3600;
+	
+	const B4_CODE						= 'b4';
+	const B4_NOM						= 'Vache';
+	const B4_NIVEAU_COMPETENCE			= 4;
+	const B4_CODE_OBJET					= 'VA';
+	const B4_TEMP						= 3600;
 	
 	//--- fonction qui est lancer lors de la création de l'objet. ---
 	public function __construct(array $carte, array $batiment){
@@ -30,16 +76,8 @@ class ferme extends batiment{
 		
 		foreach ($carte as $key => $value){
 			switch ($key){
-				case 'date_action_batiment':
-					$this->DateAction = (is_null($value)?NULL:strtotime($value));
-					break;
-				case 'contenu_batiment':
-					if(is_null($value)){
-						$this->Contenu = NULL;
-					}else{
-						$this->Contenu = $value;
-					}
-					break;
+				case 'date_action_batiment':	$this->DateAction = (is_null($value)?NULL:strtotime($value)); break;
+				case 'contenu_batiment':		$this->Contenu = (is_null($value)?array('a1', 0):explode(',', $value));	break;
 			}
 		}
 		
@@ -54,94 +92,146 @@ class ferme extends batiment{
 			
 			unset($Producteur);
 		}
+		for($i = 2; $i <= $this->GetNbMaxEsclave(); $i++)
+		{
+			if(isset($this->Contenu[$i]))
+			{
+				$arEsclave = explode('=', $this->Contenu[$i]);
+				if($arEsclave[0] == parent::CODE_ESCLAVE AND (strtotime('now') - $arEsclave[1]) >= self::DUREE_ESCLAVE)
+				{
+					unset($this->Contenu[$i]);
+				}
+			}else{
+				break;
+			}
+		}
 	}
 	
 	//Quelle quantité maximum on peut prendre maximum par action sur une ressource
-	Private function QuelleQuantite($NiveauCompetence, $CodeProduction){
+	Private function QuelleQuantite($CodeProduction){
 		
-		switch($CodeProduction){
-			case self::CODE_PRODUCTION_NOURRITURE:
-				switch($NiveauCompetence){
-					case 0: return 10;
-					case 1: return 20;
-					case 2:
-					case 3: return 30;
-					default: return 0;
+		switch($CodeProduction)
+		{
+			case self::A1_CODE:
+				switch($this->GetNiveau())
+				{
+					case 1: return 2;
+					case 2: return 4;
+					case 3: return 6;
+					case 4: return 8;
 				}
 				break;
-			case self::CODE_PRODUCTION_COTTON:
-				switch($NiveauCompetence){
-					case 2: return 10;
-					case 3: return 20;
-					default: return 0;
+			case self::B1_CODE:
+				switch($this->GetNiveau())
+				{
+					case 1: return 1;
+					case 2: return 2;
+					case 3: return 3;
+					case 4: return 4;
 				}
 				break;
-			case self::CODE_PRODUCTION_MIEL:
-				switch($NiveauCompetence){
-					case 3: return 10;
-					default: return 0;
+			case self::A2_CODE:
+				switch($this->GetNiveau())
+				{
+					case 2: return 2;
+					case 3: return 4;
+					case 4: return 6;
 				}
 				break;
+			case self::B2_CODE:
+				switch($this->GetNiveau())
+				{
+					case 2: return 1;
+					case 3: return 2;
+					case 4: return 3;
+				}
+				break;
+			case self::A3_CODE:
+				switch($this->GetNiveau())
+				{
+					case 3: return 2;
+					case 4: return 4;
+				}
+				break;
+			case self::B3_CODE:
+				switch($this->GetNiveau())
+				{
+					case 3: return 1;
+					case 4: return 2;
+				}
+				break;
+			case self::A4_CODE:
+				switch($this->GetNiveau())
+				{
+					case 4: return 2;
+				}
+			case self::B4_CODE:
+				switch($this->GetNiveau())
+				{
+					case 4: return 1;
+				}
 		}
+		return 0;
 	}
 	
 	//--- Gestion du stock  ---
-	public function ViderStock($stock, maison &$maison, personnage &$joueur){
-		$arContenu = explode(',', $this->Contenu);
-		
-		switch($arContenu['0']){
-			case self::CODE_PRODUCTION_NOURRITURE:
-				$maison->AddRessource(maison::TYPE_RES_NOURRITURE, $stock);
-				break;
-			case self::CODE_PRODUCTION_MIEL:
-				$joueur->AddInventaire('ResMiel', NULL, $stock, false);
-				break;
-			case self::CODE_PRODUCTION_COTTON:
-				$joueur->AddInventaire('ResFibC', NULL, $stock, false);
-				break;
+	public function ViderStock(personnage &$joueur){
+		if($this->GetStockContenu() > 0)
+		{
+			$joueur->AddInventaire($this->GetCodeRessource($this->GetTypeContenu()), NULL, $this->GetStockContenu(), false);
 		}
 		
-		$this->Contenu = $arContenu['0'].','.($arContenu['1'] - $stock);
-		if($this->GetStockMax() == $stock){$this->DateAction = strtotime('now');}
+		$this->Contenu[1] -= $this->GetStockContenu();
+		if($this->GetStockMax() == $this->GetStockContenu()){$this->DateAction = strtotime('now');}
 	}
 	public function AddStock($NiveauCompetence){
-		$arContenu = explode(',', $this->Contenu);
+		//$arContenu = explode(',', $this->Contenu);
 		
-		$nb = intval((strtotime('now') - parent::GetDateAction()) / $this->GetTempCulture($arContenu[0]));
+		$nb = intval((strtotime('now') - parent::GetDateAction()) / $this->GetTempCulture($this->GetTypeContenu()));
 		
 		for($i=1;$i<=$nb;$i++){
-			if($this->GetStockMax() > $arContenu[1]){
-				$arContenu[1] += $this->QuelleQuantite($NiveauCompetence, $arContenu[0]);
+			if($this->GetStockMax() > $this->Contenu[1]){
+				$this->Contenu[1] += $this->QuelleQuantite($this->GetTypeContenu());
 			}else{break;}
 		}
 		
-		$this->Contenu = $arContenu[0].','.($arContenu[1] > $this->GetStockMax()?$this->GetStockMax():$arContenu[1]);
+		$this->Contenu[1] = ($this->GetStockContenu() > $this->GetStockMax()?$this->GetStockMax():$this->GetStockContenu());
 		$this->DateAction = strtotime('now');
 	}
 	//--- On change de type de production ---
 	public function ChangerProductionBatiment($production){
-		$arContenu = explode(',', $this->Contenu);
+		//$arContenu = explode(',', $this->Contenu);
 		
-		$this->Contenu = $production.','.$arContenu[1];
+		$this->Contenu[0] = $production;
 		$this->DateAction = strtotime('now');
 	}
 	
 	//Les Affichages
 	//==============
+	Public function AfficheAchatEsclave(personnage &$oJoueur){
+		$txt = NULL;
+	
+		if($this->GetNbEsclave() < $this->GetNbMaxEsclave())
+		{
+				
+		}
+	
+		return $txt;
+	}
 	public function AfficheContenu(personnage &$oJoueur){//OK
-		$stock = explode(',', $this->Contenu);
+		//$stock = explode(',', $this->Contenu);
 		
-		if($stock[1] < $this->GetStockMax()){
+		if($this->GetStockContenu() < $this->GetStockMax()){
 			$_SESSION['main'][get_class($this)]['stock'] = 1;
 			$status = '
 							<div style="display:inline;" id="TimeToWait'.ucfirst(strtolower(get_class($this))).'"></div>'
-							.AfficheCompteurTemp(ucfirst(strtolower(get_class($this))), 'index.php?page=village', ($this->GetTempCulture($stock[0]) - (strtotime('now') - parent::GetDateAction())));
+							.AfficheCompteurTemp(ucfirst(strtolower(get_class($this))), 'index.php?page=village', ($this->GetTempCulture($this->GetTypeContenu()) - (strtotime('now') - parent::GetDateAction())));
 		}else{
 			$status = '<p>Votre stock est plein.</p>';
 		}
 		
-		$_SESSION['main'][get_class($this)]['production']	= $stock[0];
-		$_SESSION['main'][get_class($this)]['vider']		= $stock[1];
+		$_SESSION['main'][get_class($this)]['production']	= $this->GetTypeContenu();
+		//$_SESSION['main'][get_class($this)]['vider']		= $this->GetStockContenu();
 		
 		$PositionBatiment	= implode(',', array_merge(array(parent::GetCarte()), parent::GetCoordonnee()));
 		$PositionJoueur		= implode(',', array_merge(array($oJoueur->GetCarte()), $oJoueur->GetPosition()));
@@ -149,17 +239,26 @@ class ferme extends batiment{
 		if($PositionBatiment == $PositionJoueur){
 			$txtAction = '
 				<td>
-					<a href="index.php?page=village&action=viderstock'.strtolower(get_class($this)).'&amp;anchor='.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'">Vider votre stock</a>
+					<form method="post" action="index.php?page=village">
+						<input type="hidden" name="action" value="viderstock'.strtolower(get_class($this)).'" />
+						<input type="hidden" name="anchor" value="'.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'" />
+						<input type="submit" name="submit" value="Vider votre stock" />
+					</form>
 				</td>
 				<td>'
-					.'<form method="get" action="index.php" class="production">'
+					.'<form method="post" action="index.php" class="production">'
 						.'<input type="hidden" name="page" value="village" />'
 						.'<input type="hidden" name="anchor" value="'.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'" />'
 						.'<input type="hidden" name="action" value="production'.strtolower(get_class($this)).'" />'
 						.'<select name="type" onclick="document.getElementById(\'BtSubmit\').disabled=false;">'
-							.'<option value="'.self::CODE_PRODUCTION_NOURRITURE.'"'.(($stock[0] == self::CODE_PRODUCTION_NOURRITURE)?' disabled="disabled"':'').'>Produire de la Nourriture</option>'
-							.'<option value="'.self::CODE_PRODUCTION_COTTON.'"'.(($stock[0] == self::CODE_PRODUCTION_COTTON OR $oJoueur->GetNiveauCompetence(self::TYPE_COMPETENCE) < self::NIVEAU_COMPETENCE_COTTON)?' disabled="disabled"':'').'>Produire du Cotton</option>'
-							.'<option value="'.self::CODE_PRODUCTION_MIEL.'"'.(($stock[0] == self::CODE_PRODUCTION_MIEL OR $oJoueur->GetNiveauCompetence(self::TYPE_COMPETENCE) < self::NIVEAU_COMPETENCE_MIEL)?' disabled="disabled"':'').'>Produire du Miel</option>'
+							.($this->GetNiveau() >= self::A1_NIVEAU_COMPETENCE?'<option value="'.self::A1_CODE.'"'.($this->GetTypeContenu() == self::A1_CODE?' disabled="disabled"':'').'>'.self::A1_NOM.'</option>':'')
+							.($this->GetNiveau() >= self::B1_NIVEAU_COMPETENCE?'<option value="'.self::B1_CODE.'"'.($this->GetTypeContenu() == self::B1_CODE?' disabled="disabled"':'').'>'.self::B1_NOM.'</option>':'')
+							.($this->GetNiveau() >= self::A2_NIVEAU_COMPETENCE?'<option value="'.self::A2_CODE.'"'.($this->GetTypeContenu() == self::A2_CODE?' disabled="disabled"':'').'>'.self::A2_NOM.'</option>':'')
+							.($this->GetNiveau() >= self::B2_NIVEAU_COMPETENCE?'<option value="'.self::B2_CODE.'"'.($this->GetTypeContenu() == self::B2_CODE?' disabled="disabled"':'').'>'.self::B2_NOM.'</option>':'')
+							.($this->GetNiveau() >= self::A3_NIVEAU_COMPETENCE?'<option value="'.self::A3_CODE.'"'.($this->GetTypeContenu() == self::A3_CODE?' disabled="disabled"':'').'>'.self::A3_NOM.'</option>':'')
+							.($this->GetNiveau() >= self::B3_NIVEAU_COMPETENCE?'<option value="'.self::B3_CODE.'"'.($this->GetTypeContenu() == self::B3_CODE?' disabled="disabled"':'').'>'.self::B3_NOM.'</option>':'')
+							.($this->GetNiveau() >= self::A4_NIVEAU_COMPETENCE?'<option value="'.self::A4_CODE.'"'.($this->GetTypeContenu() == self::A4_CODE?' disabled="disabled"':'').'>'.self::A4_NOM.'</option>':'')
+							.($this->GetNiveau() >= self::B4_NIVEAU_COMPETENCE?'<option value="'.self::B4_CODE.'"'.($this->GetTypeContenu() == self::B4_CODE?' disabled="disabled"':'').'>'.self::B4_NOM.'</option>':'')
 						.'</select>'
 						.'<input type="submit" value="Go" id="BtSubmit" disabled="disabled" />'
 					.'</form>'
@@ -174,12 +273,12 @@ class ferme extends batiment{
 		$txt ='
 		<table border style="margin:3px;">
 			<tr>
-				<td style="width:60%;">Production de '.$this->QuelleQuantite($oJoueur->GetNiveauCompetence(self::TYPE_COMPETENCE), $stock[0]).'x '.AfficheIcone($this->GetIconeNameProduction($stock[0])).'</td>
+				<td style="width:60%;">Production de '.$this->QuelleQuantite($this->GetTypeContenu()).'x '.AfficheIcone($this->GetCodeRessource($this->GetTypeContenu())).'</td>
 				<td>'.$status.'</td>
 			</tr>
 			<tr>
 				<td>Stock</td>
-				<td>'.$stock[1].'/'.$this->GetStockMax().' '.AfficheIcone($this->GetIconeNameProduction($stock[0])).'</td>
+				<td>'.$this->GetStockContenu().'/'.$this->GetStockMax().' '.AfficheIcone($this->GetCodeRessource($this->GetTypeContenu())).'</td>
 			</tr>
 			<tr>
 				'.$txtAction.'
@@ -193,28 +292,78 @@ class ferme extends batiment{
 	public function GetStockMax(){				return 500 + (parent::GetNiveau() * 100);}
 	public function GetContenu(){				return $this->Contenu;}
 	public function GetDateAction(){			return $this->DateAction;}
-	Public function GetIconeNameProduction($type){
+	Public function GetCodeRessource($type){
 		switch($type){
-			case self::CODE_PRODUCTION_NOURRITURE:	return self::ICONE_NAME_NOURRITURE;
-			case self::CODE_PRODUCTION_MIEL:		return self::ICONE_NAME_MIEL;
-			case self::CODE_PRODUCTION_COTTON:		return self::ICONE_NAME_COTTON;
+			case self::A1_CODE:	return self::A1_CODE_OBJET;		break;
+			case self::B1_CODE:	return self::B1_CODE_OBJET;		break;
+			case self::A2_CODE:	return self::A2_CODE_OBJET;		break;
+			case self::B2_CODE:	return self::B2_CODE_OBJET;		break;
+			case self::A3_CODE:	return self::A3_CODE_OBJET;		break;
+			case self::B3_CODE:	return self::B3_CODE_OBJET;		break;
+			case self::A4_CODE:	return self::A4_CODE_OBJET;		break;
+			case self::B4_CODE:	return self::B4_CODE_OBJET;		break;
 		}
 	}
 	public function GetTypeContenu(){
-		$contenu = explode(',', $this->Contenu);
-		return $contenu[0];
+		//$contenu = explode(',', $this->Contenu);
+		return $this->Contenu[0];
 	}
 	public function GetStockContenu(){
-		$contenu = explode(',', $this->Contenu);
-		return $contenu[1];
+		//$contenu = explode(',', $this->Contenu);
+		return $this->Contenu[1];
 	}
 	public function GetTempCulture($code){
+		$Duree = 0;
+		
 		switch($code){
-			case self::CODE_PRODUCTION_NOURRITURE:	return self::TEMP_CULTURE_NOURRITURE;
-			case self::CODE_PRODUCTION_MIEL:		return self::TEMP_CULTURE_MIEL;
-			case self::CODE_PRODUCTION_COTTON:		return self::TEMP_CULTURE_COTTON;
+			case self::A1_CODE:	$Duree = self::A1_TEMP;	break;
+			case self::B1_CODE:	$Duree = self::B1_TEMP;	break;
+			case self::A2_CODE:	$Duree = self::A2_TEMP;	break;
+			case self::B2_CODE:	$Duree = self::B2_TEMP;	break;
+			case self::A3_CODE:	$Duree = self::A3_TEMP;	break;
+			case self::B3_CODE:	$Duree = self::B3_TEMP;	break;
+			case self::A4_CODE:	$Duree = self::A4_TEMP;	break;
+			case self::B4_CODE:	$Duree = self::B4_TEMP;	break;
 		}
+		
+		$Duree = $Duree * ((100 - (self::GAIN_TEMP_PAR_ESCLAVE * $this->GetNbEsclave())) / 100);
+		
+		return $Duree;
 	}
+	public function GetNbMaxEsclave($Niveau = NULL){
+		if(is_null($Niveau))
+		{
+			$Niveau = $this->GetNiveau();
+		}
+	
+		switch($Niveau)
+		{
+			case 1:	return self::NB_ESCLAVES_NIV_1;
+			case 2:	return self::NB_ESCLAVES_NIV_2;
+			case 3:	return self::NB_ESCLAVES_NIV_3;
+			case 4:	return self::NB_ESCLAVES_NIV_4;
+		}
+		return 0;
+	}
+	public function GetNbEsclave(){
+		$nbEsclave = 0;
+	
+		for($i = 2; $i <= $this->GetNbMaxEsclave(); $i++)
+		{
+		if(isset($this->Contenu[$i]))
+		{
+		$arEsclave = explode('=', $this->Contenu[$i]);
+		if($arEsclave[0] == parent::CODE_ESCLAVE)
+		{
+		$nbEsclave++;
+		}
+		}else{
+		break;
+		}
+		}
+	
+		return $nbEsclave;
+		}
 }
 
 ?>

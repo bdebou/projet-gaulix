@@ -47,27 +47,27 @@ class carriere extends batiment{
 		
 	//Les valeurs de production spécifique à la carrière sont :
 	const B1_CODE				= 'b1';
-	const B1_NOM				= 'de la pierre brute';
+	const B1_NOM				= 'de la Pierre';
 	const B1_NIVEAU_COMPETENCE	= 1;
-	const B1_CODE_OBJET			= 'ResPierreB';
+	const B1_CODE_OBJET			= 'PIE';
 	const B1_TEMP				= 2400;
 	
 	const B2_CODE				= 'b2';
 	const B2_NOM				= 'du Granit';
 	const B2_NIVEAU_COMPETENCE	= 2;
-	const B2_CODE_OBJET			= 'ResGranit';
+	const B2_CODE_OBJET			= 'GR';
 	const B2_TEMP				= 3000;
 	
 	const B3_CODE				= 'b3';
 	const B3_NOM				= 'du Marbre';
 	const B3_NIVEAU_COMPETENCE	= 3;
-	const B3_CODE_OBJET			= 'ResMarbre';
+	const B3_CODE_OBJET			= 'MA';
 	const B3_TEMP				= 3000;
 	
 	const B4_CODE				= 'b4';
 	const B4_NOM				= 'du Diamant';
 	const B4_NIVEAU_COMPETENCE	= 4;
-	const B4_CODE_OBJET			= 'ResDiamant';
+	const B4_CODE_OBJET			= 'DIA';
 	const B4_TEMP				= 3600;
 	
 		
@@ -112,81 +112,77 @@ class carriere extends batiment{
 	}
 	
 	//Quelle quantité maximum on peut prendre maximum par action sur une ressource
-	Private function QuelleQuantite($NiveauCompetence, $CodeProduction){
+	Private function QuelleQuantite($CodeProduction){
 	
 		switch($CodeProduction)
 		{
 			case self::A1_CODE:
 			case self::B1_CODE:
-				switch($NiveauCompetence)
+				switch($this->GetNiveau())
 				{
-					case 0: return 5;
-					case 1: return 10;
-					case 2: return 20;
-					case 3: return 30;
-					case 4: return 40;
-					case 5: return 50;
+					case 1: return 2;
+					case 2: return 4;
+					case 3: return 6;
+					case 4: return 8;
 				}
 				break;
 			case self::A2_CODE:
-			case self::B2_CODE:
-				switch($NiveauCompetence)
+				switch($this->GetNiveau())
 				{
-					case 0:
-					case 1:	return 5;
-					case 2: return 10;
-					case 3: return 10;
-					case 4: return 20;
-					case 5: return 30;
+					case 2: return 2;
+					case 3: return 4;
+					case 4: return 6;
+				}
+				break;
+			case self::B2_CODE:
+				switch($this->GetNiveau())
+				{
+					case 2: return 1;
+					case 3: return 2;
+					case 4: return 3;
 				}
 				break;
 			case self::A3_CODE:
-			case self::B3_CODE:
-				switch($NiveauCompetence)
+				switch($this->GetNiveau())
 				{
-					case 0:
-					case 1:
-					case 2:
-					case 3: return 5;
-					case 4: return 10;
-					case 5: return 20;
+					case 3: return 4;
+					case 4: return 8;
+				}
+				break;
+			case self::B3_CODE:
+				switch($this->GetNiveau())
+				{
+					case 3: return 1;
+					case 4: return 2;
 				}
 				break;
 			case self::A4_CODE:
-			case self::B4_CODE:
-				switch($NiveauCompetence)
+				switch($this->GetNiveau())
 				{
-					case 0:
-					case 1:
-					case 2:
-					case 3:
-					case 4: return 5;
-					case 5: return 10;
+					case 4: return 3;
+				}
+				break;
+			case self::B4_CODE:
+				switch($this->GetNiveau())
+				{
+					case 4: return 1;
 				}
 				break;
 		}
 		
-		return 0;
+		return 1;
 	}
 	
 	//--- Gestion du stock  ---
-	public function ViderStock($stock, personnage &$joueur){
-		switch($this->GetTypeContenu()){
-			case self::A1_CODE:
-			case self::A2_CODE:
-			case self::A3_CODE:
-			case self::A4_CODE:
-			case self::B1_CODE:
-			case self::B2_CODE:
-			case self::B3_CODE:
-			case self::B4_CODE:
-				$joueur->AddInventaire($this->GetTypeContenu(), NULL, $stock, false);
-				break;
+	public function ViderStock(personnage &$joueur){
+		if($this->GetStockContenu() > 0)
+		{
+			$joueur->AddInventaire($this->GetCodeRessource($this->GetTypeContenu()), NULL, $this->GetStockContenu(), false);
 		}
-
+		
 		//$this->Contenu = $Contenu[0].','.($Contenu[1] - $stock);
-		$this->Contenu[1] = $this->GetStockContenu() - $stock;
-		if($this->GetStockMax() == $stock){$this->DateAction = strtotime('now');}
+		$this->Contenu[1] -= $this->GetStockContenu();
+		if($this->GetStockMax() == $this->GetStockContenu()){$this->DateAction = strtotime('now');}
 	}
 	public function AddStock($NiveauCompetence){
 		//$Contenu = explode(',', $this->Contenu);
@@ -194,8 +190,8 @@ class carriere extends batiment{
 		$nb = intval((strtotime('now') - parent::GetDateAction()) / $this->GetTempExtraction($this->GetTypeContenu()));
 		
 		for($i=1;$i<=$nb;$i++){
-			if($this->GetStockMax() > $this->Contenu['1']){
-				$this->Contenu[1] += $this->QuelleQuantite($NiveauCompetence, $this->GetTypeContenu());
+			if($this->GetStockMax() > $this->Contenu[1]){
+				$this->Contenu[1] += $this->QuelleQuantite($this->GetTypeContenu());
 			}else{break;}
 		}
 		
@@ -234,7 +230,7 @@ class carriere extends batiment{
 		}
 		
 		$_SESSION['main'][get_class($this)]['production']	= $this->GetTypeContenu();
-		$_SESSION['main'][get_class($this)]['vider']		= $this->GetStockContenu();
+		//$_SESSION['main'][get_class($this)]['vider']		= $this->GetStockContenu();
 		
 		$PositionBatiment	= implode(',', array_merge(array(parent::GetCarte()),parent::GetCoordonnee()));
 		$PositionJoueur		= implode(',', array_merge(array($oJoueur->GetCarte()),$oJoueur->GetPosition()));
@@ -242,7 +238,11 @@ class carriere extends batiment{
 		if($PositionBatiment == $PositionJoueur){
 			$txtAction = '
 				<td>
-					<a href="index.php?page=village&amp;action=viderstock'.strtolower(get_class($this)).'&amp;anchor='.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'">Vider votre stock</a>
+					<form method="post" action="index.php?page=village">
+						<input type="hidden" name="action" value="viderstock'.strtolower(get_class($this)).'" />
+						<input type="hidden" name="anchor" value="'.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'" />
+						<input type="submit" name="submit" value="Vider votre stock" />
+					</form>
 				</td>
 				<td>'
 					.'<form method="get" action="index.php" class="production">'
@@ -270,7 +270,7 @@ class carriere extends batiment{
 		$txt ='
 		<table border style="width:100%;">
 			<tr>
-				<td style="width:60%;">Production de '.$this->QuelleQuantite($oJoueur->GetNiveauCompetence(self::TYPE_COMPETENCE), $this->GetTypeContenu()).'x '.AfficheIcone($this->GetCodeRessource($this->GetTypeContenu())).'</td>
+				<td style="width:60%;">Production de '.$this->QuelleQuantite($this->GetTypeContenu()).'x '.AfficheIcone($this->GetCodeRessource($this->GetTypeContenu())).'</td>
 				<td>'.$status.'</td>
 			</tr>
 			<tr>
