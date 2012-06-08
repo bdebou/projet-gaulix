@@ -42,7 +42,11 @@ class personnage{
 	Const VIE_MAX					= 300;			// Limite de vie maximum
 	Const TAUX_ATTAQUANT			= 1.15;			// Taux d'augmentation de l'attaquant
 	
-	const TYPE_RES_MONNAIE			= 'sesterce';
+	const TYPE_RES_MONNAIE			= 'Sesterce';
+	const TYPE_COMPETENCE			= 'Compétence';
+	
+	Const TYPE_PERFECT_ATTAQUE		= 'Attaque';
+	Const TYPE_PERFECT_DEFENSE		= 'Defense';
 	
 	const CIVILISATION_ROMAIN		= 'romains';
 	const CIVILISATION_GAULOIS		= 'gaulois';
@@ -235,41 +239,42 @@ class personnage{
 	//les Compétences
 	private function CreateListCompetence($list, $lstStatus){
 		foreach($list as $cmp){
-			$this->lstCompetences[ucfirst($cmp['cmp_lst_nom'])] = null;
+			$this->lstCompetences[$cmp] = false;
 		}
+		
 		foreach($lstStatus as $cmp){
-			if(is_null($cmp['cmp_niveau'])){
-				$this->lstCompetences[ucfirst($cmp['cmp_nom'])] = NULL;
-			}elseif($this->lstCompetences[ucfirst($cmp['cmp_nom'])] < $cmp['cmp_niveau']){
-				$this->lstCompetences[ucfirst($cmp['cmp_nom'])] = (int)$cmp['cmp_niveau'];
-			}
+			/* if(is_null($cmp['cmp_niveau'])){ */
+				$this->lstCompetences[$cmp] = true;
+			/* }elseif($this->lstCompetences[ucfirst($cmp['cmp_code'])] < $cmp['cmp_niveau']){
+				$this->lstCompetences[ucfirst($cmp['cmp_code'])] = (int)$cmp['cmp_niveau'];
+			} */
 		}
 	}
 	
 	public function EquiperPerso($numObject, $typeObject){
 		$chk = true;
 		switch($typeObject){
-			case 'arme':
+			case objArmement::TYPE_ARME:
 				if(!is_null($this->code_arme)){$this->AddInventaire($this->code_arme, $typeObject);}
 				$this->code_arme = $numObject;
 				break;
-			case 'bouclier':
+			case objArmement::TYPE_BOUCLIER:
 				if(!is_null($this->code_bouclier)){$this->AddInventaire($this->code_bouclier, $typeObject);}
 				$this->code_bouclier = $numObject;
 				break;
-			case 'cuirasse':
+			case objArmement::TYPE_CUIRASSE:
 				if(!is_null($this->code_cuirasse)){$this->AddInventaire($this->code_cuirasse, $typeObject);}
 				$this->code_cuirasse = $numObject;
 				break;
-			case 'jambiere':
+			case objArmement::TYPE_JAMBIERE:
 				if(!is_null($this->code_jambiere)){$this->AddInventaire($this->code_jambiere, $typeObject);}
 				$this->code_jambiere = $numObject;
 				break;
-			case 'casque':
+			case objArmement::TYPE_CASQUE:
 				if(!is_null($this->code_casque)){$this->AddInventaire($this->code_casque, $typeObject);}
 				$this->code_casque = $numObject;
 				break;
-			case 'sort':
+			case objDivers::TYPE_SORT:
 				//if(!is_null($this->code_divers)){$this->AddInventaire($this->code_divers, $typeObject);}
 				if($this->LivreSorts == 'NoBook'){
 					unset($this->LstSorts);
@@ -285,11 +290,11 @@ class personnage{
 					}
 				}
 				break;
-			case 'livre':
+			case objDivers::TYPE_LIVRE:
 				if(!is_null($this->LivreSorts) AND $this->LivreSorts != 'NoBook'){$this->AddInventaire($this->LivreSorts, $typeObject);}
 				$this->LivreSorts = $numObject;
 				break;
-			case 'sac':
+			case objDivers::TYPE_SAC:
 				if(!is_null($this->code_sac)){$this->AddInventaire($this->code_sac, $typeObject);}
 				$this->code_sac = $numObject;
 				break;
@@ -324,7 +329,7 @@ class personnage{
 		if(!is_null($this->arInventaire)){
 			foreach($this->arInventaire as $key=>$element){
 				$arTemp = explode('=', $element);
-				if(	$arTemp['0'] == $codeObjet AND $this->CheckSiObjetPeutEtreGroupe($codeObjet, $typeObjet)){
+				if(	$arTemp['0'] == $codeObjet/*  AND $this->CheckSiObjetPeutEtreGroupe($codeObjet, $typeObjet) */){
 					$arTemp['1'] += $nbObjet;
 					$this->arInventaire[$key] = implode('=', $arTemp);
 					$chk = true;
@@ -396,32 +401,46 @@ class personnage{
 	    }
 	}
 
-	public function LaunchPerfAttaque($tmp, $prix, $step){
+	public function LaunchPerfectionnement($type, $tmp, $prix, $step){
 		switch($step){
 			case '1':
-				$this->date_perf_attaque=strtotime('now');
+				switch($type)
+				{
+					case self::TYPE_PERFECT_ATTAQUE:
+						$this->date_perf_attaque=strtotime('now');
+						break;
+					case self::TYPE_PERFECT_DEFENSE:
+						$this->date_perf_defense=strtotime('now');
+						break;
+				}
 				$this->argent -= abs($prix);
 				break;
 			case '2':
-				$this->date_perf_attaque=null;
-				$this->val_attaque++;
+				switch($type)
+				{
+					case self::TYPE_PERFECT_ATTAQUE:
+						$this->date_perf_attaque=null;
+						$this->val_attaque++;
+						break;
+					case self::TYPE_PERFECT_DEFENSE:
+						$this->date_perf_defense=null;
+						$this->val_defense++;
+						break;
+				}
 				break;
 		}
-		$this->tmp_perf_attaque=$tmp;
-	}
-	public function LaunchPerfDefense($tmp, $prix, $step){
-		switch($step){
-			case '1':
-				$this->date_perf_defense=strtotime('now');
-				$this->argent -= abs($prix);
+		switch($type)
+		{
+			case self::TYPE_PERFECT_ATTAQUE:
+				$this->tmp_perf_attaque = $tmp;
 				break;
-			case '2':
-				$this->date_perf_defense=null;
-				$this->val_defense++;
+			case self::TYPE_PERFECT_DEFENSE:
+				$this->tmp_perf_defense = $tmp;
 				break;
 		}
-		$this->tmp_perf_defense=$tmp;
+				
 	}
+	
 	public function AddDeplacement($nbDep, $type){
 		
 		if($nbDep > 1){
@@ -769,23 +788,28 @@ class personnage{
 			}
 		}
 		
-		//on crée la liste des compétences
-		$sqlLstCmp = "SELECT cmp_lst_nom FROM `table_competence_lst` WHERE `cmp_lst_type` = 'competence' ORDER BY cmp_lst_nom ASC;";
+		//on crée la liste des compétences possible
+		//$sqlLstCmp = "SELECT cmp_lst_code FROM `table_competence_lst` WHERE cmp_lst_acces IN ('".GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class')."', 'Tous') ORDER BY cmp_lst_code ASC;";
+		$sqlLstCmp = "SELECT cmp_lst_code FROM `table_competence_lst` WHERE (cmp_lst_acces IN ('%".GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class')."%', 'Tous') OR `cmp_lst_acces` LIKE '%".GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class')."%')ORDER BY cmp_lst_code ASC;";
 		$rqtLstCmp = mysql_query($sqlLstCmp) or die (mysql_error().'<br />'.$sqlLstCmp);
+		
 		if(mysql_num_rows($rqtLstCmp) > 0){
 			while($item = mysql_fetch_array($rqtLstCmp, MYSQL_ASSOC)){
-				$lst[] = $item;
+				$lst[] = $item['cmp_lst_code'];
 			}
 		}
+		
 		//On récupère les infos à propos des compétences
-		$sqlCmp = "SELECT cmp_nom, cmp_niveau FROM table_competence WHERE cmp_login='".$this->login."' AND cmp_finish=1;";
+		$sqlCmp = "SELECT cmp_code FROM table_competence WHERE cmp_login='".$this->login."' AND cmp_finish=1;";
 		$rqtCmp = mysql_query($sqlCmp) or die (mysql_error().'<br />'.$sqlCmp);
+		
 		if(mysql_num_rows($rqtCmp) > 0){
 			while($cmp = mysql_fetch_array($rqtCmp, MYSQL_ASSOC)){
-				$status[] = $cmp;
+				$status[] = $cmp['cmp_code'];
 			}
 			//$this->UpdateCompetences($competences);
 		}
+		
 		if(mysql_num_rows($rqtLstCmp) > 0 AND mysql_num_rows($rqtCmp) > 0){
 			$this->CreateListCompetence($lst, $status);
 		}
@@ -861,10 +885,22 @@ class personnage{
 	public function GetNbMort(){			return $this->nb_mort;}
 	public function GetId(){				return $this->id;}
 	public function GetArgent(){			return $this->argent;}
-	public function GetDatePerfAttaque(){	return $this->date_perf_attaque;}
-	public function GetTmpPerfAttaque(){	return $this->tmp_perf_attaque;}
-	public function GetDatePerfDefense(){	return $this->date_perf_defense;}
-	public function GetTmpPerfDefense(){	return $this->tmp_perf_defense;}
+	public function GetDatePerfect($type){
+		switch($type)
+		{
+			case self::TYPE_PERFECT_ATTAQUE:	return $this->date_perf_attaque;
+			case self::TYPE_PERFECT_DEFENSE:	return $this->date_perf_defense;
+		}
+		return NULL;
+	}
+	public function GetTmpPerfect($type){
+		switch($type)
+		{
+			case self::TYPE_PERFECT_ATTAQUE:	return $this->tmp_perf_attaque;
+			case self::TYPE_PERFECT_DEFENSE:	return $this->tmp_perf_defense;
+		}
+		return NULL;
+	}
 	public function GetLastAction(){		return $this->last_action;}
 	public function GetLastCombat(){		return $this->last_combat;}
 	public function GetChkChasse(){			return $this->chk_chasse;}
@@ -893,5 +929,12 @@ class personnage{
 	}
 	public function GetDateLasMessageLu(){	return $this->DateLastMessageLu;}
 	public function GetObjSaMaison(){		return FoundBatiment(1, $this->login);}
+	public function CheckCompetence($codeCompetence){
+		if(isset($this->lstCompetences[$codeCompetence]))
+		{
+			return $this->lstCompetences[$codeCompetence];
+		}
+		return false;
+	}
 }
 ?>
