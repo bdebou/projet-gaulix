@@ -7,25 +7,36 @@ $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
 FinishAllCompetenceEnCours($oJoueur);
 
-if($chkDebug){	echo '$_SESSION[\'main\']<br />';print_r($_SESSION['main']);echo '<br />';}
-if($chkDebug){	echo '$_GET<br />';print_r($_GET);echo '<br />';}
-if($chkDebug){	echo '$_POST<br />';print_r($_POST);echo '<br />';}
-if($chkDebug){	echo '<hr />';}
+$ChkDebugVar = false;
+
+if($chkDebug AND $ChkDebugVar)
+{
+	echo '$_SESSION[\'competences\']<br />';var_dump($_SESSION['competences']);echo '<br />';
+	echo '$_GET<br />';var_dump($_GET);echo '<br />';
+	echo '$_POST<br />';var_dump($_POST);echo '<br />';
+	echo '<hr />';
+}
+
 
 $chkErr = true;
 $CheckRetour = false;
 
 if(isset($_GET['action'])){
 	switch($_GET['action']){
-		case 'PerfAtt':					ActionPerfAtt($chkErr, $oJoueur); break;
-		case 'PerfDef':					ActionPerfDef($chkErr, $oJoueur); break;
+		case 'PerfAtt':					ActionPerfectionnement($chkErr, $oJoueur, personnage::TYPE_PERFECT_ATTAQUE); break;
+		case 'PerfDef':					ActionPerfectionnement($chkErr, $oJoueur, personnage::TYPE_PERFECT_DEFENSE); break;
 		case 'competence':				ActionCompetence($chkErr, $oJoueur, $_GET['cmp'], $objManager); break;
 	}
 	unset($_GET['action']);
 	$CheckRetour = true;
+}elseif(isset($_POST['action'])){
+	switch($_POST['action'])
+	{
+		case 'competence':				ActionCompetence($chkErr, $oJoueur, $_POST['cmp'], $objManager); break;
+	}
 }
 
-if($chkDebug){print_r($_SESSION['main']);}
+if($chkDebug AND $ChkDebugVar){var_dump($_SESSION['main']);}
 
 $objManager->update($oJoueur);
 unset($oJoueur);

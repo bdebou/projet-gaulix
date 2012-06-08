@@ -1,26 +1,28 @@
 <?php
-function AfficheAutreCompetences(){
-	global $objManager;
-	$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
+function AfficheAutreCompetences(personnage &$oJoueur, maison &$oMaison){
 
 	$NomPrecedent = null;
 	$txtJScript = '
 				<script type="text/javascript">
 					//<!--';
 	$nbComp = 0;
-		
-	$sqlLstCmp = "SELECT * FROM table_competence_lst WHERE cmp_lst_type='competence' ORDER BY cmp_lst_nom, cmp_lst_niveau ASC;";
+
+	//$sqlLstCmp = "SELECT * FROM table_competence_lst WHERE cmp_lst_acces IN ('".GetInfoCarriere($oJoueur->GetCodeCarriere(), 'carriere_class')."', 'Tous') ORDER BY cmp_lst_code ASC;";
+	$sqlLstCmp = "SELECT * FROM table_competence_lst WHERE (cmp_lst_acces IN ('".GetInfoCarriere($oJoueur->GetCodeCarriere(), 'carriere_class')."', 'Tous') OR cmp_lst_acces LIKE '%".GetInfoCarriere($oJoueur->GetCodeCarriere(), 'carriere_class')."%') ORDER BY cmp_lst_code ASC;";
 	$rqtLstCmp = mysql_query($sqlLstCmp) or die (mysql_error().'<br />'.$sqlLstCmp);
-		
+
 	while($cmp = mysql_fetch_array($rqtLstCmp, MYSQL_ASSOC)){
+		
 		$chkFinis = false;
+		$NomOnglet = str_replace(array(' ', "'"), '_', $cmp['cmp_lst_type']);
+		
 		//on récupère les info de la première compétence
-		if($cmp['cmp_lst_nom'] != $NomPrecedent){
-			$NomPrecedent = $cmp['cmp_lst_nom'];
+		if($NomOnglet != $NomPrecedent){
+			$NomPrecedent = $NomOnglet;
 			$nbNiveau = 1;
 			$txtJScript .= '
 					arOnglets['.$nbComp.'] = new Array;
-					arOnglets['.$nbComp.'][0] = \''.$cmp['cmp_lst_nom'].'\';
+					arOnglets['.$nbComp.'][0] = \''.$NomOnglet.'\';
 					arOnglets['.$nbComp.']['.$nbNiveau.'] = '.$cmp['cmp_lst_niveau'].';';
 			$nbComp++;
 		}else{
@@ -28,79 +30,78 @@ function AfficheAutreCompetences(){
 			$txtJScript .= '
 					arOnglets['.($nbComp-1).']['.$nbNiveau.'] = '.$cmp['cmp_lst_niveau'].';';
 		}
-		$sqlCmp = "SELECT * FROM table_competence WHERE cmp_login='".$oJoueur->GetLogin()."' AND cmp_nom='".$cmp['cmp_lst_nom']."' AND cmp_niveau=".$cmp['cmp_lst_niveau'].";";
+		
+		$sqlCmp = "SELECT * FROM table_competence WHERE cmp_login='".$oJoueur->GetLogin()."' AND cmp_code='".$cmp['cmp_lst_code']."';";
 		$rqtCmp = mysql_query($sqlCmp) or die (mysql_error().'<br />'.$sqlCmp);
-		if(mysql_num_rows($rqtCmp) > 0){
+		
+		if(mysql_num_rows($rqtCmp) > 0)
+		{
 			$CmpEnCours = mysql_fetch_array($rqtCmp, MYSQL_ASSOC);
-			
-			$arOnglets[$cmp['cmp_lst_nom']][$cmp['cmp_lst_niveau']]['contenu'] = '
-            <div class="contenu_onglet" id="contenu_onglet_'.$cmp['cmp_lst_nom'].'_'.$cmp['cmp_lst_niveau'].'">'
-                .AfficheAvancementCompetence($CmpEnCours, $cmp, $chkFinis)
-            .'</div>';
+				
+			$arOnglets[$NomOnglet][$cmp['cmp_lst_niveau']]['contenu'] = '
+            <div class="contenu_onglet" id="contenu_onglet_'.$NomOnglet.'_'.$cmp['cmp_lst_niveau'].'">'
+			.AfficheAvancementCompetence($CmpEnCours, $cmp, $chkFinis)
+			.'</div>';
 		}else{
-			$arOnglets[$cmp['cmp_lst_nom']][$cmp['cmp_lst_niveau']]['contenu'] = '
-            <div class="contenu_onglet" id="contenu_onglet_'.$cmp['cmp_lst_nom'].'_'.$cmp['cmp_lst_niveau'].'">'
-                .AfficheInfoCompetence($cmp, $oJoueur)
-            .'</div>';
+			$arOnglets[$NomOnglet][$cmp['cmp_lst_niveau']]['contenu'] = '
+            <div class="contenu_onglet" id="contenu_onglet_'.$NomOnglet.'_'.$cmp['cmp_lst_niveau'].'">'
+			.AfficheInfoCompetence($cmp, $oJoueur, $oMaison)
+			.'</div>';
 		}
-		$arOnglets[$cmp['cmp_lst_nom']][$cmp['cmp_lst_niveau']]['span'] = '
+		
+		$arOnglets[$NomOnglet][$cmp['cmp_lst_niveau']]['code'] = $cmp['cmp_lst_code'];
+		$arOnglets[$NomOnglet][$cmp['cmp_lst_niveau']]['span'] = '
 			<span 
 				class="onglet_0 onglet" 
-				id="onglet_'.$cmp['cmp_lst_nom'].'_'.$cmp['cmp_lst_niveau'].'" 
-				onclick="javascript:change_onglet(\''.$cmp['cmp_lst_nom'].'\', \''.$cmp['cmp_lst_niveau'].'\');">'
-				.($chkFinis?AfficheIcone('check', 18).' ':'')
-				.($cmp['cmp_lst_nom'] == 'tailleurp'
-					?'Tailleur de pierre'
-					:ucfirst($cmp['cmp_lst_nom'])
-				)
-				.' (Niveau '.$cmp['cmp_lst_niveau'].')
+				id="onglet_'.$NomOnglet.'_'.$cmp['cmp_lst_niveau'].'" 
+				onclick="javascript:change_onglet(\''.$NomOnglet.'\', \''.$cmp['cmp_lst_niveau'].'\');">'
+		.($chkFinis?AfficheIcone('check', 18).' ':'')
+		.ucfirst($cmp['cmp_lst_type'])
+		.' (Niveau '.$cmp['cmp_lst_niveau'].')
 			</span>';
-					
+			
 	}
-    $txtJScript .= '
+	$txtJScript .= '
 					//-->
 				</script>';
 	$txt = null;
 	$txtFinish = null;
 	$numCol = 0;
 	$checkA = true;
-	
-	foreach($arOnglets as $key => $onglet){
-	
+
+	foreach($arOnglets as $onglet => $data){
+
 		$chkPremier = true;
-		
+
 		//on ouvre la ligne
 		if($numCol == 0 AND $checkA){
 			$txt .= '<tr style="vertical-align:top;">';
 			$checkA = false;
 		}
-		
+
 		$txt .= '<td>
 	<div class="systeme_onglets">
 		<div class="onglets">';
-		
-		foreach($onglet as $niveau => $span){
+	
+		foreach($data as $Niveau => $span){
 			//on récupère les info de la première compétence
 			if($chkPremier){
-				if(is_null($oJoueur->GetNiveauCompetence(ucfirst($key)))){
+				if(!$oJoueur->CheckCompetence($span['code'])){
 					$chkPremier = false;
-					$NomPremier = $key;
-					$NiveauPremier = $niveau;
-				}elseif($oJoueur->GetNiveauCompetence(ucfirst($key)) == $niveau){
-					$chkPremier = false;
-					$NomPremier = $key;
-					$NiveauPremier = $niveau+1;
-					if($oJoueur->GetNiveauCompetence(ucfirst($key)) == 0){$NiveauPremier = 1;}
+					$NomPremier = $onglet;
+					$NiveauPremier = $Niveau;
 				}
 			}
 			$txt .= $span['span'];
 		}
-		
+
 		$txt .=	'</div>
         <div class="contenu_onglets">';
-		
-		foreach($onglet as $contenu){$txt .= $contenu['contenu'];}
-		
+
+		foreach($data as $contenu){
+			$txt .= $contenu['contenu'];
+		}
+
 		$txt .= '</div>
     </div>
 	<script type="text/javascript">
@@ -109,7 +110,7 @@ function AfficheAutreCompetences(){
 		//-->
 	</script>
 	</td>';
-	
+
 		$numCol++;
 		//on ferme la ligne
 		if($numCol == 2){
@@ -118,9 +119,7 @@ function AfficheAutreCompetences(){
 			$checkA = true;
 		}
 	}
-	
-	$objManager->update($oJoueur);
-	unset($oJoueur);
+
 	return array($txt, $txtJScript);
 }
 function AfficheAvancementCompetence($competence, $info, &$chkFinis){
@@ -128,8 +127,8 @@ function AfficheAvancementCompetence($competence, $info, &$chkFinis){
 		$txtStatus = '
 		<tr>
 			<td style="background:#b6ff6c; text-align:center;"><p style="display:inline;">En cours.<br />Reste : </p>'
-				.'<div style="display:inline;" id="TimeToWait'.$competence['cmp_nom'].'"></div>'
-				.AfficheCompteurTemp($competence['cmp_nom'], 'index.php?page=competences', ($competence['cmp_temp'] - (strtotime('now')-strtotime($competence['cmp_date']))))
+				.'<div style="display:inline;" id="TimeToWait'.$competence['cmp_code'].'"></div>'
+				.AfficheCompteurTemp($competence['cmp_code'], 'index.php?page=competences', ($competence['cmp_temp'] - (strtotime('now')-strtotime($competence['cmp_date']))))
 			.'</td>
 		</tr>';
 		$chkFinis = false;
@@ -140,79 +139,58 @@ function AfficheAvancementCompetence($competence, $info, &$chkFinis){
 	
 	return '
 	<table class="competence">
-		<tr style="background:lightgrey;"><th>'
-		.($competence['cmp_nom'] == 'tailleurp'
-			?'Tailleur de pierre'
-			:ucfirst($competence['cmp_nom'])
-		)
-		.'</th></tr>
+		<tr style="background:lightgrey;"><th>'.ucfirst($info['cmp_lst_nom']).'</th></tr>
 		<tr><td>'.$info['cmp_lst_description'].'</td></tr>
-		<tr><td>Niveau : '.$competence['cmp_niveau'].'</td></tr>'
+		<tr><td>Niveau : '.$info['cmp_lst_niveau'].'</td></tr>'
 		.$txtStatus
 	.'</table>';
 }
-function AfficheInfoCompetence($competence, personnage &$oJoueur){
-	$maison = $oJoueur->GetObjSaMaison();
+function AfficheInfoCompetence($competence, personnage &$oJoueur, maison &$oMaison){
+	
 	$check = false;
 	
-	if(	!is_null($maison))
+	if(CheckCout(explode(',', $competence['cmp_lst_prix']), $oJoueur, $oMaison)
+		)
 	{
-		if(CheckCout(explode(',', $competence['cmp_lst_prix']), $oJoueur, $maison)
-			AND (
-				$oJoueur->GetNiveauCompetence(ucfirst($competence['cmp_lst_nom'])) == ($competence['cmp_lst_niveau'] - 1)
-				OR (
-					is_null($oJoueur->GetNiveauCompetence(ucfirst($competence['cmp_lst_nom'])))
-						AND
-					in_array($competence['cmp_lst_niveau'], array(0, 1))
-					)
-				)
-			)
-		{
-			$check = true;
-			$_SESSION['main'][$competence['cmp_lst_nom']]['prix']				= explode(',', $competence['cmp_lst_prix']);
-			$_SESSION['main'][$competence['cmp_lst_nom']]['niveau']				= $competence['cmp_lst_niveau'];
-			$_SESSION['main'][$competence['cmp_lst_nom']]['temp']				= $competence['cmp_lst_temp'];
-		}
+		$check = true;
+		$_SESSION['competences'][$competence['cmp_lst_code']]['prix']				= explode(',', $competence['cmp_lst_prix']);
+		//$_SESSION['competences'][$competence['cmp_lst_code']]['code']				= $competence['cmp_lst_code'];
+		$_SESSION['competences'][$competence['cmp_lst_code']]['temp']				= $competence['cmp_lst_temp'];
 	}
 		
 	return '
 	<table class="competence">
-		<tr style="background:lightgrey;"><th colspan="2">'
-		.($competence['cmp_lst_nom'] == 'tailleurp'
-			?'Tailleur de pierre'
-			:ucfirst($competence['cmp_lst_nom'])
-		)
-		.'</th></tr>
-		<tr><td colspan="2">'.$competence['cmp_lst_description'].'</td></tr>
-		<tr>
+		<tr style="background:lightgrey;">
+			<th colspan="2">'.ucfirst($competence['cmp_lst_nom']).'</th>
+		</tr>'
+		.(!is_null($competence['cmp_lst_description'])?'<tr><td colspan="2">'.$competence['cmp_lst_description'].'</td></tr>':NULL)
+		.'<tr>
 			<td>Niveau : '.$competence['cmp_lst_niveau'].'</td>
 			<td>Durée : '.AfficheTempPhrase(DecoupeTemp($competence['cmp_lst_temp'])).'</td>
 		</tr>
-		<tr><td colspan="2" style="text-align:center;">Coût : '
-		.AfficheListePrix(explode(',', $competence['cmp_lst_prix']), $oJoueur, $maison)
-		.'</td></tr>
-		<tr><td colspan="2" style="text-align:center;">
-			<button 
-				type="button" 
-				onclick="window.location=\'index.php?page=competences&amp;action=competence&amp;cmp='.$competence['cmp_lst_nom'].'\'" '
-				.($check?'':'disabled="disabled"').' 
-				style="width:100px;background:'.(!$check?'Tomato':'LightGreen').';">
-					Go
-			</button>
-		</td></tr>
+		<tr>
+			<td colspan="2" style="text-align:center;">Coût : '.AfficheListePrix(explode(',', $competence['cmp_lst_prix']), $oJoueur, $oMaison).'</td>
+		</tr>
+		<tr>
+			<td colspan="2" style="text-align:center;">
+				<form method="post" action="index.php?page=competences">
+					<input type="hidden" name="action" value="competence" />
+					<input type="hidden" name="cmp" value="'.$competence['cmp_lst_code'].'" />
+					<input style="width:100px;background:'.(!$check?'Tomato':'LightGreen').';" '.($check?'':'disabled="disabled"').' type="submit" name="submit" value="Go" />
+				</form>
+			</td>
+		</tr>
 	</table>';
 	
 }
-function AfficheModulePerfectionnement($type){
-	global $objManager;
-	$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
+function AfficheModulePerfectionnement($type, personnage &$oJoueur, maison &$oMaison){
 	
-	if(	($type == 'attaque' AND is_null($oJoueur->GetDatePerfAttaque()))
+	if(	($type == objArmement::TYPE_ATTAQUE AND is_null($oJoueur->GetDatePerfect(personnage::TYPE_PERFECT_ATTAQUE)))
 		OR
-		($type == 'defense' AND is_null($oJoueur->GetDatePerfDefense()))){
-		return GoPerfectionnement($type, $oJoueur);		
-	}elseif(	($type == 'attaque' AND (strtotime('now')-$oJoueur->GetDatePerfAttaque()) < $oJoueur->GetTmpPerfAttaque())
-			OR	($type == 'defense' AND (strtotime('now')-$oJoueur->GetDatePerfDefense()) < $oJoueur->GetTmpPerfDefense())
+		($type == objArmement::TYPE_DEFENSE AND is_null($oJoueur->GetDatePerfect(personnage::TYPE_PERFECT_DEFENSE)))){
+		return GoPerfectionnement($type, $oJoueur, $oMaison);		
+	}elseif(	($type == objArmement::TYPE_ATTAQUE AND (strtotime('now')-$oJoueur->GetDatePerfect(personnage::TYPE_PERFECT_ATTAQUE)) < $oJoueur->GetTmpPerfect(personnage::TYPE_PERFECT_ATTAQUE))
+			OR	($type == objArmement::TYPE_DEFENSE AND (strtotime('now')-$oJoueur->GetDatePerfect(personnage::TYPE_PERFECT_DEFENSE)) < $oJoueur->GetTmpPerfect(personnage::TYPE_PERFECT_DEFENSE))
 			){
 		$txt = '
 	<table class="competence">
@@ -220,7 +198,7 @@ function AfficheModulePerfectionnement($type){
 			<th>Entrainement pour "'.ucfirst($type).'"</th>
 		</tr>
 		<tr>
-			<td>Augmente vos points '.($type == 'attaque'?'d\'':'de ').$type.'.</td>
+			<td>Augmente vos points '.($type == objArmement::TYPE_ATTAQUE?'d\'':'de ').$type.'.</td>
 		</tr>
 		<tr>
 			<td style="background:#b6ff6c; text-align:center;"><p style="display:inline;">En cours.<br />Reste : </p>
@@ -228,33 +206,33 @@ function AfficheModulePerfectionnement($type){
 				.AfficheCompteurTemp(
 							ucfirst(substr($type, 0, 3)),
 							'index.php?page=competences',
-							($type == 'attaque'?
-								($oJoueur->GetTmpPerfAttaque()-(strtotime('now')-$oJoueur->GetDatePerfAttaque()))
-								:($oJoueur->GetTmpPerfDefense()-(strtotime('now')-$oJoueur->GetDatePerfDefense()))
+							($type == objArmement::TYPE_ATTAQUE?
+								($oJoueur->GetTmpPerfect(personnage::TYPE_PERFECT_ATTAQUE)-(strtotime('now')-$oJoueur->GetDatePerfect(personnage::TYPE_PERFECT_ATTAQUE)))
+								:($oJoueur->GetTmpPerfect(personnage::TYPE_PERFECT_DEFENSE)-(strtotime('now')-$oJoueur->GetDatePerfect(personnage::TYPE_PERFECT_DEFENSE)))
 							)
 							)
 			.'</td>
 		</tr>
 	</table>';
 		
-		$objManager->update($oJoueur);
-		unset($oJoueur);
 		return $txt;
 	}else{
-		$_SESSION['main']['Perf'.ucfirst(substr($type, 0, 3))] = 'Finish';
-		$_SESSION['main']['Tmp'.ucfirst(substr($type, 0, 3))] = 0;
-		$objManager->update($oJoueur);
-		unset($oJoueur);
+		$_SESSION['competences']['Perf'.ucfirst(substr($type, 0, 3))] = 'Finish';
+		$_SESSION['competences']['Tmp'.ucfirst(substr($type, 0, 3))] = 0;
 		//redir('./fct/main.php?action=Perf'.ucfirst(substr($type, 0, 3)));
 		return '<script type="text/javascript">window.location="index.php?page=competences&action=Perf'.ucfirst(substr($type, 0, 3)).'";</script>';
 		//header('location: index.php?page=competences&action=Perf'.ucfirst(substr($type, 0, 3)));
 	}
 }
-function GoPerfectionnement($type, &$oJoueur){
-	$nbMaxPerf = 25; $PrixDepart = 50; $check = false; $StepPerf=5;
+function GoPerfectionnement($type, personnage &$oJoueur, maison &$oMaison){
+	$nbMaxPerf	= 25;
+	$PrixDepart	= 50;
+	$check		= false;
+	$StepPerf	= 5;
+	
 	switch($type){
-		case 'attaque':	$temp = $oJoueur->GetAttPerso();	break;
-		case 'defense':	$temp = $oJoueur->GetDefPerso();	break;
+		case objArmement::TYPE_ATTAQUE:	$temp = $oJoueur->GetAttPerso();	break;
+		case objArmement::TYPE_DEFENSE:	$temp = $oJoueur->GetDefPerso();	break;
 	}
 	
 	$nbPerfDone = $temp['0']-10;
@@ -263,20 +241,22 @@ function GoPerfectionnement($type, &$oJoueur){
 	$temp = intval(3600 * exp($nbPerfDone / 8));
 	//$arTemp = DecoupeTemp($temp);
 	
-	if(	$nbPerfDone < (($oJoueur->GetNiveau() + 1) * $StepPerf)
-		AND $oJoueur->GetArgent() >= $prix){
-		$check=true;
-	}elseif($nbPerfDone > (($oJoueur->GetNiveau() + 1) * $StepPerf)){
+	if($nbPerfDone > (($oJoueur->GetNiveau() + 1) * $StepPerf))
+	{
 		return '
 	<table class="competence">
 		<tr style="background:lightgrey;"><th colspan="2">Amélioration '.ucfirst($type).'</th></tr>
 		<tr><td>Vous avez atteint le maximum.</td></tr>
 	</table>';
+	}elseif($nbPerfDone < (($oJoueur->GetNiveau() + 1) * $StepPerf)
+			AND CheckCout(array('monnaie='.$prix), $oJoueur, $oMaison)/* $oJoueur->GetArgent() >= $prix */)
+	{
+		$check=true;
 	}
 	
-	$_SESSION['main']['Perf'.ucfirst(substr($type, 0, 3))] = 'Go';
-	$_SESSION['main']['Tmp'.ucfirst(substr($type, 0, 3))] = $temp;
-	$_SESSION['main']['Prix'.ucfirst(substr($type, 0, 3))] = $prix;
+	$_SESSION['competences']['Perf'.ucfirst(substr($type, 0, 3))] = 'Go';
+	$_SESSION['competences']['Tmp'.ucfirst(substr($type, 0, 3))] = $temp;
+	$_SESSION['competences']['Prix'.ucfirst(substr($type, 0, 3))] = $prix;
 	
 	return '
 	<table class="competence">
@@ -286,7 +266,7 @@ function GoPerfectionnement($type, &$oJoueur){
 			<p>Vous avez encore la possibilité d\'augmenter de '.((($oJoueur->GetNiveau() + 1) * $StepPerf) - $nbPerfDone).' points votre '.$type.'.</p>
 		</td></tr>
 		<tr><td style="text-align:center;">Durée : '.AfficheTempPhrase(DecoupeTemp($temp)).'</td></tr>
-		<tr><td style="text-align:center;">Coût : '.AfficheListePrix(array('ResOr='.$prix), $oJoueur).'</td></tr>
+		<tr><td style="text-align:center;">Coût : '.AfficheListePrix(array('monnaie='.$prix), $oJoueur, $oMaison).'</td></tr>
 		<tr><td style="text-align:center;">
 			<button 
 				type="button" 
@@ -298,18 +278,18 @@ function GoPerfectionnement($type, &$oJoueur){
 		</td></tr>
 	</table>';
 }
-function AddEnregistrementCompetence($nom, $niveau, $duree){
+function AddEnregistrementCompetence($code, $duree){
 	$sql = "INSERT INTO `table_competence`
-		(`cmp_id`, `cmp_login`, `cmp_nom`, `cmp_niveau`, `cmp_temp`, `cmp_date`, `cmp_finish`)
+		(`cmp_id`, `cmp_login`, `cmp_code`, `cmp_temp`, `cmp_date`, `cmp_finish`)
 		VALUES
-		(NULL, '".$_SESSION['joueur']."', '$nom', $niveau, $duree, '".date('Y-m-d H:i:s')."', NULL);";
+		(NULL, '".$_SESSION['joueur']."', '$code', $duree, '".date('Y-m-d H:i:s')."', NULL);";
 	mysql_query($sql) or die ( mysql_error() .'<br />'.$sql);
 }
 
 //+---------------------------------+
 //|				ACTIONS				|
 //+---------------------------------+
-Function ActionPerfDef(&$check, &$oJoueur){
+/* Function ActionPerfDef(&$check, &$oJoueur){
 	if(!is_null($_SESSION['main']['PerfDef'])){
 		switch($_SESSION['main']['PerfDef']){
 			case 'Go':
@@ -340,22 +320,41 @@ function ActionPerfAtt(&$check, &$oJoueur){
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionPerfAtt';
 	}
+} */
+function ActionPerfectionnement(&$check, personnage &$oJoueur, $type){
+	if(isset($_SESSION['competences']['Perf'.substr($type, 0, 3)])){
+		switch($_SESSION['competences']['Perf'.substr($type, 0, 3)]){
+			case 'Go':
+				$oJoueur->LaunchPerfectionnement($type, $_SESSION['competences']['Tmp'.substr($type, 0, 3)],$_SESSION['competences']['Prix'.substr($type, 0, 3)],1);
+				break;
+			case 'Finish':
+				$oJoueur->LaunchPerfectionnement($type, null,null,2);
+				break;
+		}
+		unset($_SESSION['competences']['Perf'.substr($type, 0, 3)]);
+	}else{
+		$check = false;
+		echo 'Erreur GLX0002: Fonction ActionPerfectionnement - '.$type;
+	}
 }
 function ActionCompetence(&$check, personnage &$oJoueur, $cmp, &$objManager){
-	if(!is_null($_SESSION['main'][$cmp])){
+	if(isset($_SESSION['competences'][$cmp])){
 		$maison = $oJoueur->GetObjSaMaison();
 
-		AddEnregistrementCompetence($cmp, $_SESSION['main'][$cmp]['niveau'], $_SESSION['main'][$cmp]['temp']);
-
-		foreach($_SESSION['main'][$cmp]['prix'] as $Prix)
+		if(CheckCout($_SESSION['competences'][$cmp]['prix'], $oJoueur, $maison))
 		{
-			UtilisationRessource(explode('=', $Prix), $oJoueur, $maison);
+			foreach($_SESSION['competences'][$cmp]['prix'] as $Prix)
+			{
+				UtilisationRessource(explode('=', $Prix), $oJoueur, $maison);
+			}
+			
+			AddEnregistrementCompetence($cmp, $_SESSION['competences'][$cmp]['temp']);
 		}
 		
 		$objManager->UpdateBatiment($maison);
 		unset($maison);
 
-		$_SESSION['main'][$cmp] = null;
+		unset($_SESSION['competences'][$cmp]);
 	}else{
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionCompetence';
