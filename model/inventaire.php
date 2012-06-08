@@ -21,23 +21,24 @@ function AfficheRessource($type, personnage &$oJoueur){
 	$txtBt = NULL;
 	
 	if(!is_null($maison)){
-		$nb = $maison->GetRessource($type);
+		if ($maison->GetRessource($type) > 500) {
 
-		switch ($type){
-			case maison::TYPE_RES_NOURRITURE:
-				$qte = 50;
-				break;
-			case maison::TYPE_RES_EAU_POTABLE:
-				$qte = 25;
-				break;
-		}
-		if ($nb > 500) {
+			switch ($type){
+				case maison::TYPE_RES_NOURRITURE:
+					$qte = 50;
+					break;
+				case maison::TYPE_RES_EAU_POTABLE:
+					$qte = 25;
+					break;
+			}
+		
 			$_SESSION['inventaire'][$type] = $qte;
 				
-			$InfoBulle = '<table class="equipement"><tr><td>Mettre ' . $qte . 'pts ' . AfficheIcone($type, 15) . ' dans votre Bolga</td></tr></table>';
-			$txtBt = '	<form method="post" action="index.php?page=inventaire">
-							<input type="hidden" name="action" value="MettreBolga" />
-							<input type="hidden" name="type" name="'.$type.' />'
+			$InfoBulle = '<table class="equipement"><tr><td>Vendre ' . $qte . 'pts ' . AfficheIcone($type, 15) . ' pour '.$qte.AfficheIcone(personnage::TYPE_RES_MONNAIE, 15).'</td></tr></table>';
+			$txtBt = '	<form method="post" action="index.php?page=inventaire" style="display:inline;">
+							<input type="hidden" name="action" value="Vendre" />
+							<input type="hidden" name="id" value="'.$type.'" />
+							<input type="hidden" name="qte" value="'.$qte.'" />'
 							.(isset($_GET['page'])?'<input type="hidden" name="retour" value="'.$_GET['page'].'" />':NULL)
 							.'<input type="submit" 
 								name="submit" 
@@ -46,65 +47,18 @@ function AfficheRessource($type, personnage &$oJoueur){
 								onmouseout="cache();" 
 								 />
 						</form>';
-			/* <button '
-			. 'type="button" '
-			. (count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga() ? '' : 'disabled="disabled" ')
-			. 'class="LoginStatus" '
-			. 'onmouseover="montre(\'' . CorrectDataInfoBulle($InfoBulle) . '\');" '
-			. 'onmouseout="cache();" '
-			. 'onclick="window.location=\'index.php?page=common&amp;action=MettreBolga&amp;type='.$type.(isset($_GET['page'])?'&amp;retour='.$_GET['page']:'').'\'" '
-			. 'alt="Mettre ' . $qte . 'pts de ' . $type . ' dans votre Bolga">'
-			. '-' . $qte . 'x'
-			. '</button>'; */
 		}
 	}
 
-	return AfficheIcone($type) . ' : ' . $nb . $txtBt;
+	return AfficheIcone($type) . ' : ' . $maison->GetRessource($type) . $txtBt;
 }
 
 //+---------------------------------+
 //|				ACTIONS				|
 //+---------------------------------+
-function ActionMettreDansBolga(&$check, $type, personnage &$oJoueur, &$objManager){
-	if(isset($_SESSION['inventaire'])){
-		//On vérifie si le bolga est plein ou pas
-		if(count($oJoueur->GetLstInventaire()) >= $oJoueur->QuelCapaciteMonBolga()){
-			$check = false;
-			echo 'Erreur GLX0003: Fonction ActionMettreDansBolga - Bolga plein';
-			return;
-		}
-		//on vérifie si on a bien la quantitée
-		if(!isset($_SESSION['inventaire'][$type])){
-			$check = false;
-			echo 'Erreur GLX0003: Fonction ActionMettreDansBolga - Pas assez de ressource';
-			return;
-		}
-		//Si tout OK, alors on transfert
-		$maison = $oJoueur->GetObjSaMaison();
-		switch($type)
-		{
-			case maison::TYPE_RES_NOURRITURE:
-			case maison::TYPE_RES_EAU_POTABLE:
-				$maison->MindRessource($maison->GetCodeRessource($type), $_SESSION['inventaire'][$type]);
-				break;
-		}
-		$oJoueur->AddInventaire($maison->GetCodeRessource($type), NULL, 1, false);
 
-		$objManager->UpdateBatiment($maison);
-
-		unset($_SESSION['inventaire'][$type]);
-	}else{
-		$check = false;
-		echo 'Erreur GLX0002: Fonction ActionMettreDansBolga';
-	}
-}
-function ActionVendre(&$check, $id, &$oJoueur, &$objManager, $qte){
+function ActionVendre(&$check, $id, personnage &$oJoueur, &$objManager, $qte){
 	if(isset($_SESSION['inventaire'][$id]['code'])){
-
-		/* $sql = "SELECT contenu_vendeur FROM table_marche WHERE type_vendeur='marchant'";
-		$requete = mysql_query($sql) or die (mysql_error()); */
-
-		//$objMarche = new marchant(mysql_fetch_array($requete, MYSQL_ASSOC));
 		
 		$objObjet = FoundObjet($_SESSION['inventaire'][$id]['code']);
 
@@ -128,7 +82,17 @@ function ActionVendre(&$check, $id, &$oJoueur, &$objManager, $qte){
 				
 		}
 
-		unset($_SESSION['inventaire'][$id]['code']);
+		unset($_SESSION['inventaire']);
+	}elseif(in_array($id, array(maison::TYPE_RES_NOURRITURE, maison::TYPE_RES_EAU_POTABLE)))
+	{
+		$maison = $oJoueur->GetObjSaMaison();
+		
+		$maison->MindRessource($id, $qte);
+		$oJoueur->AddOr($qte);
+		
+		$objManager->UpdateBatiment($maison);
+		unset($maison, $_SESSION['inventaire']);
+		
 	}else{
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionVendre';
