@@ -112,10 +112,10 @@ class PersonnagesManager{
 		$q->bindValue(':strInventaire', (is_null($perso->GetLstInventaire())?NULL:implode(',', $perso->GetLstInventaire())), PDO::PARAM_STR);
 		$q->bindValue(':id', $perso->GetId(), PDO::PARAM_INT);
 		$q->bindValue(':argent', $perso->GetArgent(), PDO::PARAM_INT);
-		$q->bindValue(':date_perf_attaque', ($perso->GetDatePerfAttaque()?date('Y-m-d H:i:s',$perso->GetDatePerfAttaque()):NULL), PDO::PARAM_INT);
-		$q->bindValue(':tmp_perf_attaque', ($perso->GetTmpPerfAttaque()?$perso->GetTmpPerfAttaque():NULL), PDO::PARAM_INT);
-		$q->bindValue(':date_perf_defense', ($perso->GetDatePerfDefense()?date('Y-m-d H:i:s',$perso->GetDatePerfDefense()):NULL), PDO::PARAM_INT);
-		$q->bindValue(':tmp_perf_defense', ($perso->GetTmpPerfDefense()?$perso->GetTmpPerfDefense():NULL), PDO::PARAM_INT);
+		$q->bindValue(':date_perf_attaque', ($perso->GetDatePerfect(personnage::TYPE_PERFECT_ATTAQUE)?date('Y-m-d H:i:s',$perso->GetDatePerfect(personnage::TYPE_PERFECT_ATTAQUE)):NULL), PDO::PARAM_INT);
+		$q->bindValue(':tmp_perf_attaque', ($perso->GetTmpPerfect(personnage::TYPE_PERFECT_ATTAQUE)?$perso->GetTmpPerfect(personnage::TYPE_PERFECT_ATTAQUE):NULL), PDO::PARAM_INT);
+		$q->bindValue(':date_perf_defense', ($perso->GetDatePerfect(personnage::TYPE_PERFECT_DEFENSE)?date('Y-m-d H:i:s',$perso->GetDatePerfect(personnage::TYPE_PERFECT_DEFENSE)):NULL), PDO::PARAM_INT);
+		$q->bindValue(':tmp_perf_defense', ($perso->GetTmpPerfect(personnage::TYPE_PERFECT_DEFENSE)?$perso->GetTmpPerfect(personnage::TYPE_PERFECT_DEFENSE):NULL), PDO::PARAM_INT);
 		$q->bindValue(':maison_installe', (is_null($perso->GetMaisonInstalle())?NULL:implode(',', $perso->GetMaisonInstalle())), PDO::PARAM_STR);
 		$q->bindValue(':clan', (is_null($perso->GetClan())?NULL:htmlspecialchars($perso->GetClan(), ENT_QUOTES)), PDO::PARAM_STR);
 		$q->bindvalue(':date_last_msg_lu', date('Y-m-d H:i:s', $perso->GetDateLasMessageLu()), PDO::PARAM_INT);
