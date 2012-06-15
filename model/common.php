@@ -52,15 +52,18 @@ function FoundObjet($CodeObject, $nbObjet = 1){
 }
 
 function AfficheIcone($type, $HeightIcone = 20) {
-	$Name = $type;
+	$Name = NULL;
 	$FileName = $type;
 
 	switch (strtolower($type)) {
-		case 'bois':				$FileName = 'ResBoi';										break;
-		case 'pierre':				$FileName = 'ResPie';										break;
-		case 'nourriture':			$FileName = 'ResNou';										break;
-		case 'argent':
-		case 'or':					$FileName = 'ResOr';										break;
+		//case 'bois':				$FileName = 'ResBoi';										break;
+		//case 'pierre':				$FileName = 'ResPie';										break;
+		case strtolower(maison::TYPE_RES_NOURRITURE):
+			$FileName	= maison::TYPE_RES_NOURRITURE;
+			$Name		= maison::TYPE_RES_NOURRITURE;
+			break;
+		//case 'argent':
+		//case 'or':					$FileName = 'ResOr';										break;
 		case 'marche_cancel':		$Name = 'Annuler transaction';								break;
 		case 'marche_accept':		$Name = 'Accepter transaction';								break;
 		case 'marche_attention':	$Name = 'Transaction impossible';							break;
@@ -72,9 +75,13 @@ function AfficheIcone($type, $HeightIcone = 20) {
 		case 'amedalargent':		$Name = 'Médaille d\'argent au classement des alliances';	break;
 		case 'amedalbronze':		$Name = 'Médaille de bronze au classement des alliances';	break;
 		case 'trash':				$Name = 'Supprimer';										break;
+		case 'monnaie':
+			$FileName	= personnage::TYPE_RES_MONNAIE;
+			$Name		= personnage::TYPE_RES_MONNAIE;
+			break;
 	}
 
-	switch (substr($type, 0, 5)) {
+	/* switch (substr($type, 0, 5)) {
 		case 'ResBo':	$Name = 'Bois';						$FileName = substr($type, 0, 6);	break;
 		case 'ResPi':	$Name = 'Pierre';					$FileName = substr($type, 0, 6);	break;
 		case 'ResNo':	$Name = 'Nourriture';				$FileName = substr($type, 0, 6);	break;
@@ -91,15 +98,21 @@ function AfficheIcone($type, $HeightIcone = 20) {
 		case 'Hydro':	$Name = 'Hydromel';					$FileName = 'hydromel';				break;
 		case 'PotVi':	$Name = 'Potion de vie';			$FileName = 'PotVie';				break;
 		case 'PotDe':	$Name = 'Potion de déplacement';	$FileName = 'PotDep';				break;
-	}
+	} */
 
-	$sql = "SELECT objet_nom FROM table_objets WHERE objet_code='$type';";
-	$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
-
-	if (mysql_num_rows($requete) > 0) {
-		$row = mysql_fetch_array($requete, MYSQL_ASSOC);
-		$Name = $row['objet_nom'];
+	if(is_null($Name))
+	{
+		$sql = "SELECT objet_nom FROM table_objets WHERE objet_code='$type';";
+		$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
+		
+		if (mysql_num_rows($requete) > 0) {
+			$row = mysql_fetch_array($requete, MYSQL_ASSOC);
+			$Name = $row['objet_nom'];
+		}else{
+			$Name = 'NoName';
+		}
 	}
+	
 
 	return '<img src="./img/icones/ic_' . $FileName . '.png" alt="Icone (' . strtolower($Name) . ')" title="' . ucfirst(strtolower($Name)) . '" height="' . $HeightIcone . 'px" />';
 }
@@ -186,24 +199,38 @@ function AfficheListePrix($lstPrix, personnage &$oJoueur = NULL, maison &$maison
 		foreach($lstPrix as $arPrix)
 		{
 			$Prix = explode('=', $arPrix);
-		
-			if($chk)
+			
+			if(	$Prix[0] != 'QUEST')
 			{
-				$txt .= ', ';
-			}
-		
-			if($Prix[1] > 0)
-			{
-				$ColorPrix = 'black';
-				
-				if (!is_null($oJoueur) AND !is_null($maison) AND !CheckIfAssezRessource($Prix, $oJoueur, $maison))
+				if($chk)
 				{
-					$ColorPrix = 'red';
+					$txt .= ', ';
 				}
+				
+				if($Prix[1] > 0 OR QuelTypeObjet($Prix[0]) == personnage::TYPE_COMPETENCE)
+				{
+					$ColorPrix = 'black';
+				
+					if (!is_null($oJoueur) AND !is_null($maison) AND !CheckIfAssezRessource($Prix, $oJoueur, $maison))
+					{
+						$ColorPrix = 'red';
+					}
 					
-				$txt .= '<span style="color:' . $ColorPrix . ';">' . $Prix[1] . '</span> ' . AfficheIcone($Prix[0]);
+					switch(QuelTypeObjet($Prix[0]))
+					{
+						case personnage::TYPE_COMPETENCE:
+							$txt .= '<span style="color:' . $ColorPrix . ';">Compétence "' . GetInfoCompetence($Prix[0], 'cmp_lst_nom') . '"</span>';
+							break;
+						default:
+							$txt .= '<span style="color:' . $ColorPrix . ';">' . $Prix[1] . '</span> ' . AfficheIcone($Prix[0]);
+							break;
+					}
+					
+					
+				}
+				$chk = true;
 			}
-			$chk = true;
+			
 		}
 	}else{
 		$txt = 'Gratuit';
@@ -287,6 +314,8 @@ function UtilisationRessource(array $arRessource, personnage &$Joueur, maison &$
 		case personnage::TYPE_RES_MONNAIE:
 			$Joueur->MindOr($arRessource[1]);
 			break;
+		case personnage::TYPE_COMPETENCE:
+			break;
 		default:
 			$Joueur->CleanInventaire($arRessource[0], false, $arRessource[1]);
 			break;
@@ -302,8 +331,8 @@ function CheckIfAssezRessource(array $arRessource, personnage &$Joueur, maison &
 		case personnage::TYPE_RES_MONNAIE:
 			if($Joueur->GetArgent() >= $arRessource[1]){return true;}
 			break;
-		case personnage::TYPE_COMPETENCE;
-			
+		case personnage::TYPE_COMPETENCE:
+			return $Joueur->CheckCompetence($arRessource[0]);
 			break;
 		default:
 			return $Joueur->AssezElementDansBolga($arRessource[0], $arRessource[1]);
@@ -396,50 +425,7 @@ function CheckIfOnEstSurUnBatiment($NumBatiment, $position){
 
 	return true;
 }
-function AfficheInfoObjet($CodeObjet, $intHeightImg = 50) {
-	$sql = "SELECT * FROM table_objets WHERE objet_code='" . $CodeObjet . "';";
-	$rqt = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
 
-	$rowObjet = mysql_fetch_array($rqt, MYSQL_ASSOC);
-
-	if (in_array($rowObjet['objet_type'], array('arme', 'bouclier', 'cuirasse', 'jambiere', 'casque'))) {
-		$nbInfo = 0;
-		$txtInfo = '<tr>';
-
-		if($rowObjet['objet_attaque'] != 0){
-			$txtInfo .= '<td>' . AfficheIcone('attaque') . ' = ' . $rowObjet['objet_attaque'] . '</td>';
-			$nbInfo++;
-		}
-
-		if($rowObjet['objet_distance'] != 0){
-			$txtInfo .= '<td>' . AfficheIcone('distance') . ' = ' . $rowObjet['objet_distance'] . '</td>';
-			$nbInfo++;
-		}
-
-		if($rowObjet['objet_defense'] != 0){
-			$txtInfo .= '<td>' . AfficheIcone('defense') . ' = ' . $rowObjet['objet_defense'] . '</td>';
-			$nbInfo++;
-		}
-
-		$txtInfo .= '</tr>';
-	}
-
-	$InfoBulle = '<table class="InfoBulle">'
-	. '<tr><th' . (isset($txtInfo) ? ' colspan="'.$nbInfo.'"' : '') . '>' . $rowObjet['objet_nom'] . '</th></tr>'
-	. ((!is_null($rowObjet['objet_description']))?'<tr><td'.(isset($txtInfo)?' colspan="'.$nbInfo.'"':'').' style="text-align:left;">' . $rowObjet['objet_description'] . '</td></tr>':'')
-	. (isset($txtInfo) ? $txtInfo : '')
-	. '<tr><td' . (isset($txtInfo) ? ' colspan="'.$nbInfo.'"' : '') . '>' . AfficheIcone('or') . ' = ' . $rowObjet['objet_prix'] . '</td></tr>'
-	. '</table>';
-
-	return '<img '
-	. 'style="vertical-align:middle;" '
-	. 'alt="' . $rowObjet['objet_nom'] . '" '
-	. 'src="./img/objets/' . $rowObjet['objet_code'] . '.png" '
-	. 'onmouseover="montre(\'' . CorrectDataInfoBulle($InfoBulle) . '\');" '
-	. 'onmouseout="cache();" '
-	. 'height="'.$intHeightImg.'px"'
-	. ' />';
-}
 function QuelTypeObjet($Code){
 	$Ressource = QuelTypeRessource($Code);
 	if($Ressource != $Code)
@@ -535,15 +521,19 @@ function AddHistory($Login, $Carte, $Position, $Type, $Adversaire, $Date, $Info)
 	mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
 }
 function FinishAllCompetenceEnCours(personnage &$oJoueur) {
-	global $lstPoints;
-	$sqlCmp = "SELECT * FROM table_competence WHERE cmp_login='" . $_SESSION['joueur'] . "' AND cmp_finish IS NULL";
+	$sqlCmp = "SELECT * FROM table_competence WHERE cmp_login='" . $oJoueur->GetLogin() . "' AND cmp_finish IS NULL";
 	$rqtCmp = mysql_query($sqlCmp) or die(mysql_error() . '<br />' . $sqlCmp);
-	while ($cmp = mysql_fetch_array($rqtCmp, MYSQL_ASSOC)) {
-		if ((strtotime('now') - strtotime($cmp['cmp_date'])) >= $cmp['cmp_temp']) {
+	
+	while ($cmp = mysql_fetch_array($rqtCmp, MYSQL_ASSOC))
+	{
+		if ((strtotime('now') - strtotime($cmp['cmp_date'])) >= $cmp['cmp_temp'])
+		{
 			$sql = "UPDATE  `table_competence` SET  `cmp_finish` =  TRUE WHERE `table_competence`.`cmp_id` =" . $cmp['cmp_id'] . ";";
 			mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
+			
 			$oJoueur->UpdatePoints(personnage::POINT_COMPETENCE_TERMINE);
-			AddHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'Competence', NULL, NULL, 'Compétence terminée : '.$cmp['cmp_nom'].' de niveau '.$cmp['cmp_niveau']);
+			
+			AddHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'Competence', NULL, NULL, 'Compétence terminée');
 		}
 	}
 }
@@ -553,6 +543,21 @@ function AfficheNbMessageAlliance($clan, $date){
 			ORDER BY date_chat DESC;";
 	$requete = mysql_query($sql) or die (mysql_error());
 	return mysql_num_rows($requete);
+}
+function GetInfoCompetence($code, $info = NULL){
+	$sql = "SELECT * FROM table_competence_lst WHERE cmp_lst_code='".$code."';";
+	$rqtCmp = mysql_query($sql) or die ( mysql_error() );
+	
+	if(mysql_num_rows($rqtCmp) > 0){
+		if(is_null($info)){
+			return mysql_fetch_array($rqtCmp, MYSQL_ASSOC);
+		}else{
+			$temp = mysql_fetch_array($rqtCmp, MYSQL_ASSOC);
+			return $temp[$info];
+		}
+	}
+	
+	return null;
 }
 function GetInfoCarriere($code, $info = null){
 	$sql = "SELECT * FROM table_carrieres_lst WHERE carriere_code='".$code."';";
@@ -565,9 +570,8 @@ function GetInfoCarriere($code, $info = null){
 			$temp = mysql_fetch_array($rqtMetier, MYSQL_ASSOC);
 			return $temp[$info];
 		}
-	}else{
-		return null;
 	}
+	return null;
 }
 function CheckCout(array $lstPrix, personnage &$oJoueur, maison &$maison){
 	if(!is_null($lstPrix))
