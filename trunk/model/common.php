@@ -56,7 +56,11 @@ function AfficheIcone($type, $HeightIcone = 20) {
 	$FileName = $type;
 
 	switch (strtolower($type)) {
-		//case 'bois':				$FileName = 'ResBoi';										break;
+		case strtolower(objArmement::TYPE_ATTAQUE):
+		case strtolower(objArmement::TYPE_DEFENSE):
+		case strtolower(objArmement::TYPE_DISTANCE):
+			$Name = $type;
+			break;
 		//case 'pierre':				$FileName = 'ResPie';										break;
 		case strtolower(maison::TYPE_RES_NOURRITURE):
 			$FileName	= maison::TYPE_RES_NOURRITURE;
