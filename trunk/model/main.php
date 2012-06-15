@@ -263,7 +263,7 @@ function AfficheRedirectionBatiment(personnage &$oJoueur){
 function AfficheActionViderStock(personnage &$oJoueur){
 	$batiment = FoundBatiment(false, false, $oJoueur->GetCoordonnee());
 	if(	!is_null($batiment)
-		AND in_array(get_class($batiment), array('mine', 'ferme'))
+		AND in_array($batiment->GetIDType(), array(mine::ID_BATIMENT, ferme::ID_BATIMENT, carriere::ID_BATIMENT, potager::ID_BATIMENT/* , scierie::ID_BATIMENT */))
 		AND $batiment->GetStockContenu() == $batiment->GetStockMax()){
 		
 		$_SESSION['main'][get_class($batiment)]['vider'] = $batiment->GetStockContenu();
@@ -281,7 +281,6 @@ function AfficheObjetTrouveDansMenuAction(personnage &$oJoueur) {
 	$DebugMode = false;
 	$txt = null;
 	if (!$oJoueur->GetChkObject()) {
-		//$CodeObjetTrouve = ObjetTrouve($oJoueur);
 		
 		$objObjet = FoundObjet(ObjetTrouve($oJoueur));
 		
@@ -293,25 +292,14 @@ function AfficheObjetTrouveDansMenuAction(personnage &$oJoueur) {
 		{
 			$oJoueur->SetLastObject(true, null);
 		} else {
-			//$sql = "SELECT * FROM table_objets WHERE objet_code='".$objObjet->GetCode()."';";
-			//$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
-			//$result = mysql_fetch_array($requete, MYSQL_ASSOC);
 			
-			if ($objObjet->GetNiveau() <= $oJoueur->GetNiveau())
-			{
-				$oJoueur->SetLastObject(true, $objObjet->GetCode());
-				$txt .= AfficheActionPossible($oJoueur, $objObjet);
-			} else {
-				$oJoueur->SetLastObject(true, null);
-			}
+			$oJoueur->SetLastObject(true, $objObjet->GetCode());
+			$txt .= AfficheActionPossible($oJoueur, $objObjet);
+			
 		}
 	} else {
 		if (!is_null($oJoueur->GetLastObject()))
 		{
-			/* $sql = "SELECT * FROM table_objets WHERE objet_code='" . strval($oJoueur->GetLastObject()) . "';";
-			$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
-			$result = mysql_fetch_array($requete, MYSQL_ASSOC); */
-			
 			$objObjet = FoundObjet($oJoueur->GetLastObject());
 			
 			$txt .= AfficheActionPossible($oJoueur, $objObjet);
@@ -405,7 +393,8 @@ function ChkIfFree($position) {
 function AfficheGibierAChasser(personnage &$oJoueur) {
 	$txt = null;
 	if (!is_null($oJoueur->GetNiveauCompetence('Chasseur')) AND !$oJoueur->GetChkChasse()) {
-		$Gibier = GibierTrouve($oJoueur->GetNiveauCompetence('Chasseur'));
+		//$Gibier = GibierTrouve($oJoueur->GetNiveauCompetence('Chasseur'));
+		$Gibier = GibierTrouve($oJoueur);
 
 		if (!is_null($Gibier)) {
 			$_SESSION['main']['chasser']['nourriture'] = $Gibier->GetGainNourriture($oJoueur->GetNiveauCompetence('Boucher'));
@@ -608,23 +597,7 @@ function AfficheMenuConstruction(personnage &$oJoueur, &$chkConstruction) {
 						$LstPrix = explode(',', $row['batiment_prix']);
 					}
 					
-					$chkPrix = true;
-					if(!is_null($LstPrix))
-					{
-						foreach($LstPrix as $Prix)
-						{
-							$arPrix = explode('=', $Prix);
-						
-							//on vérifie si on a assez de ressource
-							if(!CheckIfAssezRessource($arPrix, $oJoueur, $maison))
-							{
-								$chkPrix = false;
-								break;
-							}
-						}
-					}
-					
-					if ($chkPrix)
+					if (CheckCout($LstPrix, $oJoueur, $maison))
 					{
 						$_SESSION['main'][$nbBatiment]['construire'] = $row['id_batiment'];
 						//$_SESSION['main'][$nbBatiment]['prix'] = $row['batiment_prix'];
@@ -748,10 +721,11 @@ function ObjetTrouve(personnage &$oJoueur) {
 	}
 	//on prend un nombre aléatoire
 	$num = mt_rand(1, count($arObjets) + intval(exp(($oJoueur->GetNiveau() > 5 ? 5 : $oJoueur->GetNiveau()))));
-
+	
 	if (isset($arObjets[$num])/*  AND $arObjets[$num]['objet_niveau'] <= $oJoueur->GetNiveau() */) {
 		return $arObjets[$num]['objet_code'];
 	}
+	
 	return null;
 }
 function AfficheActionPossible(personnage &$oJoueur, objMain &$objObjet) {
@@ -776,7 +750,8 @@ function AfficheActionPossible(personnage &$oJoueur, objMain &$objObjet) {
 			.'<ul style="list-style-type:none; padding:0px; text-align:center;">';
 	
 	//on vérifie si le bolga n'est pas plein
-	if (count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga())
+	if(	CheckIfAssezRessource(array($objObjet->GetCode(), 1), $oJoueur, $oJoueur->GetObjSaMaison())
+		OR count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga())
 	{
 		$txt .= $txtRamasser;
 	}else{
@@ -784,7 +759,7 @@ function AfficheActionPossible(personnage &$oJoueur, objMain &$objObjet) {
 	}
 	
 	//on vérifie le type d'objet
-	if (in_array($Type, array(personnage::TYPE_RES_MONNAIE, maison::TYPE_RES_NOURRITURE, maison::TYPE_RES_BOIS, maison::TYPE_RES_PIERRE, objDivers::TYPE_RES_VIE, objDivers::TYPE_RES_DEP)))
+	if (in_array($Type, array(objDivers::TYPE_RES_VIE, objDivers::TYPE_RES_DEP)))
 	{
 		if($Type == objDivers::TYPE_RES_VIE AND ($oJoueur->GetVie() + $objObjet->GetNb(objDivers::TYPE_RES_VIE)) > personnage::VIE_MAX)
 		{
@@ -794,41 +769,37 @@ function AfficheActionPossible(personnage &$oJoueur, objMain &$objObjet) {
 			$txt .= '<li style="display:inline; margin-left:20px;">Limite de ' . personnage::DEPLACEMENT_MAX . ' déplacements atteint</li>';
 		}else{
 			//on vérifie si on a déja une maison ou pas
-			if (in_array($Type, array(maison::TYPE_RES_NOURRITURE, maison::TYPE_RES_BOIS, maison::TYPE_RES_PIERRE))
-				AND is_null($oJoueur->GetMaisonInstalle()))
-			{
-				$txt .= '<li style="display:inline; margin-left:20px;">Pas Encore de Maison</li>';
-			}elseif(!in_array($Type, array('divers')))
-			{
-				$txt .= $txtUtiliser;
-			}
+			$txt .= $txtUtiliser;
 		}
 		
-	}/*  elseif(count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga())
-	{
-		//Si le bolga n'est pas plein, on peut s'équiper.
-		$txt .= $txtEquiper;
-	} */
+	}
 
 	//on affiche la possibilité de laisser l'objet
 	$txt .= $txtLaisser.'</ul></p>';
 
 	return $txt;
 }
-Function GibierTrouve($NiveauChasseur) {
+Function GibierTrouve(personnage &$oJoueur) {
 	//$sqlGibier = "SELECT * FROM table_gibier;";
 	$sqlGibier = "SELECT * FROM table_objets WHERE objet_civilisation='gibier';";
 	$rqtGibier = mysql_query($sqlGibier) or die(mysql_error() . '<br />' . $sqlGibier);
 	//on crée une table contenant les infos des objets
 	$arGibier = null;
 	while ($row = mysql_fetch_array($rqtGibier, MYSQL_ASSOC)) {
-		$arGibier[] = new Gibier($row);
+		//$arGibier[] = new Gibier($row);
+		$arGibier[] = $row;
 	}
 	//on prend un nombre aléatoire
 	$num = mt_rand(1, mysql_num_rows($rqtGibier) * 20);
 
-	if (isset($arGibier[$num])) {
-		switch ($NiveauChasseur) {
+	if (isset($arGibier[$num]))
+	{
+		$oGibier = new Gibier($arGibier[$num]);
+		if($oJoueur->CheckCompetence($oGibier->GetCodeCompetenceRequise()))
+		{
+			return $oGibier;
+		}
+		/* switch ($NiveauChasseur) {
 			case 3: if ($arGibier[$num]->GetNiveau() == 'grand') {
 				return $arGibier[$num];
 			}
@@ -838,7 +809,7 @@ Function GibierTrouve($NiveauChasseur) {
 			case 1: if ($arGibier[$num]->GetNiveau() == 'petit') {
 				return $arGibier[$num];
 			}
-		}
+		} */
 	}
 	return null;
 }
@@ -905,7 +876,7 @@ function AddCaseCarte($position, $login, $IDBatiment, $etat, $niveau){
 	`login`, 
 	`id_type_batiment`, 
 	`contenu_batiment`, 
-	`res_nourriture`, `res_bois`, `res_pierre`, 
+	`res_nourriture`, `res_bois`, `res_pierre`, `res_eau`, 
 	`date_action_batiment`, 
 	`etat_batiment`, 
 	`date_last_attaque`, 
@@ -915,9 +886,9 @@ function AddCaseCarte($position, $login, $IDBatiment, $etat, $niveau){
 	'$position', 
 	'$login', 
 	$IDBatiment, "
-	.(in_array($IDBatiment, array(6 /*Ferme*/, 10 /*Mine*/, 16 /*Carrière*/))?"'a1,0'":'NULL').", "
-	.($IDBatiment == 1?"0, 0, 0, ":"NULL, NULL, NULL, ")
-	.(in_array($IDBatiment, array(6 /*Ferme*/, 10 /*Mine*/, 16 /*Carrière*/))?"'".date('Y-m-d H:i:s')."'":'NULL').", 
+	.(in_array($IDBatiment, array(ferme::ID_BATIMENT, mine::ID_BATIMENT, carriere::ID_BATIMENT, potager::ID_BATIMENT))?"'a1,0'":'NULL').", "
+	.($IDBatiment == maison::ID_BATIMENT?"0, 0, 0, 0, ":"NULL, NULL, NULL, NULL, ")
+	.(in_array($IDBatiment, array(ferme::ID_BATIMENT, mine::ID_BATIMENT, carriere::ID_BATIMENT, potager::ID_BATIMENT))?"'".date('Y-m-d H:i:s')."'":'NULL').", 
 	$etat, 
 	NULL, 
 	NULL, 
@@ -1152,57 +1123,75 @@ function ActionLegionnaire(&$check, personnage &$oJoueur){
 	}
 }
 function ActionConstruire(&$check, $id, personnage &$oJoueur, &$objManager){
-	if($_SESSION['main'][$id]['construire'] == 1){
-		$oJoueur->MaisonInstalle($oJoueur->GetCoordonnee());
-		$ressource = array('pierre'=>0, 'bois'=>0, 'nourriture'=>0, 'hydromel'=>0);
-	}
-
-	// on recupère les info du batiment
-	$sql = "SELECT * FROM table_batiment WHERE id_batiment=".$_SESSION['main'][$id]['construire'].";";
-	$requete = mysql_query($sql) or die ( mysql_error() );
-	$batiment = mysql_fetch_array($requete, MYSQL_ASSOC);
-
-	// on ajoute le batiment à la carte
-	/* if($_SESSION['main'][$id]['construire']==1){
-		AddCaseCarte($oJoueur->GetCoordonnee(), $oJoueur->GetLogin(), $_SESSION['main'][$id]['construire'], $batiment['batiment_vie'], $batiment['batiment_niveau'], $ressource);
-	}else{ */
-		AddCaseCarte($oJoueur->GetCoordonnee(), $oJoueur->GetLogin(), $_SESSION['main'][$id]['construire'], $batiment['batiment_vie'], $batiment['batiment_niveau']);
-	//}
-	
-	//on gagne des points
-	$oJoueur->UpdatePoints($batiment['batiment_points']);
-	
-	//on ajoute un historique que le batiment est construit
-	AddHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'Construction', NULL, NULL, 'Batiment construit. ID du batiment = '.$_SESSION['main'][$id]['construire']);
-	
-	//On trouve la maison
-	$maison = $oJoueur->GetObjSaMaison();
-	
-	//on paie le batiment
-	if(!is_null($_SESSION['main'][$id]['prix']))
+	if(ChkIfBatimentDejaConstruit($_SESSION['main'][$id]['construire']))
 	{
-		foreach($_SESSION['main'][$id]['prix'] as $Prix)
-		{
-			UtilisationRessource(explode('=', $Prix), $oJoueur, $maison);
-		}
+		$check = false;
+		echo 'Erreur GLX0003: Fonction ActionConstruire - Bâtiment déja construit';
+		return NULL;
 	}
-	
-	/* if(isset($_SESSION['main'][$id]['prix_or'])){
-		$oJoueur->MindOr($_SESSION['main'][$id]['prix_or']);
-	}
-	if(isset($_SESSION['main'][$id]['prix_bois'])){
-		$maison->MindBois($_SESSION['main'][$id]['prix_bois']);
-	}
-	if(isset($_SESSION['main'][$id]['prix_pierre'])){
-		$maison->MindPierre($_SESSION['main'][$id]['prix_pierre']);
-	}
-	if(isset($_SESSION['main'][$id]['prix_nourriture'])){
-		$maison->MindNourriture($_SESSION['main'][$id]['prix_nourriture']);
-	} */
-	
 
-	$objManager->UpdateBatiment($maison);
-	unset($maison);
+	if($_SESSION['main'][$id]['construire'] == maison::ID_BATIMENT)
+	{
+		//On construit sa maison
+		$oJoueur->MaisonInstalle($oJoueur->GetCoordonnee());
+		// on recupère les info du batiment
+		$sql = "SELECT * FROM table_batiment WHERE id_batiment=".maison::ID_BATIMENT.";";
+		$requete = mysql_query($sql) or die ( mysql_error() );
+		$batiment = mysql_fetch_array($requete, MYSQL_ASSOC);
+
+		// on ajoute le batiment à la carte
+		AddCaseCarte($oJoueur->GetCoordonnee(), $oJoueur->GetLogin(), maison::ID_BATIMENT, $batiment['batiment_vie'], $batiment['batiment_niveau']);
+		
+	}else{
+		//On trouve la maison
+		$maison = $oJoueur->GetObjSaMaison();
+		
+		if(!is_null($maison))
+		{
+		
+		
+			//on paie le batiment
+			$chkPaye = true;
+		
+			if(!is_null($_SESSION['main'][$id]['prix']) AND CheckCout($_SESSION['main'][$id]['prix'], $oJoueur, $maison))
+			{
+					
+				foreach($_SESSION['main'][$id]['prix'] as $Prix)
+				{
+					UtilisationRessource(explode('=', $Prix), $oJoueur, $maison);
+				}
+				
+				$objManager->UpdateBatiment($maison);
+				
+				// on recupère les info du batiment
+				$sql = "SELECT * FROM table_batiment WHERE id_batiment=".$_SESSION['main'][$id]['construire'].";";
+				$requete = mysql_query($sql) or die ( mysql_error() );
+				$batiment = mysql_fetch_array($requete, MYSQL_ASSOC);
+				
+				// on ajoute le batiment à la carte
+				AddCaseCarte($oJoueur->GetCoordonnee(), $oJoueur->GetLogin(), $_SESSION['main'][$id]['construire'], $batiment['batiment_vie'], $batiment['batiment_niveau']);
+				
+				
+				//on gagne des points
+				$oJoueur->UpdatePoints($batiment['batiment_points']);
+				
+				//on ajoute un historique que le batiment est construit
+				AddHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'Construction', NULL, NULL, 'Batiment construit. ID du batiment = '.$_SESSION['main'][$id]['construire']);
+			}else{
+				$check = false;
+				echo 'Erreur GLX0003: Fonction ActionConstruire - Pas assez de ressource pour payer';
+				return NULL;
+			}
+			
+			unset($maison);
+			
+		}else{
+			$check = false;
+			echo 'Erreur GLX0003: Fonction ActionConstruire - Maison introuvable';
+			return NULL;
+		}
+			unset($_SESSION['main'][$id]);
+	}
 }
 function ActionQuete(&$check, $id, personnage &$oJoueur, &$objManager){
 	reset($_SESSION['QueteEnCours']);
