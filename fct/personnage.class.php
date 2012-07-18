@@ -1,10 +1,10 @@
 <?php
 class personnage{
 
-	private	$id,
-			$login,
-			$mail,
-			$position,
+	private	$id;
+	private $login;
+	private $mail;
+	private $position,
 			$vie,
 			$civilisation,
 			$village,
@@ -30,7 +30,8 @@ class personnage{
 			$maison_installe,
 			$clan,
 			$DateLastMessageLu,
-			$lstCompetences,
+			$lstCompetences, 
+			$lstTypeCompetences, 
 			$not_attaque, $not_combat,
 			$nb_points;
 			
@@ -239,16 +240,21 @@ class personnage{
 	//les Compétences
 	private function CreateListCompetence($list, $lstStatus){
 		foreach($list as $cmp){
-			$this->lstCompetences[$cmp] = false;
+			if(array_key_exists($cmp[0], $lstStatus))
+			{
+				$this->lstCompetences[$cmp[0]] = true;
+			}else
+			{
+				$this->lstCompetences[$cmp[0]] = false;
+			}
+			
+			$this->lstTypeCompetences[$cmp[1]][] = $cmp[0];
+			
 		}
 		
-		foreach($lstStatus as $cmp){
-			/* if(is_null($cmp['cmp_niveau'])){ */
-				$this->lstCompetences[$cmp] = true;
-			/* }elseif($this->lstCompetences[ucfirst($cmp['cmp_code'])] < $cmp['cmp_niveau']){
-				$this->lstCompetences[ucfirst($cmp['cmp_code'])] = (int)$cmp['cmp_niveau'];
-			} */
-		}
+		/* foreach($lstStatus as $cmp){
+			$this->lstCompetences[$cmp[1]][$cmp[0]] = true;
+		} */
 	}
 	
 	public function EquiperPerso($numObject, $typeObject){
@@ -790,12 +796,12 @@ class personnage{
 		
 		//on crée la liste des compétences possible
 		//$sqlLstCmp = "SELECT cmp_lst_code FROM `table_competence_lst` WHERE cmp_lst_acces IN ('".GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class')."', 'Tous') ORDER BY cmp_lst_code ASC;";
-		$sqlLstCmp = "SELECT cmp_lst_code FROM `table_competence_lst` WHERE (cmp_lst_acces IN ('%".GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class')."%', 'Tous') OR `cmp_lst_acces` LIKE '%".GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class')."%')ORDER BY cmp_lst_code ASC;";
+		$sqlLstCmp = "SELECT cmp_lst_code, cmp_lst_type FROM `table_competence_lst` WHERE (cmp_lst_acces IN ('%".GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class')."%', 'Tous') OR `cmp_lst_acces` LIKE '%".GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class')."%')ORDER BY cmp_lst_code ASC;";
 		$rqtLstCmp = mysql_query($sqlLstCmp) or die (mysql_error().'<br />'.$sqlLstCmp);
 		
 		if(mysql_num_rows($rqtLstCmp) > 0){
 			while($item = mysql_fetch_array($rqtLstCmp, MYSQL_ASSOC)){
-				$lst[] = $item['cmp_lst_code'];
+				$lst[] = array($item['cmp_lst_code'], $item['cmp_lst_type']);
 			}
 		}
 		
@@ -803,6 +809,7 @@ class personnage{
 		$sqlCmp = "SELECT cmp_code FROM table_competence WHERE cmp_login='".$this->login."' AND cmp_finish=1;";
 		$rqtCmp = mysql_query($sqlCmp) or die (mysql_error().'<br />'.$sqlCmp);
 		
+		$status[] = NULL;
 		if(mysql_num_rows($rqtCmp) > 0){
 			while($cmp = mysql_fetch_array($rqtCmp, MYSQL_ASSOC)){
 				$status[] = $cmp['cmp_code'];
@@ -810,10 +817,9 @@ class personnage{
 			//$this->UpdateCompetences($competences);
 		}
 		
-		if(mysql_num_rows($rqtLstCmp) > 0 AND mysql_num_rows($rqtCmp) > 0){
+		if(mysql_num_rows($rqtLstCmp) > 0){
 			$this->CreateListCompetence($lst, $status);
 		}
-		
 		
 	}
 	// -------------------- GET info ----------------------
@@ -923,9 +929,15 @@ class personnage{
 	public function GetNotifCombat(){		return $this->not_combat;}
 	public function GetNotifAttaque(){		return $this->not_attaque;}
 	public function GetNbPoints(){			return $this->nb_points;}
-	//Les Compétences
 	public function GetNiveauCompetence($competence){
-		return $this->lstCompetences[ucfirst($competence)];
+		if(isset($this->lstCompetences[ucfirst($competence)]))
+		{
+			return $this->lstCompetences[ucfirst($competence)];
+			
+		}else{
+			
+			return NULL;
+		}
 	}
 	public function GetDateLasMessageLu(){	return $this->DateLastMessageLu;}
 	public function GetObjSaMaison(){		return FoundBatiment(1, $this->login);}
@@ -933,6 +945,28 @@ class personnage{
 		if(isset($this->lstCompetences[$codeCompetence]))
 		{
 			return $this->lstCompetences[$codeCompetence];
+		}
+		return false;
+	}
+	public function GetTypeCompetence($codeCompetence){
+		foreach ($this->lstTypeCompetences as $Type=>$code)
+		{
+			if($code == $codeCompetence)
+			{
+				return $Type;
+			}
+		}
+		
+		return NULL;
+	}
+	public function CheckTypeCompetence($typeCompetence){
+		
+		foreach($this->lstTypeCompetences[$typeCompetence] as $Competence)
+		{
+			if($this->CheckCompetence($Competence))
+			{
+				return true;
+			}
 		}
 		return false;
 	}
