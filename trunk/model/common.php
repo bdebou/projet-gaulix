@@ -80,6 +80,7 @@ function AfficheIcone($type, $HeightIcone = 20) {
 		case 'amedalbronze':		$Name = 'Médaille de bronze au classement des alliances';	break;
 		case 'trash':				$Name = 'Supprimer';										break;
 		case 'monnaie':
+		case strtolower(personnage::TYPE_RES_MONNAIE):
 			$FileName	= personnage::TYPE_RES_MONNAIE;
 			$Name		= personnage::TYPE_RES_MONNAIE;
 			break;
