@@ -66,8 +66,10 @@ function AfficheIcone($type, $HeightIcone = 20) {
 			$FileName	= maison::TYPE_RES_NOURRITURE;
 			$Name		= maison::TYPE_RES_NOURRITURE;
 			break;
-		//case 'argent':
-		//case 'or':					$FileName = 'ResOr';										break;
+		case strtolower(maison::TYPE_RES_EAU_POTABLE):
+			$FileName	= maison::TYPE_RES_EAU_POTABLE;
+			//$Name		= maison::TYPE_RES_EAU_POTABLE;
+			break;
 		case 'marche_cancel':		$Name = 'Annuler transaction';								break;
 		case 'marche_accept':		$Name = 'Accepter transaction';								break;
 		case 'marche_attention':	$Name = 'Transaction impossible';							break;
