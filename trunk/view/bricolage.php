@@ -1,12 +1,4 @@
 <div class="main">
-<script>
-function printValue(ValueFrom, ValueTo) {
-	var x = document.getElementById(ValueTo);
-	var y = document.getElementById(ValueFrom);
-	x.value = y.value;
-}
-
-</script>
 
 <?php
 	global $objManager;

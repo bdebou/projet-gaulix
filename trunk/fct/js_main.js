@@ -12,6 +12,17 @@ window.___gcfg = {lang: 'fr'};
 
 /*
 +---------------------------------------------------------------------------------------+
+|				La fonction pour mettre à jour les valeurs des SidesBar.				|
++---------------------------------------------------------------------------------------+
+ */
+function printValue(ValueFrom, ValueTo) {
+	var x = document.getElementById(ValueTo);
+	var y = document.getElementById(ValueFrom);
+	x.value = y.value;
+}
+
+/*
++---------------------------------------------------------------------------------------+
 |				La fonction pour afficher le compteur de déplacement.					|
 +---------------------------------------------------------------------------------------+
 */
@@ -102,6 +113,7 @@ function ArrangeDate(heure){
 */
 var _gaq = _gaq || [];
 	_gaq.push(['_setAccount', 'UA-25828929-1']);
+	_gaq.push(['_setSiteSpeedSampleRate', 75]);
 	_gaq.push(['_trackPageview']);
 
 (function() {
