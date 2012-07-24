@@ -1,14 +1,4 @@
 <div class="main">
-
-<script>
-	function printValue(ValueFrom, ValueTo) {
-		var x = document.getElementById(ValueTo);
-		var y = document.getElementById(ValueFrom);
-		x.value = y.value;
-	}
-	
-</script>
-
 <h1>Votre Bolga <dfn>(Sac)</dfn></h1>
 <?php
 	global $arCouleurs, $objManager;
