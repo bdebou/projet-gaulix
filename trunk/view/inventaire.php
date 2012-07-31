@@ -128,9 +128,10 @@ foreach($lstTypeObjets as $Category)
 			
 			echo '<form class="inventaire" action="index.php?page=inventaire" formmethod="post" method="post">'
 	.'<table class="objet">
-		<tr><td rowspan="'.$nbLigne.'" style="width:105px; margin:auto;">
-					<img src="./img/objets/'.$objObjet->GetCode().'.png" alt="'.$objObjet->GetNom().'" width="100px" onmouseover="montre(\''.CorrectDataInfoBulle($objObjet->GetInfoBulle()).'\');" onmouseout="cache();" style="vertical-align:middle;" />
-					</td></tr>'
+		<tr><td rowspan="'.$nbLigne.'" style="width:105px; margin:auto;">'
+					//.'<img src="./img/objets/'.$objObjet->GetCode().'.png" alt="'.$objObjet->GetNom().'" width="100px" onmouseover="montre(\''.CorrectDataInfoBulle($objObjet->GetInfoBulle()).'\');" onmouseout="cache();" style="vertical-align:middle;" />'
+					.$objObjet->AfficheInfoObjet(100)
+					.'</td></tr>'
 					.'<tr><th colspan="'.$nbColonne.'">'.($objObjet->GetQuantite() > 1?'<b>'.$objObjet->GetQuantite().'x</b> ':'').$objObjet->GetNom().$txtAbandonner.'</th></tr>'
 					.$txtInfoArmement
 					.'<tr><td colspan="'.$nbColonne.'" style="text-align:center;">
