@@ -7,6 +7,8 @@ class maison extends batiment{
 	const COUT_AMELIORATION_NIVEAU_2	= 'Sesterce=1000';
 	const COUT_AMELIORATION_NIVEAU_3	= 'Sesterce=150000';
 	
+	Const PRIX_REPARATION				= 'Sesterce=20,BC=10';		// Prix des réparation par point de vie
+	
 	const ID_BATIMENT					= 1;
 	
 	const TYPE_RES_NOURRITURE			= 'Nourriture';
@@ -216,7 +218,6 @@ class maison extends batiment{
 		}
 		return parent::GetNom();
 	}
-	
 	
 }
 ?>
