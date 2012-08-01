@@ -32,6 +32,46 @@ class objArmement extends objMain{
 		}
 	}
 	
+	//Les Affichages
+	//==============
+	public function AfficheInfoObjet($intHeightImg = 50) {
+	
+		$nbInfo = 0;
+		$txtInfo = '<tr>';
+	
+		if($this->Attaque != 0){
+			$txtInfo .= '<td>' . AfficheIcone(objArmement::TYPE_ATTAQUE) . ' = ' . $this->Attaque . '</td>';
+			$nbInfo++;
+		}
+
+		if($this->Distance != 0){
+			$txtInfo .= '<td>' . AfficheIcone(objArmement::TYPE_DISTANCE) . ' = ' . $this->Distance . '</td>';
+			$nbInfo++;
+		}
+
+		if($this->Defense != 0){
+			$txtInfo .= '<td>' . AfficheIcone(objArmement::TYPE_DEFENSE) . ' = ' . $this->Defense . '</td>';
+			$nbInfo++;
+		}
+	
+		$txtInfo .= '</tr>';
+	
+		$InfoBulle = '<table class="InfoBulle">'
+					. '<tr><th' . (isset($txtInfo) ? ' colspan="'.$nbInfo.'"' : '') . '>' . $this->GetNom() . '</th></tr>'
+					. ((!is_null($this->GetDescription()))?'<tr><td'.(isset($txtInfo)?' colspan="'.$nbInfo.'"':'').' style="text-align:left;">' . $this->GetDescription() . '</td></tr>':'')
+					. (isset($txtInfo) ? $txtInfo : '')
+					. '<tr><td' . (isset($txtInfo) ? ' colspan="'.$nbInfo.'"' : '') . '>' . AfficheIcone(personnage::TYPE_RES_MONNAIE) . ' = ' . $this->GetPrix() . '</td></tr>'
+					. '</table>';
+	
+		return '<img
+					style="vertical-align:middle;" 
+					alt="' . $this->GetNom() . '" 
+					src="./img/objets/' . $this->GetCode() . '.png" 
+					onmouseover="montre(\'' . CorrectDataInfoBulle($InfoBulle) . '\');" 
+					onmouseout="cache();" 
+					height="'.$intHeightImg.'px"
+				 />';
+	}
 	//Les GETS
 	//========
 	Public function GetType(){
