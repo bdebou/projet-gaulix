@@ -20,17 +20,24 @@ function CreateListBatiment(personnage &$oJoueur){
 }
 function AfficheBatiment(batiment &$batiment, personnage &$oJoueur){
 	$ImgSize = 'height';
-	$txt = '
-	<table class="village">';
+	$txt = NULL;
 
 	$contenu = 'Ne peut rien contenir';
 	$PositionBatiment	= implode(',', array_merge(array($batiment->GetCarte()), $batiment->GetCoordonnee()));
 	$PositionJoueur		= $oJoueur->GetCoordonnee();
 	$chkOptions = false;
 	$chkMarche = false;
+	
+	$nbLigne = 5;
+	
+	$lstBatimentAvecEsclaves = array(ferme::ID_BATIMENT, potager::ID_BATIMENT, mine::ID_BATIMENT, carriere::ID_BATIMENT);
 
-	switch($batiment->GetType()){
-		case 'maison':
+	if(in_array($batiment->GetIDType(), $lstBatimentAvecEsclaves))
+	{
+		$nbLigne++;
+	}
+	switch($batiment->GetIDType()){
+		case maison::ID_BATIMENT:
 			$ImgSize = 'width';
 			if($PositionBatiment == $PositionJoueur){
 				$contenu = '<p>Ne peut rien contenir.</p>';
@@ -42,9 +49,12 @@ function AfficheBatiment(batiment &$batiment, personnage &$oJoueur){
 		case 'bank':
 			$contenu = $batiment->AfficheContenu($oJoueur);
 			break;
-		case 'entrepot':
-		case 'ferme':
-		case 'mine' :
+		case entrepot::ID_BATIMENT:
+			$nbLigne--;
+		case ferme::ID_BATIMENT:
+		case mine::ID_BATIMENT :
+		case potager::ID_BATIMENT:
+		case carriere::ID_BATIMENT:
 			$ImgSize = 'width';
 			$contenu = $batiment->AfficheContenu($oJoueur);
 			break;
@@ -56,42 +66,38 @@ function AfficheBatiment(batiment &$batiment, personnage &$oJoueur){
 			}
 			break;
 	}
+	
 	$txt .= '
 		<tr>
-			<td rowspan="'.($batiment->GetType() == 'entrepot'?'5':'6').'" style="width:400px;">
-				<img alt="'.$batiment->GetType().'" src="./img/batiments/'.$batiment->GetType().'-'.$batiment->GetNiveau().'.png" width="400px" />
+			<td rowspan="'.$nbLigne.'" style="width:400px;">
+				<img alt="'.$batiment->GetType().'" src="./img/batiments/'.$batiment->GetType().'.png" width="400px"  onmouseover="montre(\''.CorrectDataInfoBulle($batiment->GetDescription()).'\');" onmouseout="cache();"/>
 			</td>
-			<th colspan="4"><a name="'.str_replace(',', '_', $PositionBatiment).'">'.$batiment->GetNom($oJoueur->GetCivilisation()).' ('.$batiment->GetNiveau().' / '.$batiment->GetNiveauMax().')</a></th>
+			<th colspan="4">
+				<a name="'.str_replace(',', '_', $PositionBatiment).'">'.$batiment->GetNom($oJoueur->GetCivilisation()).' ('.$batiment->GetNiveau().' / '.$batiment->GetNiveauMax().')</a>
+			</th>
 		</tr>
-		<tr>
-			<td colspan="4">'.$batiment->AfficheOptionAmeliorer($oJoueur).'</td>
-		</tr>
-		<tr>
-			<td colspan="4">'.$batiment->GetDescription().'</td>
-		</tr>
-		<tr>
+		<tr><td colspan="4">'.$batiment->AfficheOptionAmeliorer($oJoueur).'</td></tr>'
+		.(in_array($batiment->GetIDType(), $lstBatimentAvecEsclaves)?'<tr><td colspan="4">'.$batiment->AfficheAchatEsclave($oJoueur).'</td></tr>':NULL)
+		.'<tr>
 			<td colspan="4">'
-	.'<img alt="Barre status" src="./fct/fct_image.php?type=statusetat&amp;value='.$batiment->GetEtat().'&amp;max='.$batiment->GetEtatMax().'" />'
-	.'<br />'
-	.$batiment->AfficheOptionReparer($oJoueur)
-	.'</td>
+				.'<img alt="Barre status" src="./fct/fct_image.php?type=statusetat&amp;value='.$batiment->GetEtat().'&amp;max='.$batiment->GetEtatMax().'" />'
+				.'<br />'
+				.$batiment->AfficheOptionReparer($oJoueur)
+			.'</td>
 		</tr>
 		<tr>
 			<td colspan="4">
-				<ul style="list-style-type:none; padding:0px; text-align:center; margin:0px;">'
-	.'<li style="display:inline;">'.AfficheIcone('attaque').' : '.(is_null($batiment->GetAttaque())?'0':$batiment->GetAttaque()).'</li>'
-	.'<li style="display:inline; margin-left:40px;">'.AfficheIcone('distance').' : '.(is_null($batiment->GetDistance())?'0':$batiment->GetDistance())	.'</li>'
-	.'<li style="display:inline; margin-left:40px;">'.AfficheIcone('defense').' : '.(is_null($batiment->GetDefense())?'0':$batiment->GetDefense()).'</li>'
-	.'</ul>
+				<ul style="list-style-type:none; padding:0px; text-align:center; margin:0px;">
+					<li style="display:inline;">'.AfficheIcone(objArmement::TYPE_ATTAQUE).' : '.(is_null($batiment->GetAttaque())?'0':$batiment->GetAttaque()).'</li>
+					<li style="display:inline; margin-left:40px;">'.AfficheIcone(objArmement::TYPE_DISTANCE).' : '.(is_null($batiment->GetDistance())?'0':$batiment->GetDistance())	.'</li>
+					<li style="display:inline; margin-left:40px;">'.AfficheIcone(objArmement::TYPE_DEFENSE).' : '.(is_null($batiment->GetDefense())?'0':$batiment->GetDefense()).'</li>
+				</ul>
 			</td>
 		</tr>
-		<tr>
-			<td colspan="'.($batiment->GetType() == 'entrepot'?'5':'4').'">'.$contenu.'</td>
-		</tr>'
-	.($chkOptions?$batiment->AfficheOptions($oJoueur):'')
-	.($chkMarche?$batiment->AfficheTransactions($oJoueur):'')
-	.'<tr style="background:lightgrey;"><td colspan="5" style="text-align:right;"><a href="#TopPage" alt="TopPage">Top</a></td></tr>'
-	.'</table>';
+		<tr><td colspan="'.($batiment->GetIDType() == entrepot::ID_BATIMENT?'5':'4').'">'.$contenu.'</td></tr>'
+		.($chkOptions?$batiment->AfficheOptions($oJoueur):'')
+		.($chkMarche?$batiment->AfficheTransactions($oJoueur):'');
+	
 	return $txt;
 }
 function AddTransaction($vendeur, $achat=array('nourriture'=>'NULL', 'pierre'=>'NULL', 'bois'=>'NULL', 'or'=>'NULL'), $vente=array('nourriture'=>'NULL', 'pierre'=>'NULL', 'bois'=>'NULL', 'or'=>'NULL')){
@@ -127,37 +133,24 @@ function ActionAmeliorerBatiment(&$check, personnage &$oJoueur, &$objManager, $c
 	if(isset($_SESSION['main'][$coordonnee])){
 
 		$maison = $oJoueur->GetObjSaMaison();
-		$chk = true;
 
 		if(!is_null($maison)){
 				
 			$batiment = FoundBatiment(null, null, str_replace('_', ',', $coordonnee));
 				
 			if(!is_null($batiment)){
-
-				if(get_class($batiment) == 'maison'){
-					$chk = false;
-				}
 				
 				switch($batiment->GetStatusAmelioration()){
 					case 'Go':
 						$chkPrix = true;
 						if(!is_null($_SESSION['main'][$coordonnee]['prixAmelioration']))
 						{
-							foreach($_SESSION['main'][$coordonnee]['prixAmelioration'] as $Prix)
-							{
-								if(!CheckIfAssezRessource(explode('=', $Prix), $oJoueur, $maison))
-								{
-									$chkPrix = false;
-									break;
-								}
-							}
-							if($chkPrix){
-								foreach($_SESSION['main'][$coordonnee]['prixAmelioration'] as $Prix)
+							if(CheckCout($batiment->GetCoutAmelioration(), $oJoueur, $maison)){
+								foreach($batiment->GetCoutAmelioration() as $Prix)
 								{
 									UtilisationRessource(explode('=', $Prix), $oJoueur, $maison);
 								}
-								if(get_class($batiment) == 'maison'){
+								if($batiment->GetIDType() == maison::ID_BATIMENT){
 									$batiment = $maison;
 								}
 							}else{
@@ -198,25 +191,43 @@ function ActionAmeliorerBatiment(&$check, personnage &$oJoueur, &$objManager, $c
 		echo 'Erreur GLX0002: Fonction ActionAmeliorerBatiment';
 	}
 }
-function ActionReparer(&$check, $id, $num, personnage &$oJoueur, &$objManager){
-	if(isset($_SESSION['main']['Reparer'])){
+function ActionReparer(&$check, $qtePoint, personnage &$oJoueur, &$objManager){
+	//if(isset($_SESSION['main']['Reparer'])){
 		$batiment = FoundBatiment(null, $oJoueur->GetLogin(), $oJoueur->GetCoordonnee());
 		
 		if(!is_null($batiment)){
-			if(CheckIfAssezRessource(array('ResOr', $_SESSION['main']['Reparer'][$id]['montant']), $oJoueur, $oJoueur->GetObjSaMaison())){
-				$batiment->Reparer($_SESSION['main']['Reparer'][$id]['pts'], $oJoueur);
-				$oJoueur->MindOr($_SESSION['main']['Reparer'][$id]['montant']);
+			$objMaison = $oJoueur->GetObjSaMaison();
+			
+			if(CheckCout($batiment->GetCoutReparation($qtePoint), $oJoueur, $objMaison))
+			{
+				$batiment->Reparer($qtePoint, $oJoueur);
+				
+				if($batiment->GetIDType() == maison::ID_BATIMENT)
+				{
+					foreach($batiment->GetCoutReparation($qtePoint) as $Prix)
+					{
+						UtilisationRessource(explode('=', $Prix), $oJoueur, $batiment);
+					}
+				}else{
+				foreach($batiment->GetCoutReparation($qtePoint) as $Prix)
+					{
+						UtilisationRessource(explode('=', $Prix), $oJoueur, $objMaison);
+					}
+					$objManager->UpdateBatiment($objMaison);
+				}
+				//$oJoueur->MindOr(batiment::PRIX_REPARATION * $qtePoint);
 				$objManager->UpdateBatiment($batiment);
+				
 			}
 		}else{
 			$check = false;
 			echo 'Erreur GLX0003: Fonction ActionReparer - Batiment Introuvable';
 		}
-		unset($_SESSION['main']['Reparer']);
+	/* 	unset($_SESSION['main']['Reparer']);
 	}else{
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionReparer';
-	}
+	} */
 }
 function ActionDepot(&$check, &$oJoueur, &$objManager){
 	if(isset($_POST['depot'])){
@@ -290,49 +301,39 @@ function ActionReprendre(&$check, $id, &$oJoueur, &$objManager){
 	}
 }
 function ActionViderStock(&$check, $id, $type, personnage &$oJoueur, &$objManager){
-	if(isset($_SESSION['main'][$type]['vider'])){
-		$maison = $oJoueur->GetObjSaMaison();
-		if(!is_null($maison)){
-			$batiment = FoundBatiment($id, null, $oJoueur->GetCoordonnee());
-			if(!is_null($batiment)){
-				$batiment->ViderStock($_SESSION['main'][$type]['vider'], $maison, $oJoueur);
-				$objManager->UpdateBatiment($batiment);
-				unset($batiment);
-			}else{
-				$check = false;
-				echo 'Erreur GLX0003: Fonction ActionViderStock - '.ucfirst(strtolower($type)).' Introuvable';
-			}
-			$objManager->UpdateBatiment($maison);
-			unset($maison);
-		}else{
-			$check = false;
-			echo 'Erreur GLX0003: Fonction ActionViderStock - Maison Introuvable';
-		}
-		unset($_SESSION['main'][$type]['vider']);
+	$batiment = FoundBatiment($id, null, $oJoueur->GetCoordonnee());
+	
+	if(!is_null($batiment))
+	{
+		//On vide le stock du batiment
+		$batiment->ViderStock($oJoueur);
+		
+		$objManager->UpdateBatiment($batiment);
+		unset($batiment);
 	}else{
 		$check = false;
-		echo 'Erreur GLX0002: Fonction ActionViderStock';
+		echo 'Erreur GLX0003: Fonction ActionViderStock - '.ucfirst(strtolower($type)).' Introuvable';
 	}
+	
 }
 function ActionProduction(&$check, $id, $NomBatiment, $type, personnage &$oJoueur, &$objManager){
-	$maison = $oJoueur->GetObjSaMaison();
-	if(!is_null($maison)){
-		$batiment = FoundBatiment($id, null, $oJoueur->GetCoordonnee());
-		if(!is_null($batiment)){
-			$batiment->ViderStock($_SESSION['main'][$NomBatiment]['vider'], $maison, $oJoueur);
-			//$batiment->ChangerProductionBatiment($_SESSION['main'][$NomBatiment]['production']);
-			$batiment->ChangerProductionBatiment($type);
-			$objManager->UpdateBatiment($batiment);
-			$objManager->UpdateBatiment($maison);
-			unset($batiment);
-		}else{
-			$check = false;
-			echo 'Erreur GLX0003: Fonction ActionProduction - '.ucfirst(strtolower($NomBatiment)).' Introuvable';
-		}
+	$batiment = FoundBatiment($id, null, $oJoueur->GetCoordonnee());
+		
+	if(!is_null($batiment))
+	{
+		//On vide d'abord le stock du batiment
+		$batiment->ViderStock($oJoueur);
+
+		//Et puis on change le type de production
+		$batiment->ChangerProductionBatiment($type);
+		
+		$objManager->UpdateBatiment($batiment);
+		unset($batiment);
 	}else{
 		$check = false;
-		echo 'Erreur GLX0003: Fonction ActionProduction - Maison Introuvable';
+		echo 'Erreur GLX0003: Fonction ActionProduction - '.ucfirst(strtolower($NomBatiment)).' Introuvable';
 	}
+	
 }
 function ActionDruide(&$chkErr, $id, personnage &$oJoueur, &$objManager){
 	if(isset($_SESSION['main']['druide'])){
