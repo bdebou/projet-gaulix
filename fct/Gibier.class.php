@@ -1,14 +1,23 @@
 <?php
-class Gibier{
+class Gibier extends objRessource{
+//class Gibier{
 
-	private	$ID,
-			$Code,
-			$Nom,
-			$Categorie,
-			$Attaque,
-			$GainNourriture = null,
-			$GainCuir = null;
+	private $Attaque;
+	private $GainNourriture = null;
+	private $GainCuir = null;
 			
+	Const TYPE_CMP_MAIN		= 'Chasse';
+	Const TYPE_CMP_CUIR		= 'Travail du cuir';
+	Const TYPE_CMP_NOUR		= 'Cuisine';
+	
+	const CMP_CHASSE_1		= 'cmpCha1';
+	const CMP_CHASSE_2		= 'cmpCha2';
+	const CMP_CHASSE_3		= 'cmpCha3';
+	const CMP_CHASSE_4		= 'cmpCha4';
+	
+	Const CODE_GAIN_NOUR	= maison::TYPE_RES_NOURRITURE;
+	Const CODE_GAIN_CUIR	= 5;
+	
 	// Initialisation de l'objet
 	public function __construct(array $donnees){
 		$this->hydrate($donnees);
@@ -16,71 +25,23 @@ class Gibier{
 	
 	//Remplir l'objet Gibier
 	public function hydrate(array $donnees){
+		parent::Hydrate($donnees, 1);
+		
 		foreach ($donnees as $key => $value){
 			switch ($key){
-				case 'id_objet':			$this->ID = intval($value); break;
-				case 'objet_code':			$this->Code = strval($value); break;
-				case 'objet_nom':			$this->Nom = strval($value); break;
-				case 'objet_niveau':		$this->Categorie = intval($value); break;
 				case 'objet_attaque':		$this->Attaque = (is_null($value)?NULL:intval($value)); break;
-				case 'objet_ressource':
-					if(!is_null($value)){
-						$arTmp = explode(',', $value);
-						foreach($arTmp as $gain){
-							$arTmpG = explode('=', $gain);
-							switch($arTmpG[0]){
-								case 'ResNou' :		$this->GainNourriture = $arTmpG[1];	break;
-								case 'ResCuir' :	$this->GainCuir = $arTmpG[1];			break;
-							}
-						}
-					}
-					break;
 			}
 		}
 	}
 	// -------------------- GET info ----------------------
-	public function GetNiveau(){
-		switch($this->Categorie){
-			case 1: return 'petit';
-			case 2: return 'moyen';
-			case 3: return 'grand';
-		}
+	public function GetCodeCompetenceRequise(){
+		$Cout = $this->GetCoutFabrication();
+		$tmp = explode('=', $Cout[0]);
+		
+		return $tmp[0];
 	}
 	Public function GetAttaque(){
 		return $this->Attaque;
 	}
-	Public function GetGainNourriture($NiveauBoucher){
-		if(is_null($NiveauBoucher)){
-			return $this->GainNourriture;
-		}else{
-			switch($NiveauBoucher){
-				case 1:	return (3 * $this->GainNourriture);
-				case 2:	return (6 * $this->GainNourriture);
-				case 3:	return (10 * $this->GainNourriture);
-			}
-		}
-	}
-	Public function GetGainCuir($NiveauTanneur){
-		if(is_null($NiveauTanneur)){
-			return NULL;
-		}else{
-			switch($NiveauTanneur){
-				case 1: return $this->GainCuir;
-				case 2:	return (2 * $this->GainCuir);
-				case 3:	return (3 * $this->GainCuir);
-				case 4:	return (4 * $this->GainCuir);
-			}
-		}
-	}
-	Public function GetNom(){
-		return $this->Nom;
-	}
-	public function GetAfficheGainChasse(&$oJoueur){
-	$chk = false;
-	$txt = $this->GetGainNourriture($oJoueur->GetNiveauCompetence('Boucher')).AfficheIcone('nourriture');
-	if(!is_null($this->GetGainCuir($oJoueur->GetNiveauCompetence('Tanneur')))){$txt .= ' et '.$this->GetGainCuir($oJoueur->GetNiveauCompetence('Tanneur')).AfficheIcone('ResCuir');}
-	return $txt;
-	
-}
 }
 ?>
