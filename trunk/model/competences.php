@@ -249,7 +249,7 @@ function GoPerfectionnement($type, personnage &$oJoueur, maison &$oMaison){
 		<tr><td>Vous avez atteint le maximum.</td></tr>
 	</table>';
 	}elseif($nbPerfDone < (($oJoueur->GetNiveau() + 1) * $StepPerf)
-			AND CheckCout(array('monnaie='.$prix), $oJoueur, $oMaison)/* $oJoueur->GetArgent() >= $prix */)
+			AND CheckCout(array(personnage::TYPE_RES_MONNAIE.'='.$prix), $oJoueur, $oMaison)/* $oJoueur->GetArgent() >= $prix */)
 	{
 		$check=true;
 	}
@@ -266,7 +266,7 @@ function GoPerfectionnement($type, personnage &$oJoueur, maison &$oMaison){
 			<p>Vous avez encore la possibilité d\'augmenter de '.((($oJoueur->GetNiveau() + 1) * $StepPerf) - $nbPerfDone).' points votre '.$type.'.</p>
 		</td></tr>
 		<tr><td style="text-align:center;">Durée : '.AfficheTempPhrase(DecoupeTemp($temp)).'</td></tr>
-		<tr><td style="text-align:center;">Coût : '.AfficheListePrix(array('monnaie='.$prix), $oJoueur, $oMaison).'</td></tr>
+		<tr><td style="text-align:center;">Coût : '.AfficheListePrix(array(personnage::TYPE_RES_MONNAIE.'='.$prix), $oJoueur, $oMaison).'</td></tr>
 		<tr><td style="text-align:center;">
 			<button 
 				type="button" 
