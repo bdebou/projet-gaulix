@@ -42,6 +42,25 @@ abstract class objMain{
 		
 	}
 	
+	//Les Affichages
+	//==============
+	public function AfficheInfoObjet($intHeightImg = 50) {
+		
+		$InfoBulle = '<table class="InfoBulle">'
+					. '<tr><th>' . $this->Nom . '</th></tr>'
+					. ((!is_null($this->Description))?'<tr><td style="text-align:left;">' . $this->Description . '</td></tr>':'')
+					. '<tr><td>' . AfficheIcone(personnage::TYPE_RES_MONNAIE) . ' = ' . $this->Prix . '</td></tr>'
+					. '</table>';
+	
+		return '<img 
+					style="vertical-align:middle;" 
+					alt="' . $this->Nom . '" 
+					src="./img/objets/' . $this->Code . '.png" 
+					onmouseover="montre(\'' . CorrectDataInfoBulle($InfoBulle) . '\');" 
+					onmouseout="cache();" 
+					height="'.$intHeightImg.'px"
+				 />';
+	}
 	//Les GET
 	//=======
 	public function GetRessource(){
@@ -70,6 +89,9 @@ abstract class objMain{
 				.'<tr><th colspan="2">'.$this->Nom.'</th></tr>'
 				.'<tr><td>Prix</td><td>'.$this->Prix.AfficheIcone(personnage::TYPE_RES_MONNAIE).'</td></tr>'
 				.'</table>';
+	}
+	public function GetCoutFabrication(){
+		return $this->Cout;
 	}
 	public function GetType(){
 		return NULL;
