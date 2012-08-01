@@ -50,6 +50,13 @@ function FoundObjet($CodeObject, $nbObjet = 1){
 	
 	return NULL;
 }
+function FoundGibier($CodeGibier){
+	$sqlGibier = "SELECT * FROM table_objets WHERE objet_code='".$CodeGibier."';";
+	$rqtGibier = mysql_query($sqlGibier) or die(mysql_error() . '<br />' . $sqlGibier);
+	//on crée une table contenant les infos des objets
+	
+	return new Gibier(mysql_fetch_array($rqtGibier, MYSQL_ASSOC));
+}
 
 function AfficheIcone($type, $HeightIcone = 20) {
 	$Name = NULL;
@@ -197,7 +204,7 @@ function AfficheRecompenses($login = NULL, $alliance = NULL) {
 
 	return (!is_null($login) ? $txtGeneral . $txtMedalHonor : '') . (!is_null($alliance) ? $txtMedalAlliance : '');
 }
-function AfficheListePrix($lstPrix, personnage &$oJoueur = NULL, maison &$maison = NULL) {
+function AfficheListePrix(array $lstPrix, personnage &$oJoueur = NULL, maison &$maison = NULL) {
 	$chk = false;
 	$txt = NULL;
 	
@@ -358,11 +365,18 @@ function CheckIfOnEstSurUnBatiment($NumBatiment, $position){
 }
 
 function QuelTypeObjet($Code){
-	$Ressource = QuelTypeRessource($Code);
-	if($Ressource != $Code)
+	/* $Ressource = QuelTypeRessource($Code);
+	if(!is_null($Ressource))
 	{
 		return $Ressource;
-	}
+	} */
+	/* if($Ressource != $Code)
+	{
+		return $Ressource;
+	} */
+	
+	Global $lstRessources;
+	if(in_array($Code, $lstRessources)){return $Code;}
 	
 	switch (substr($Code, 0, 5))
 	{
@@ -382,11 +396,12 @@ function QuelTypeObjet($Code){
 function QuelTypeRessource(&$Code) {
 	switch (strtolower($Code))
 	{
-		case 'nourriture':	return maison::TYPE_RES_NOURRITURE;
-		case 'h2o':			return maison::TYPE_RES_EAU_POTABLE;
-		case 'monnaie':		return personnage::TYPE_RES_MONNAIE;
+		case 'nourriture':									return maison::TYPE_RES_NOURRITURE;
+		case 'eau':											return maison::TYPE_RES_EAU_POTABLE;
+		case 'monnaie':										return personnage::TYPE_RES_MONNAIE;
+		case strtolower(personnage::TYPE_RES_MONNAIE):		return personnage::TYPE_RES_MONNAIE;
 	}
-	return $Code;
+	return NULL;
 }
 function FreeCaseCarte($carte = NULL) {
 	$sql = "SELECT coordonnee FROM table_carte WHERE detruit IS NULL AND id_type_batiment NOT IN (11);";
