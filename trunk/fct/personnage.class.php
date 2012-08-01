@@ -239,8 +239,9 @@ class personnage{
 	
 	//les Compétences
 	private function CreateListCompetence($list, $lstStatus){
+		
 		foreach($list as $cmp){
-			if(array_key_exists($cmp[0], $lstStatus))
+			if(in_array($cmp[0], $lstStatus))
 			{
 				$this->lstCompetences[$cmp[0]] = true;
 			}else
@@ -796,7 +797,10 @@ class personnage{
 		
 		//on crée la liste des compétences possible
 		//$sqlLstCmp = "SELECT cmp_lst_code FROM `table_competence_lst` WHERE cmp_lst_acces IN ('".GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class')."', 'Tous') ORDER BY cmp_lst_code ASC;";
-		$sqlLstCmp = "SELECT cmp_lst_code, cmp_lst_type FROM `table_competence_lst` WHERE (cmp_lst_acces IN ('%".GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class')."%', 'Tous') OR `cmp_lst_acces` LIKE '%".GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class')."%')ORDER BY cmp_lst_code ASC;";
+		$sqlLstCmp = "SELECT cmp_lst_code, cmp_lst_type 
+						FROM `table_competence_lst` 
+						WHERE (cmp_lst_acces IN ('%".GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class')."%', 'Tous') OR `cmp_lst_acces` LIKE '%".GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class')."%') 
+						ORDER BY cmp_lst_type, cmp_lst_code ASC;";
 		$rqtLstCmp = mysql_query($sqlLstCmp) or die (mysql_error().'<br />'.$sqlLstCmp);
 		
 		if(mysql_num_rows($rqtLstCmp) > 0){
@@ -806,10 +810,12 @@ class personnage{
 		}
 		
 		//On récupère les infos à propos des compétences
-		$sqlCmp = "SELECT cmp_code FROM table_competence WHERE cmp_login='".$this->login."' AND cmp_finish=1;";
+		$sqlCmp = "SELECT cmp_code 
+					FROM table_competence 
+					WHERE cmp_login='".$this->login."' AND cmp_finish=1;";
 		$rqtCmp = mysql_query($sqlCmp) or die (mysql_error().'<br />'.$sqlCmp);
 		
-		$status[] = NULL;
+		//$status[] = NULL;
 		if(mysql_num_rows($rqtCmp) > 0){
 			while($cmp = mysql_fetch_array($rqtCmp, MYSQL_ASSOC)){
 				$status[] = $cmp['cmp_code'];
@@ -929,15 +935,24 @@ class personnage{
 	public function GetNotifCombat(){		return $this->not_combat;}
 	public function GetNotifAttaque(){		return $this->not_attaque;}
 	public function GetNbPoints(){			return $this->nb_points;}
-	public function GetNiveauCompetence($competence){
-		if(isset($this->lstCompetences[ucfirst($competence)]))
+	public function GetNiveauCompetence($TypeCompetence){
+		
+		if(isset($this->lstTypeCompetences[$TypeCompetence]))
 		{
-			return $this->lstCompetences[ucfirst($competence)];
+			$Niveau = 0;
 			
-		}else{
+			foreach($this->lstTypeCompetences[$TypeCompetence] as $CodeCompetence)
+			{
+				if($this->CheckCompetence($CodeCompetence))
+				{
+					$Niveau++;
+				}
+			}
 			
-			return NULL;
+			return $Niveau;
 		}
+		
+		return NULL;
 	}
 	public function GetDateLasMessageLu(){	return $this->DateLastMessageLu;}
 	public function GetObjSaMaison(){		return FoundBatiment(1, $this->login);}
