@@ -22,7 +22,7 @@ abstract class batiment{
 	private $Contenu;
 	private $IDType;
 	
-	Const PRIX_REPARATION			= 5;		// Prix des réparation 5or/pts de vie
+	Const PRIX_REPARATION			= 'Sesterce=5,BC=10';		// Prix des réparation par point de vie
 	Const NIVEAU_MAX				= 4;		// Niveau Maximum pour chaque batiment.
 	
 	const CODE_ESCLAVE				= 'Esclave';
@@ -134,7 +134,7 @@ abstract class batiment{
 				
 				$arContenu = explode(',', $this->Contenu);
 				$nomClass = get_class($this);
-				$this->AddStock($persoCible->GetNiveauCompetence($nomClass::TYPE_COMPETENCE));
+				$this->AddStock($persoCible->GetNiveauCompetence());
 				$arContenu = explode(',', $this->Contenu);
 				//$maison = FoundBatiment(1, $persoAttaquant->GetLogin());
 				$this->ViderStock($arContenu['1'], $persoAttaquant);
@@ -152,7 +152,6 @@ abstract class batiment{
 	public function Reparer($etat, personnage $Perso){
 		$this->Etat += $etat;
 		if($this->Etat == $this->GetEtatMax()){
-			global $lstPoints;
 				//on gère les points gagnés ou perdus
 			$Perso->UpdatePoints(self::POINT_BATIMENT_REPARE);
 		}
@@ -281,67 +280,43 @@ abstract class batiment{
 			return '<br /><a href="index.php?page=village&action=ameliorer&id='.$id.'&anchor='.str_replace(',', '_', $this->Coordonnee).'" title="Or = '.$prixAmelioration['Or'].'&#13;Bois = '.$prixAmelioration['Bois'].'&#13;Pierre = '.$prixAmelioration['Pierre'].'&#13;Nourriture = '.$prixAmelioration['Nourriture'].'&#13;'.AfficheTempPhrase(DecoupeTemp(intval(3600*exp($this->Niveau)))).'">Améliorer</a> pour '.AfficheListePrix($prixAmelioration, $oJoueur, $maison);
 		}
 	}
-	public function AfficheOptionReparer(&$oJoueur){
+	public function AfficheOptionReparer(personnage &$oJoueur){
 		
-		$txt = null;
+		$txt = 'Coût par point de réparation : </br>'.AfficheListePrix($this->GetCoutReparation(), $oJoueur, $oJoueur->GetObjSaMaison()).'</br>';
 		$chkA = true;
 		$txt_Options = null;
 	
-		$PositionJoueur		= implode(',', array_merge(array($oJoueur->GetCarte()),$oJoueur->GetPosition()));
+		//$PositionJoueur		= implode(',', array_merge(array($oJoueur->GetCarte()),$oJoueur->GetPosition()));
 	
 		if($this->Etat < $this->GetEtatMax()){
-			if($this->Coordonnee != $PositionJoueur){
-				return 'Placez-vous sur la case pour réparer.';
+			if($this->Coordonnee != $oJoueur->GetCoordonnee()){
+				return $txt.'Placez-vous sur la case pour réparer.';
 			}
-	
-			//$_SESSION['main']/*[$nbReparer]*/['reparer'] = $id;
-			$PtsAReparer = $this->GetEtatMax() - $this->Etat;
 			
-			if(intval($PtsAReparer/100) > 0 and $oJoueur->GetArgent() > (100 * self::PRIX_REPARATION)){
-				$chkA = false;
-				$_SESSION['main']['Reparer']['0']['pts'] = 100;
-				$_SESSION['main']['Reparer']['0']['montant'] = 100 * self::PRIX_REPARATION;
-				$txt_Options .= '<option value="0">Réparer 100pts de vie pour '.(100 * self::PRIX_REPARATION).' pièces</option>';
+			$nbMax = 0;
+			for($i = 1; $i <= ($this->GetEtatMax() - $this->Etat); $i++)
+			{
+				
+				if(CheckCout($this->GetCoutReparation($i), $oJoueur, $oJoueur->GetObjSaMaison()))
+				{
+					$nbMax = $i;
+				}else{
+					break;
+				}
 			}
-			if($PtsAReparer >= 10 and $oJoueur->GetArgent() > (10 * self::PRIX_REPARATION)){
-				$chkA = false;
-				$_SESSION['main']['Reparer']['1']['pts'] = 10;
-				$_SESSION['main']['Reparer']['1']['montant'] = 10 * self::PRIX_REPARATION;
-				$txt_Options .= '<option value="1">Réparer 10pts de vie pour '.(10 * self::PRIX_REPARATION).' pièces</option>';
+			
+			if($nbMax == 0)
+			{
+				return $txt.'Pas assez de ressources';
 			}
-			if(	$oJoueur->GetArgent() >= ($PtsAReparer * self::PRIX_REPARATION)){
-				$chkA = false;
-				$_SESSION['main']['Reparer']['2']['pts'] = $PtsAReparer;
-				$_SESSION['main']['Reparer']['2']['montant'] = $PtsAReparer * self::PRIX_REPARATION;
-				$txt_Options .= '<option value="2">Réparer '.$PtsAReparer.'pts de vie pour '.($PtsAReparer * self::PRIX_REPARATION).' pièces</option>';
-			}elseif(intval($oJoueur->GetArgent() / self::PRIX_REPARATION) != 0
-			AND intval($oJoueur->GetArgent() / self::PRIX_REPARATION) <=  $PtsAReparer){
-				$chkA = false;
-				$_SESSION['main']['Reparer']['3']['pts'] = intval($oJoueur->GetArgent() / self::PRIX_REPARATION);
-				$_SESSION['main']['Reparer']['3']['montant'] = intval($oJoueur->GetArgent() / self::PRIX_REPARATION) * self::PRIX_REPARATION;
-				$txt_Options .= '<option value="3">Réparer '.intval($oJoueur->GetArgent() / self::PRIX_REPARATION).'pts de vie pour '.(intval($oJoueur->GetArgent() / self::PRIX_REPARATION) * self::PRIX_REPARATION).' pièces</option>';
-			}
-			if(intval($oJoueur->GetArgent() / self::PRIX_REPARATION) > 0){
-				$chkA = false;
-				$_SESSION['main']['Reparer']['4']['pts'] = 1;
-				$_SESSION['main']['Reparer']['4']['montant'] = self::PRIX_REPARATION;
-				$txt_Options .= '<option value="4">Réparer 1pt de vie pour '.self::PRIX_REPARATION.' pièces</option>';
-			}
-	
-	
-			if($chkA){
-				return 'Pas assez d\'argent';
-			}
-			return '
-		<form method="get" action="index.php">
-			<input type="hidden" name="page" value="village" />
+			
+			return $txt.'
+		<form method="post" action="index.php?page=village">
 			<input type="hidden" name="anchor" value="'.str_replace(',', '_', $this->Coordonnee).'" />
 			<input type="hidden" name="action" value="reparer" />
-			<input type="hidden" name="num" value="'./*$nbReparer*/'1'.'" />
-			<select name="id">
-				'.$txt_Options.'
-			</select>
-			<br />
+			<input style="width:150px;" id="Slider'.str_replace(',', '_', $this->Coordonnee).'" type="range" min="1" max="'.$nbMax.'" step="1" value="1" onchange="printValue(\'Slider'.str_replace(',', '_', $this->Coordonnee).'\',\'RangeValue'.str_replace(',', '_', $this->Coordonnee).'\');" />
+			<input style="width:50px;" name="qte" id="RangeValue'.str_replace(',', '_', $this->Coordonnee).'" onchange="printValue(\'RangeValue'.str_replace(',', '_', $this->Coordonnee).'\',\'Slider'.str_replace(',', '_', $this->Coordonnee).'\');" type="number" min="1" max="'.$nbMax.'" step="1" value ="1" size="15" />pts
+			<script>printValue(\'Slider'.str_replace(',', '_', $this->Coordonnee).'\',\'RangeValue'.str_replace(',', '_', $this->Coordonnee).'\');</script>
 			<input type="submit" value="Réparer" />
 		</form>';
 		}else{
@@ -407,6 +382,15 @@ abstract class batiment{
 			case 3:		return explode(',', $classBatiment::COUT_AMELIORATION_NIVEAU_3);
 			case 4:		return explode(',', $classBatiment::COUT_AMELIORATION_NIVEAU_4);
 		}
+	}
+	public function GetCoutReparation($facteur = 1){
+		$temp = explode(',', $this::PRIX_REPARATION);
+		foreach($temp as $prix)
+		{
+			$arPrix = explode('=', $prix);
+			$lstPrix[] = $arPrix[0].'='.($arPrix[1] * $facteur);
+		}
+		return $lstPrix;
 	}
 }
 
