@@ -28,18 +28,28 @@ if(isset($_POST['depot'])){
 }elseif(isset($_GET['action'])){
 	switch($_GET['action']){
 		case 'ameliorer':				ActionAmeliorerBatiment($chkErr, $oJoueur, $objManager, $_GET['id']); break;
-		case 'reparer':					ActionReparer($chkErr, $_GET['id'], $_GET['num'], $oJoueur, $objManager); break;
+		
 		case 'reprendre':				ActionReprendre($chkErr, $_GET['id'], $oJoueur, $objManager); break;
-		case 'viderstockferme':			ActionViderStock($chkErr, ferme::ID_BATIMENT, 'ferme', $oJoueur, $objManager); break;
-		case 'productionferme':			ActionProduction($chkErr, ferme::ID_BATIMENT, 'ferme', $_GET['type'], $oJoueur, $objManager); break;
-		case 'viderstockmine':			ActionViderStock($chkErr, mine::ID_BATIMENT, 'mine', $oJoueur, $objManager); break;
-		case 'productionmine':			ActionProduction($chkErr, mine::ID_BATIMENT, 'mine', $_GET['type'], $oJoueur, $objManager); break;
 		case 'druide':					ActionDruide($chkErr, $_GET['id'], $oJoueur, $objManager); break;
 		case 'VenteMarche':				ActionVenteMarche($chkErr, $_GET['id'], $oJoueur, $objManager); break;
 		case 'annulertransaction':		ActionAnnulerTransaction($chkErr, $_GET['id'], $oJoueur, $objManager); break;
 		case 'acceptertransaction':		ActionAccepterTransaction($chkErr, $_GET['id'], $oJoueur, $objManager); break;
 	}
 	$CheckRetour = true;
+}elseif(isset($_POST['action']))
+{
+	switch($_POST['action'])
+	{
+		case 'productionmine':			ActionProduction($chkErr, mine::ID_BATIMENT, 'mine', $_POST['type'], $oJoueur, $objManager); break;
+		case 'productioncarriere':		ActionProduction($chkErr, carriere::ID_BATIMENT, 'carriere', $_POST['type'], $oJoueur, $objManager); break;
+		case 'productionferme':			ActionProduction($chkErr, ferme::ID_BATIMENT, 'ferme', $_POST['type'], $oJoueur, $objManager); break;
+		case 'productionpotager':		ActionProduction($chkErr, potager::ID_BATIMENT, 'potager', $_POST['type'], $oJoueur, $objManager); break;
+		case 'viderstockcarriere':		ActionViderStock($chkErr, carriere::ID_BATIMENT, 'carriere', $oJoueur, $objManager); break;
+		case 'viderstockferme':			ActionViderStock($chkErr, ferme::ID_BATIMENT, 'ferme', $oJoueur, $objManager); break;
+		case 'viderstockpotager':		ActionViderStock($chkErr, potager::ID_BATIMENT, 'potager', $oJoueur, $objManager); break;
+		case 'viderstockmine':			ActionViderStock($chkErr, mine::ID_BATIMENT, 'mine', $oJoueur, $objManager); break;
+		case 'reparer':					ActionReparer($chkErr, $_POST['qte'], $oJoueur, $objManager); break;
+	}
 }
 
 if($chkDebug AND $ChkDebugVar){print_r($_SESSION['main']);}
