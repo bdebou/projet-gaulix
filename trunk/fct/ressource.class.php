@@ -14,19 +14,24 @@ class ressource extends batiment{
 	const TEMP_RESSOURCE			= 900;		//15 minutes pour collecter une ressource
 	const MAX_RESSOURCE				= 5000;
 	
-	const COMPETENCE_POUR_PIERRE	= 'Mineur';
-	const COMPETENCE_POUR_BOIS		= 'Bucheron';
-	const COMPETENCE_POUR_OR		= 'Mineur';
+	const COMPETENCE_POUR_PIERRE	= 'cmpTrap1';
+	const COMPETENCE_POUR_BOIS		= 'cmpBuc1';
+	const COMPETENCE_POUR_OR		= 'cmpMet2';
 	
 	const NOM_RESSOURCE_BOIS		= 'bois';
 	const NOM_RESSOURCE_PIERRE		= 'pierre';
+	const NOM_RESSOURCE_EAU			= 'eau';
 	const NOM_RESSOURCE_OR			= 'or';
+	
+	const CODE_BOIS					= 'BC';
+	const CODE_PIERRE				= 'PIE';
+	const CODE_EAU					= 'H2O';
+	const CODE_OR					= 'OR';
 	
 	const TYPE_NORMAL				= 1;
 	const TYPE_OR					= 2;
 	const CMP_MAX					= 5;
 	const NIVEAU_NORMAL				= 1;
-	const NIVEAU_OR					= 3;
 	
 	// Initialisation de l'objet
 	public function __construct(array $dataCarte, array $dataBatiment){
@@ -34,10 +39,11 @@ class ressource extends batiment{
 		parent::Hydrate($dataCarte, $dataBatiment);
 		
 		$this->hydrate($dataCarte, $dataBatiment);
+		
 	}
 	
 	//Quelle quantité maximum on peut prendre maximum par action sur une ressource
-	Private function QuelQuantiteMaxParAction($NivCmp, $id){
+	Private function QuelQuantiteMaxParAction($NivCmp, $id = 1){
 		if($this->strNom == self::NOM_RESSOURCE_PIERRE and $id == 2){
 			$temp = self::NOM_RESSOURCE_OR;
 		}else{
@@ -47,32 +53,24 @@ class ressource extends batiment{
 		switch($temp){
 			case self::NOM_RESSOURCE_PIERRE:
 				switch($NivCmp){
-					case 1: return 30;
-					case 2: return 45;
-					case 3: 
-					case 4: 
-					case 5: return 50;
+					case 'cmpTrap1': return 30;
+					case 'cmpTrap2': return 45;
+					case 'cmpTrap3': 
+					case 'cmpTrap4': return 50;
 				}
 				break;
 			case self::NOM_RESSOURCE_BOIS:
 				switch($NivCmp){
-					case 1: return 50;
-					case 2: return 60;
-					case 3: return 70;
-					case 4: return 80;
-					case 5: return 100;
+					case 'cmpBuc1': return 50;
+					case 'cmpBuc2': return 60;
+					case 'cmpBuc3': return 70;
+					case 'cmpBuc4': return 80;
 				}
 				break;
-			case self::NOM_RESSOURCE_OR:
-				switch($NivCmp){
-					case 1:
-					case 2:
-					case 3:	return 30;
-					case 4:
-					case 5: return 45;
-				}
-				break;
+			case self::NOM_RESSOURCE_EAU:
+				return 5;
 		}
+		return 1;
 	}
 	
 	//On démarre la collect de ressource
@@ -98,22 +96,27 @@ class ressource extends batiment{
 	}
 	
 	//On a finit de collecter la ressource
-	Public Function FinishCollect(personnage &$oCollecteur, batiment &$oMaison){
-		$qte = $this->GetQuantiteCollecte($oCollecteur->GetNiveauCompetence($this->GetCompetenceRequise()), $this->intTypeContenu);
+	Public Function FinishCollect(personnage &$oCollecteur){
+		$qte = $this->GetQuantiteCollecte($oCollecteur->GetLastCompetenceFinish($oCollecteur->GetTypeCompetence($this->GetCompetenceRequise($this->intTypeContenu)), $this->intTypeContenu));
 		
-		switch($this->strNom){
+		/* switch($this->strNom)
+		{
 			case self::NOM_RESSOURCE_PIERRE:
 				switch($this->intTypeContenu){
-					case 1:	$oMaison->AddRessource(maison::TYPE_RES_PIERRE, $qte);	break(2);
+					case 1:	$oCollecteur->AddInventaire(self::CODE_PIERRE, NULL, $qte, false); break(2);
 					case 2: $oCollecteur->AddOr($qte);	break(2);
 				}
-			case self::NOM_RESSOURCE_BOIS:	$oMaison->AddRessource(maison::TYPE_RES_BOIS, $qte);	break;
+			case self::NOM_RESSOURCE_BOIS:	$oCollecteur->AddInventaire(self::CODE_BOIS, NULL, $qte, false); break;
 			case self::NOM_RESSOURCE_OR:	$oCollecteur->AddOr($qte);	break;
-		}
-			
-		if($oCollecteur->GetNiveauCompetence($this->GetCompetenceRequise()) < self::CMP_MAX){
-			$this->intStock -= $qte;
-			if($this->intStock <= 0){$this->bolVide = true;}
+		} */
+		
+		$oCollecteur->AddInventaire($this->GetCodeRessource($this->intTypeContenu), NULL, $qte, false);
+		
+		$this->intStock -= $qte;
+		
+		if($this->intStock <= 0)
+		{
+			$this->bolVide = true;
 		}
 		
 		$this->strCollecteur = NULL;
@@ -137,7 +140,7 @@ class ressource extends batiment{
 				case 'login':					$this->strCollecteur = (is_null($value)?NULL:strval($value)); break;
 				case 'res_pierre':				if($this->strNom == self::NOM_RESSOURCE_PIERRE){$this->intStock = (is_null($value)?NULL:intval($value));} break;
 				case 'res_bois':				if($this->strNom == self::NOM_RESSOURCE_BOIS){$this->intStock = (is_null($value)?NULL:intval($value));} break;
-				case 'res_or':					if($this->strNom == self::NOM_RESSOURCE_OR){$this->intStock = (is_null($value)?NULL:intval($value));} break;
+				case 'res_eau':					if($this->strNom == self::NOM_RESSOURCE_EAU){$this->intStock = (is_null($value)?NULL:intval($value));} break;
 				case 'date_action_batiment':	$this->dteDateAction = strtotime($value); break;
 				case 'detruit':					$this->bolVide = (is_null($value)?false:true); break;
 				case 'contenu_batiment':		$this->intTypeContenu = (is_null($value)?NULL:intval($value)); break;
@@ -190,11 +193,35 @@ class ressource extends batiment{
 	public function GetCollecteur(){			return $this->strCollecteur;}
 	public function GetNom(){					return $this->strDescription;}
 	public function GetNomType($type = self::TYPE_NORMAL){
-		if($this->strNom == self::NOM_RESSOURCE_PIERRE AND ($type == self::TYPE_OR OR $this->intTypeContenu == self::TYPE_OR)){
+		if	($this->strNom == self::NOM_RESSOURCE_PIERRE 
+			AND ($type == self::TYPE_OR OR $this->intTypeContenu == self::TYPE_OR))
+		{
 			return self::NOM_RESSOURCE_OR;
-		}else{
-			return $this->strNom;
 		}
+		
+		return $this->strNom;
+	}
+	public function GetCodeRessource($type = self::TYPE_NORMAL){
+		switch($type)
+		{
+			case self::TYPE_NORMAL:
+			case NULL:
+				switch ($this->GetNomType()) {
+					case self::NOM_RESSOURCE_BOIS:		return self::CODE_BOIS;
+					case self::NOM_RESSOURCE_PIERRE:	return self::CODE_PIERRE;
+					case self::NOM_RESSOURCE_EAU:		return self::CODE_EAU;
+				}
+				break;
+			case self::TYPE_OR:
+				return self::CODE_OR;
+		}
+		
+		if($this->GetNomType() == self::NOM_RESSOURCE_OR)
+		{
+			return self::CODE_OR;
+		}
+		
+		return NULL;
 	}
 	public function GetEtatRessource(){			return $this->intStock;}
 	public function GetEtatRessourceMax(){		return self::MAX_RESSOURCE;}
@@ -206,17 +233,27 @@ class ressource extends batiment{
 	public function GetTypeContenu(){			return $this->intTypeContenu;}
 	public function GetImgName(){				return $this->strNom;}
 	
-	public function GetCompetenceRequise(){
-		switch($this->strNom){
+	public function GetCompetenceRequise($type = NULL){
+		switch($this->GetNomType($this->GetNomType($type))){
 			case self::NOM_RESSOURCE_BOIS:		return self::COMPETENCE_POUR_BOIS;
 			case self::NOM_RESSOURCE_PIERRE:	return self::COMPETENCE_POUR_PIERRE;
 			case self::NOM_RESSOURCE_OR:		return self::COMPETENCE_POUR_OR;
 		}
+		return NULL;
 	}
 	public function GetLogin(){					return $this->strCollecteur;}
 	public function GetDateAction(){			return $this->dteDateAction;}
 	public function GetStatus(){
 		
+	}
+	public function GetTextRessource(){
+		switch ($this->GetNomType()) {
+			case self::NOM_RESSOURCE_BOIS:		return 'des buches';
+			case self::NOM_RESSOURCE_PIERRE:	return 'des pierres';
+			case self::NOM_RESSOURCE_OR:		return 'de l\'or';
+			case self::NOM_RESSOURCE_EAU:		return 'de l\'eau potable';
+		}
+		return NULL;
 	}
 }
 ?>
