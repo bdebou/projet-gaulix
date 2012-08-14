@@ -326,58 +326,60 @@ function AfficheCollecteRessource(personnage &$oJoueur) {
 	{
 		return NULL;
 	}
-
-	switch ($objRessource->GetNomType()) {
-		case ressource::NOM_RESSOURCE_BOIS:
-			$txtRes = 'des buches';
-			break;
-		case ressource::NOM_RESSOURCE_PIERRE:
-			$txtRes = 'des pierres';
-			break;
-		case ressource::NOM_RESSOURCE_OR:
-			$txtRes = 'de l\'or';
-			break;
-	}
-
 	//Dans quel etat est la ressource?
-	if (is_null($objRessource->GetCollecteur())) {
-		if (!$oJoueur->CheckTypeCompetence($objRessource->GetCompetenceRequise())) {
-			return '<p>Vous devez avoir la compétence <u>' . $objRessource->GetCompetenceRequise() . '</u> de niveau 1 pour ramasser ' . $txtRes . '</p><hr />';
+	//Si la ressource est libre
+	if (is_null($objRessource->GetCollecteur()))
+	{
+		if (!is_null($objRessource->GetCompetenceRequise())
+			AND !$oJoueur->CheckCompetence($objRessource->GetCompetenceRequise()))
+		{
+			$txt = '<p>Vous devez avoir une compétence <u>'. GetInfoCompetence($objRessource->GetCompetenceRequise(), 'cmp_lst_nom').'</u> pour ramasser ' . $objRessource->GetTextRessource() . '</p><hr />';
 		} else {
-			$txt = null;
-			if ($oJoueur->CheckTypeCompetence($objRessource->GetCompetenceRequise()) >= ressource::NIVEAU_NORMAL) {
-				$txt .= '<p style="text-align:center;">'
+			//$txt = null;
+			$txt = '<p style="text-align:center;">'
 				. '<a href="index.php?page=main&amp;action=ressource&amp;id='.ressource::TYPE_NORMAL.'">'
-				. 'Collecter ' . $objRessource->GetQuantiteCollecte($oJoueur->CheckTypeCompetence($objRessource->GetCompetenceRequise())) . ' ' . AfficheIcone(strtolower($objRessource->GetNomType()))
+				. 'Collecter ' . $objRessource->GetQuantiteCollecte($oJoueur->GetLastCompetenceFinish($oJoueur->GetTypeCompetence($objRessource->GetCompetenceRequise()))) . ' ' . AfficheIcone(strtolower($objRessource->GetCodeRessource()))
 				. '</a>'
 				. '</p>';
-			}
-			//Si on est sur de la pierre, on peut collecter aussi de l'or
+			
+			//Si on est sur une ressource de pierre, on peut collecter aussi de l'or
 			if ($objRessource->GetNomType() == ressource::NOM_RESSOURCE_PIERRE
-			AND $oJoueur->CheckTypeCompetence($objRessource->GetCompetenceRequise()) >= ressource::NIVEAU_OR) {
+				AND $oJoueur->CheckCompetence(ressource::COMPETENCE_POUR_OR))
+			{
 				$txt .= '<p style="text-align:center;">'
 				. '<a href="index.php?page=main&amp;action=ressource&amp;id='.ressource::TYPE_OR.'">'
-				. 'Collecter ' . $objRessource->GetQuantiteCollecte($oJoueur->CheckTypeCompetence($objRessource->GetCompetenceRequise()), ressource::TYPE_OR) . ' ' . AfficheIcone(strtolower($objRessource->GetNomType(ressource::TYPE_OR)))
+				. 'Collecter ' . $objRessource->GetQuantiteCollecte($oJoueur->GetLastCompetenceFinish($oJoueur->GetTypeCompetence($objRessource->GetCompetenceRequise(ressource::TYPE_OR))), ressource::TYPE_OR) . ' ' . AfficheIcone(strtolower($objRessource->GetCodeRessource(ressource::TYPE_OR)))
 				. '</a>'
 				. '</p>';
 			}
-			return $txt . '<hr />';
+			$txt .= '<hr />';
 		}
 	} else {
-		if ((strtotime('now') - $objRessource->GetDateDebutAction()) >= $objRessource->GetTempRessource()) {
-			return '<script type="text/javascript">window.location=\'index.php?page=main&action=ressource\';</script>';
-		} elseif ($objRessource->GetCollecteur() == $oJoueur->GetLogin()) {
-			return '<p style="display:inline;">Vous êtes en train de collecter ' . $txtRes . ' ' . AfficheIcone(strtolower($objRessource->GetNomType())) . '. Vous en avez encore pour :</p>
+		
+		if ((strtotime('now') - $objRessource->GetDateDebutAction()) >= $objRessource->GetTempRessource())
+		{
+			$txt = '<script type="text/javascript">window.location=\'index.php?page=main&action=ressource\';</script>';
+		} elseif ($objRessource->GetCollecteur() == $oJoueur->GetLogin())
+		{
+			$txt = '<p style="display:inline;">Vous êtes en train de collecter ' . $objRessource->GetTextRessource() . ' ' . AfficheIcone(strtolower($objRessource->GetCodeRessource($objRessource->GetTypeContenu()))) . '. Vous en avez encore pour :</p>
 				<div style="display:inline;" id="TimeToWaitRessource"></div><p style="display:inline;"> N\'interrompez pas votre collecte sinon ce sera perdu.</p>'
 			. AfficheCompteurTemp('Ressource', 'index.php?page=main&action=ressource', ($objRessource->GetTempRessource() - (strtotime('now') - $objRessource->GetDateDebutAction())))
+			//. AfficheCompteurTemp('Ressource', 'index.php', ($objRessource->GetTempRessource() - (strtotime('now') - $objRessource->GetDateDebutAction())))
 			. '<hr />';
 		} else {
-			return '<p style="display:inline;">La ressource est en cours d\'utilisation par ' . $objRessource->GetCollecteur() . ' pour encore :</p>
+			$txt = '<p style="display:inline;">La ressource est en cours d\'utilisation par ' . $objRessource->GetCollecteur() . ' pour encore :</p>
 				<div style="display:inline;" id="TimeToWaitRessource"></div>'
 			. AfficheCompteurTemp('Ressource', 'index.php?page=main&action=ressource', ($objRessource->GetTempRessource() - (strtotime('now') - $objRessource->GetDateDebutAction())))
+			//. AfficheCompteurTemp('Ressource', 'index.php', ($objRessource->GetTempRessource() - (strtotime('now') - $objRessource->GetDateDebutAction())))
 			. '<hr />';
 		}
 	}
+	
+	/* Global $objManager;
+	$objManager->UpdateBatiment($objRessource);
+	unset($objRessource); */
+	
+	return $txt;
 }
 function ChkIfFree($position) {
 	$sql = "SELECT id_case_carte FROM table_carte WHERE coordonnee='".$position."' AND detruit IS NULL;";
@@ -1225,4 +1227,43 @@ function ActionQuete(&$check, $id, personnage &$oJoueur, &$objManager){
 		}
 	}
 }
+function ActionRessource(&$check, personnage &$oJoueur, &$objManager, $id = NULL){
+	
+	$objRessource = FoundBatiment(NULL, NULL, $oJoueur->GetCoordonnee());
+		//On vérifie si la ressource est bien libre
+	if(is_null($objRessource->GetCollecteur())){
+			//On démarre la collecte
+		$objRessource->StartCollect($oJoueur, $id);
+		
+		//On verifie bien si le temp de collecte est bien terminé
+	}elseif((strtotime('now') - $objRessource->GetDateDebutAction()) >= $objRessource->GetTempRessource()){
+			//On vérifie si le joueur est bien le collecteur
+		if($oJoueur->GetLogin() == $objRessource->GetCollecteur()){
+				//on récupère la maison du joueur
+			//$oMaison = $oJoueur->GetObjSaMaison();
+				//on finit la collecte
+			$objRessource->FinishCollect($oJoueur/* , $oMaison */);
+
+		}else{
+				//Alors on récupère l'objet du collecteur
+			$oCollecteur = $objManager->GetPersoLogin($objRessource->GetCollecteur());
+				//on récupère la maison du collecteur
+			//$oMaison = $oCollecteur->GetObjSaMaison();
+				//on finit la collecte
+			$objRessource->FinishCollect($oCollecteur/* , $oMaison */);
+				//on enregistre les data du collecteur
+			$objManager->update($oCollecteur);
+			unset($oCollecteur);
+
+		}
+			//on enregistre les changement de la maison du collecteur que ce soit le joueur ou non.
+		/* $objManager->UpdateBatiment($oMaison);
+		unset($oMaison); */
+	}
+		//on enregistre les modifs de la ressource
+	$objManager->UpdateBatiment($objRessource);
+	
+	unset($objRessource);
+}
+
 ?>

@@ -52,7 +52,7 @@ function CountDownRessource(timeRessource){
 			if (btimeRessource==0){checkRessource=true;}
 		}
 		setTimeout("CountDownRessource(btimeRessource)", 1000);
-	}else if(checkRessource){window.location="index.php?page=common&action=ressource";}
+	}else if(checkRessource){window.location="index.php?page=main&action=ressource";}
 }
 /*
 +---------------------------------------------------------------------------------------+

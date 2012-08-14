@@ -538,39 +538,6 @@ function CheckCout(array $lstPrix, personnage &$oJoueur, maison &$maison){
 //+---------------------------------+
 //|				ACTIONS				|
 //+---------------------------------+
-function ActionRessource(&$check, personnage &$oJoueur, &$objManager, $id = NULL){
-	
-	$objRessource = FoundBatiment(NULL, NULL, $oJoueur->GetCoordonnee());
-	
-	if(is_null($objRessource->GetCollecteur())){
-			
-		$objRessource->StartCollect($oJoueur, $id);
-		
-	}elseif((strtotime('now') - $objRessource->GetDateDebutAction()) >= $objRessource->GetTempRessource()){
-			
-		if($oJoueur->GetLogin() == $objRessource->GetCollecteur()){
-
-			$oMaison = $oJoueur->GetObjSaMaison();
-			$objRessource->FinishCollect($oJoueur, $oMaison);
-
-		}else{
-
-			$oCollecteur = $objManager->GetPersoLogin($objRessource->GetCollecteur());
-			$oMaison = $oCollecteur->GetObjSaMaison();
-			$objRessource->FinishCollect($oCollecteur, $oMaison);
-			$objManager->update($oCollecteur);
-			unset($oCollecteur);
-
-		}
-			
-		$objManager->UpdateBatiment($oMaison);
-		unset($oMaison);
-	}
-
-	$objManager->UpdateBatiment($objRessource);
-	
-	unset($objRessource);
-}
 function ActionDeplacement(&$check, &$oJoueur){
 	if(!is_null($_SESSION['main']['deplacement'])){
 		switch($_SESSION['main']['deplacement']){

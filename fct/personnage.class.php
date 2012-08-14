@@ -238,7 +238,7 @@ class personnage{
 	}
 	
 	//les Compétences
-	private function CreateListCompetence($list, $lstStatus){
+	private function CreateListCompetence($list, $lstStatus = array(NULL)){
 		
 		foreach($list as $cmp){
 			if(in_array($cmp[0], $lstStatus))
@@ -815,14 +815,14 @@ class personnage{
 					WHERE cmp_login='".$this->login."' AND cmp_finish=1;";
 		$rqtCmp = mysql_query($sqlCmp) or die (mysql_error().'<br />'.$sqlCmp);
 		
-		//$status[] = NULL;
+		$status[] = NULL;
 		if(mysql_num_rows($rqtCmp) > 0){
 			while($cmp = mysql_fetch_array($rqtCmp, MYSQL_ASSOC)){
 				$status[] = $cmp['cmp_code'];
 			}
 			//$this->UpdateCompetences($competences);
 		}
-		
+		unset($status[0]);
 		if(mysql_num_rows($rqtLstCmp) > 0){
 			$this->CreateListCompetence($lst, $status);
 		}
@@ -935,6 +935,9 @@ class personnage{
 	public function GetNotifCombat(){		return $this->not_combat;}
 	public function GetNotifAttaque(){		return $this->not_attaque;}
 	public function GetNbPoints(){			return $this->nb_points;}
+	public function GetDateLasMessageLu(){	return $this->DateLastMessageLu;}
+	public function GetObjSaMaison(){		return FoundBatiment(1, $this->login);}
+		//Les Compétences
 	public function GetNiveauCompetence($TypeCompetence){
 		
 		if(isset($this->lstTypeCompetences[$TypeCompetence]))
@@ -954,8 +957,6 @@ class personnage{
 		
 		return NULL;
 	}
-	public function GetDateLasMessageLu(){	return $this->DateLastMessageLu;}
-	public function GetObjSaMaison(){		return FoundBatiment(1, $this->login);}
 	public function CheckCompetence($codeCompetence){
 		if(isset($this->lstCompetences[$codeCompetence]))
 		{
@@ -964,26 +965,48 @@ class personnage{
 		return false;
 	}
 	public function GetTypeCompetence($codeCompetence){
-		foreach ($this->lstTypeCompetences as $Type=>$code)
+		foreach ($this->lstTypeCompetences as $Key=>$Type)
 		{
-			if($code == $codeCompetence)
+			foreach($Type as $Code)
 			{
-				return $Type;
+				if($Code == $codeCompetence)
+				{
+					return $Key;
+				}
 			}
+			
 		}
 		
 		return NULL;
 	}
 	public function CheckTypeCompetence($typeCompetence){
-		
-		foreach($this->lstTypeCompetences[$typeCompetence] as $Competence)
+		if(isset($this->lstTypeCompetences[$typeCompetence]))
 		{
-			if($this->CheckCompetence($Competence))
+			foreach($this->lstTypeCompetences[$typeCompetence] as $Competence)
 			{
-				return true;
+				if($this->CheckCompetence($Competence))
+				{
+					return true;
+				}
 			}
 		}
+		
 		return false;
+	}
+	public function GetLastCompetenceFinish($typeCompetence){
+		$last = NULL;
+		if(isset($this->lstTypeCompetences[$typeCompetence]))
+		{
+			foreach($this->lstTypeCompetences[$typeCompetence] as $Competence)
+			{
+				if($this->CheckCompetence($Competence))
+				{
+					$last = $Competence;
+				}else{
+					return $last;
+				}
+			}
+		}
 	}
 }
 ?>

@@ -210,8 +210,9 @@ class PersonnagesManager{
 				$q->bindValue(':res_nourriture', $batiment->GetRessource(maison::TYPE_RES_NOURRITURE), PDO::PARAM_INT);
 				break;
 			case 'ressource':
-				$q->bindValue(':res_pierre', ((in_array($batiment->GetNomType(), array(ressource::NOM_RESSOURCE_PIERRE, ressource::NOM_RESSOURCE_OR)) AND !is_null($batiment->GetEtatRessource()))?$batiment->GetEtatRessource():NULL), PDO::PARAM_INT);
+				$q->bindValue(':res_pierre', (($batiment->GetNomType() == ressource::NOM_RESSOURCE_PIERRE AND !is_null($batiment->GetEtatRessource()))?$batiment->GetEtatRessource():NULL), PDO::PARAM_INT);
 				$q->bindValue(':res_bois', (($batiment->GetNomType() == ressource::NOM_RESSOURCE_BOIS AND !is_null($batiment->GetEtatRessource()))?$batiment->GetEtatRessource():NULL), PDO::PARAM_INT);
+				$q->bindValue(':res_eau', (($batiment->GetNomType() == ressource::NOM_RESSOURCE_EAU AND !is_null($batiment->GetEtatRessource()))?$batiment->GetEtatRessource():NULL), PDO::PARAM_INT);
 				break;
 		}
 		
