@@ -57,6 +57,72 @@ function FoundGibier($CodeGibier){
 	
 	return new Gibier(mysql_fetch_array($rqtGibier, MYSQL_ASSOC));
 }
+function FoundQuete($IDTypeQuete, $Login = false) {
+	$sql = "SELECT * FROM table_quete_lst WHERE id_quete=".$IDTypeQuete.";";
+	
+	$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
+
+	$infoQuete = mysql_fetch_array($requete, MYSQL_ASSOC);
+	$QueteNom = $infoQuete['quete_type'];
+	
+	if (mysql_num_rows($requete) > 0)
+	{
+		if($Login)
+		{
+			$sqlBis = "SELECT * FROM table_quetes WHERE quete_id=$IDTypeQuete AND quete_login='$Login';";
+			$requeteBis = mysql_query($sqlBis) or die(mysql_error() . '<br />' . $sqlBis);
+				
+			$row = mysql_fetch_array($requeteBis, MYSQL_ASSOC);
+			
+		}else{
+			$row = array();
+		}
+		
+		$objQuete = new $QueteNom($row, $infoQuete);
+		
+		global $objManager;
+		$objManager->UpdateQuete($objQuete);
+			
+		return $objQuete;
+	}
+	
+	return NULL;
+}
+function ListQueteEnCours() {
+	global $objManager;
+	
+	unset($_SESSION['QueteEnCours']);
+	
+	$lstQueteEnCours = NULL;
+	
+	$sql = "SELECT * FROM table_quetes WHERE quete_login='" . $_SESSION['joueur'] . "' AND quete_reussi IS NULL;";
+	$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
+	
+	$QuetePrecedente = null;
+
+	if (mysql_num_rows($requete) > 0)
+	{
+		while ($row = mysql_fetch_array($requete, MYSQL_ASSOC))
+		{
+			$sqlBis = "SELECT * FROM table_quete_lst WHERE id_quete=" . $row['quete_id'] . ";";
+			$requeteBis = mysql_query($sqlBis) or die(mysql_error() . '<br />' . $sqlBis);
+			
+			$infoQuete = mysql_fetch_array($requeteBis, MYSQL_ASSOC);
+			
+			$QueteNom = $infoQuete['quete_type'];
+			
+			$tmpQuete = new $QueteNom($row, $infoQuete);
+			$objManager->UpdateQuete($tmpQuete);
+			
+			$lstQueteEnCours[] = $tmpQuete;
+			
+			$QuetePrecedente = $row['quete_id'];
+		}
+		return $lstQueteEnCours;
+	}
+	
+	return NULL;
+}
 
 function AfficheIcone($type, $HeightIcone = 20) {
 	$Name = NULL;
