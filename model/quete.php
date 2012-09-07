@@ -198,37 +198,6 @@ function ClotureQuete($IDQuete) {
 	$sqlBis = "UPDATE table_quetes SET quete_reussi = 1, date_end = '" . date('Y-m-d H:i:s') . "' WHERE id_quete_en_cours = " . $IDQuete . ";";
 	mysql_query($sqlBis) or die(mysql_error() . '<br />' . $sqlBis);
 }
-function FoundQueteEnCours() {
-	global $objManager;
-	unset($_SESSION['QueteEnCours']);
-	$QueteEnCours = NULL;
-	$sql = "SELECT * FROM table_quetes WHERE quete_login='" . $_SESSION['joueur'] . "' AND quete_reussi IS NULL;";
-	$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
-	$QuetePrecedente = null;
-
-	if (mysql_num_rows($requete) > 0) {
-		while ($row = mysql_fetch_array($requete, MYSQL_ASSOC)) {
-			$sqlBis = "SELECT * FROM table_quete_lst WHERE id_quete=" . $row['quete_id'] . ";";
-			$requeteBis = mysql_query($sqlBis) or die(mysql_error() . '<br />' . $sqlBis);
-			$infoQuete = mysql_fetch_array($requeteBis, MYSQL_ASSOC);
-			if (is_null($infoQuete['quete_duree']) OR (strtotime('now') - strtotime($row['date_start'])) < $infoQuete['quete_duree']) {
-				if ($QuetePrecedente != $row['quete_id']) {
-					$tmpQuete = new quete($row, $infoQuete);
-					$objManager->UpdateQuete($tmpQuete);
-					$QueteEnCours[] = $tmpQuete;
-					$QuetePrecedente = $row['quete_id'];
-				} else {
-					ClotureQuete($row['id_quete_en_cours']);
-				}
-			} elseif ((strtotime('now') - strtotime($row['date_start'])) >= $infoQuete['quete_duree']) {
-				ClotureQuete($row['id_quete_en_cours']);
-			}
-		}
-		return $QueteEnCours;
-	} else {
-		return NULL;
-	}
-}
 function AfficheAvancementQuete($QueteEnCours) {
 	global $CodeCouleurQuete;
 
