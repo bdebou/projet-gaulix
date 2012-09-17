@@ -23,7 +23,7 @@ function AfficheBatiment(batiment &$batiment, personnage &$oJoueur){
 	$txt = NULL;
 
 	$contenu = 'Ne peut rien contenir';
-	$PositionBatiment	= implode(',', array_merge(array($batiment->GetCarte()), $batiment->GetCoordonnee()));
+	$PositionBatiment	= $batiment->GetCoordonnee();
 	$PositionJoueur		= $oJoueur->GetCoordonnee();
 	$chkOptions = false;
 	$chkMarche = false;
