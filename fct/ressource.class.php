@@ -14,6 +14,10 @@ class ressource extends batiment{
 	const TEMP_RESSOURCE			= 900;		//15 minutes pour collecter une ressource
 	const MAX_RESSOURCE				= 5000;
 	
+	const ID_BATIMENT_BOIS			= 8;
+	const ID_BATIMENT_PIERRE		= 7;
+	const ID_BATIMENT_EAU			= 17;
+	
 	const COMPETENCE_POUR_PIERRE	= 'cmpTrap1';
 	const COMPETENCE_POUR_BOIS		= 'cmpBuc1';
 	const COMPETENCE_POUR_OR		= 'cmpMet2';
