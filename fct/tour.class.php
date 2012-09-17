@@ -3,6 +3,7 @@ class tour extends batiment{
 	
 	//Les points
 	const POINT_TOUR_ATTAQUE		= 2;
+	const ID_BATIMENT				= 3;
 	
 	//--- fonction qui est lancer lors de la création de l'objet. ---
 	public function __construct(array $carte, array $batiment){
