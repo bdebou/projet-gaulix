@@ -90,8 +90,8 @@ abstract class batiment{
 		//on envoie un mail
 		if($persoCible->GetNotifAttaque()){NotificationMail($persoCible->GetMail(), 'attaque', $this->Nom, $txt['1']);}
 		//on ajoute un historique
-		AddHistory($persoAttaquant->GetLogin(), $this->GetCarte(), $this->GetCoordonnee(), 'attaque', $this->Login, NULL, $txt['0']);
-		AddHistory($this->Login, $this->GetCarte(), $this->GetCoordonnee(), 'attaque', $persoAttaquant->GetLogin(), NULL, $txt['1']);
+		AddHistory($persoAttaquant->GetLogin(), $this->GetCarte(), $this->GetPosition(), 'attaque', $this->Login, NULL, $txt['0']);
+		AddHistory($this->Login, $this->GetCarte(), $this->GetPosition(), 'attaque', $persoAttaquant->GetLogin(), NULL, $txt['1']);
 		return $txt;
 	}
 		
@@ -143,8 +143,8 @@ abstract class batiment{
 				//unset($objManager);
 				break;
 		}
-		AddHistory($persoAttaquant->GetLogin(), $this->GetCarte(), $this->GetCoordonnee(), 'attaque', $this->Login, strtotime('now') +3, $this->Nom.' détruit');
-		AddHistory($this->Login, $this->GetCarte(), $this->GetCoordonnee(), 'attaque', $persoAttaquant->GetLogin(), strtotime('now') +3, $this->Nom.' détruit');
+		AddHistory($persoAttaquant->GetLogin(), $this->GetCarte(), $this->GetPosition(), 'attaque', $this->Login, strtotime('now') +3, $this->Nom.' détruit');
+		AddHistory($this->Login, $this->GetCarte(), $this->GetPosition(), 'attaque', $persoAttaquant->GetLogin(), strtotime('now') +3, $this->Nom.' détruit');
 	}
 	
 	
@@ -272,7 +272,7 @@ abstract class batiment{
 			
 			$_SESSION['main'][$id]['prixAmelioration'] = $prixAmelioration;
 			
-			if(!$chkPrix OR $this->GetCoordonnee() != $oJoueur->GetPosition())
+			if(!$chkPrix OR $this->GetPosition() != $oJoueur->GetPosition())
 			{
 				return '<p>Prix de l\'amélioration : <br />'.AfficheListePrix($prixAmelioration, $oJoueur, $maison).'</p>';
 			}
@@ -356,7 +356,8 @@ abstract class batiment{
 	public function GetDateAmelioration(){		return $this->DateAmelioration;}
 	public function GetTmpAmelioration(){		return $this->TmpAmelioration;}
 	public function GetImgName(){				return get_class($this).'-'.($this->Login == $_SESSION['joueur']?'a':'b');}
-	public function GetCoordonnee(){
+	public function GetCoordonnee(){			return implode(',', $this->Coordonnee);}
+	public function GetPosition(){
 		$arPosition = explode(',', $this->Coordonnee);
 		return array($arPosition[1], $arPosition[2]);
 	}

@@ -251,7 +251,7 @@ function AfficheRedirectionBatiment(personnage &$oJoueur){
 	$batiment = FoundBatiment(false, $oJoueur->GetLogin(), $oJoueur->GetCoordonnee());
 	if(!is_null($batiment) and get_class($batiment) != 'ressource'){
 		return '<p>Allez à votre '
-					.'<a href="index.php?page=village&amp;anchor='.implode('_', array_merge(array($batiment->GetCarte()), $batiment->GetCoordonnee())).'">'
+					.'<a href="index.php?page=village&amp;anchor='.str_replace(',', '_', $batiment->GetCoordonnee()).'">'
 						.strtolower(get_class($batiment))
 						.' <img src="img/carte/'.strtolower(get_class($batiment)).'-a.png" alt="'.strtolower(get_class($batiment)).'" title="Votre '.strtolower(get_class($batiment)).'" height="20px" />'
 					.'</a>'
@@ -272,7 +272,7 @@ function AfficheActionViderStock(personnage &$oJoueur){
 				.'<img src="img/carte/'.strtolower(get_class($batiment)).'-a.png" alt="'.strtolower(get_class($batiment)).'" title="Votre '.strtolower(get_class($batiment)).'" height="20px" />'
 				.' est plein ('.$batiment->GetStockContenu().'x '.AfficheIcone($batiment->GetCodeRessource($batiment->GetTypeContenu())).'): 
 				<a href="index.php?page=main&amp;action=viderstock'.strtolower(get_class($batiment)).'">Vider</a> ou 
-				<a href="index.php?page=village&amp;anchor='.implode('_', array_merge(array($batiment->GetCarte()), $batiment->GetCoordonnee())).'">Changer de production</a></p>';
+				<a href="index.php?page=village&amp;anchor='.str_replace(',', '_', $batiment->GetCoordonnee()).'">Changer de production</a></p>';
 	}else{
 		return null;
 	}
