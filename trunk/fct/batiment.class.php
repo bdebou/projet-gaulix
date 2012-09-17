@@ -195,7 +195,7 @@ abstract class batiment{
 		
 		foreach ($carte as $key => $value){
 			switch ($key){
-				case 'coordonnee':			$this->Coordonnee = strval($value); break;
+				case 'coordonnee':			$this->Coordonnee = explode(',', $value); break;
 				case 'login':				$this->Login = strval($value); break;
 				case 'id_case_carte':		$this->IDCaseCarte = intval($value); break;
 				case 'etat_batiment':		$this->Etat = (is_null($value)?NULL:intval($value)); break;
@@ -233,7 +233,7 @@ abstract class batiment{
 	}
 	public function AfficheOptionAmeliorer(personnage &$oJoueur){
 		
-		$id = str_replace(',', '_', $this->Coordonnee);
+		$id = str_replace(',', '_', $this->GetCoordonnee());
 		
 		if($this->GetNiveau() >= $this->GetNiveauMax()){return '<p>Niveau Maximum atteint.</p>';}
 		
@@ -277,7 +277,7 @@ abstract class batiment{
 				return '<p>Prix de l\'amélioration : <br />'.AfficheListePrix($prixAmelioration, $oJoueur, $maison).'</p>';
 			}
 			
-			return '<br /><a href="index.php?page=village&action=ameliorer&id='.$id.'&anchor='.str_replace(',', '_', $this->Coordonnee).'" title="Or = '.$prixAmelioration['Or'].'&#13;Bois = '.$prixAmelioration['Bois'].'&#13;Pierre = '.$prixAmelioration['Pierre'].'&#13;Nourriture = '.$prixAmelioration['Nourriture'].'&#13;'.AfficheTempPhrase(DecoupeTemp(intval(3600*exp($this->Niveau)))).'">Améliorer</a> pour '.AfficheListePrix($prixAmelioration, $oJoueur, $maison);
+			return '<br /><a href="index.php?page=village&action=ameliorer&id='.$id.'&anchor='.$id.'" title="Or = '.$prixAmelioration['Or'].'&#13;Bois = '.$prixAmelioration['Bois'].'&#13;Pierre = '.$prixAmelioration['Pierre'].'&#13;Nourriture = '.$prixAmelioration['Nourriture'].'&#13;'.AfficheTempPhrase(DecoupeTemp(intval(3600*exp($this->Niveau)))).'">Améliorer</a> pour '.AfficheListePrix($prixAmelioration, $oJoueur, $maison);
 		}
 	}
 	public function AfficheOptionReparer(personnage &$oJoueur){
@@ -288,8 +288,10 @@ abstract class batiment{
 	
 		//$PositionJoueur		= implode(',', array_merge(array($oJoueur->GetCarte()),$oJoueur->GetPosition()));
 	
+		$id = str_replace(',', '_', $this->GetCoordonnee());
+		
 		if($this->Etat < $this->GetEtatMax()){
-			if($this->Coordonnee != $oJoueur->GetCoordonnee()){
+			if($this->GetCoordonnee() != $oJoueur->GetCoordonnee()){
 				return $txt.'Placez-vous sur la case pour réparer.';
 			}
 			
@@ -312,11 +314,11 @@ abstract class batiment{
 			
 			return $txt.'
 		<form method="post" action="index.php?page=village">
-			<input type="hidden" name="anchor" value="'.str_replace(',', '_', $this->Coordonnee).'" />
+			<input type="hidden" name="anchor" value="'.$id.'" />
 			<input type="hidden" name="action" value="reparer" />
-			<input style="width:150px;" id="Slider'.str_replace(',', '_', $this->Coordonnee).'" type="range" min="1" max="'.$nbMax.'" step="1" value="1" onchange="printValue(\'Slider'.str_replace(',', '_', $this->Coordonnee).'\',\'RangeValue'.str_replace(',', '_', $this->Coordonnee).'\');" />
-			<input style="width:50px;" name="qte" id="RangeValue'.str_replace(',', '_', $this->Coordonnee).'" onchange="printValue(\'RangeValue'.str_replace(',', '_', $this->Coordonnee).'\',\'Slider'.str_replace(',', '_', $this->Coordonnee).'\');" type="number" min="1" max="'.$nbMax.'" step="1" value ="1" size="15" />pts
-			<script>printValue(\'Slider'.str_replace(',', '_', $this->Coordonnee).'\',\'RangeValue'.str_replace(',', '_', $this->Coordonnee).'\');</script>
+			<input style="width:150px;" id="Slider'.$id.'" type="range" min="1" max="'.$nbMax.'" step="1" value="1" onchange="printValue(\'Slider'.$id.'\',\'RangeValue'.$id.'\');" />
+			<input style="width:50px;" name="qte" id="RangeValue'.$id.'" onchange="printValue(\'RangeValue'.$id.'\',\'Slider'.$id.'\');" type="number" min="1" max="'.$nbMax.'" step="1" value ="1" size="15" />pts
+			<script>printValue(\'Slider'.$id.'\',\'RangeValue'.$id.'\');</script>
 			<input type="submit" value="Réparer" />
 		</form>';
 		}else{
@@ -357,14 +359,8 @@ abstract class batiment{
 	public function GetTmpAmelioration(){		return $this->TmpAmelioration;}
 	public function GetImgName(){				return get_class($this).'-'.($this->Login == $_SESSION['joueur']?'a':'b');}
 	public function GetCoordonnee(){			return implode(',', $this->Coordonnee);}
-	public function GetPosition(){
-		$arPosition = explode(',', $this->Coordonnee);
-		return array($arPosition[1], $arPosition[2]);
-	}
-	public function GetCarte(){
-		$arPosition = explode(',', $this->Coordonnee);
-		return $arPosition['0'];
-	}
+	public function GetPosition(){				return array($this->Coordonnee[1], $this->Coordonnee[2]);}
+	public function GetCarte(){					return $this->Coordonnee['0'];}
 	public function GetStatusAmelioration(){
 		if(is_null($this->DateAmelioration) OR is_null($this->TmpAmelioration)){
 			return 'Go';
