@@ -2,11 +2,9 @@
 include_once('model/main.php');
 include_once('model/carte.php');
 include_once('model/village.php');
-include_once('model/quete.php');
+//include_once('model/quete.php');
 
 global $objManager, $chkDebug;
-
-$_SESSION['QueteEnCours'] = FoundQueteEnCours();
 
 $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
