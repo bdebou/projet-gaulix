@@ -200,27 +200,27 @@ class personnage{
 	Public function DesequiperPerso($typeObject){
 		switch($typeObject){
 			case 'arme':
-				$this->AddInventaire($this->code_arme, $typeObject, null, false);
+				$this->AddInventaire($this->code_arme, 1, false);
 				$this->code_arme = NULL;
 				break;
 			case 'bouclier':
-				$this->AddInventaire($this->code_bouclier, $typeObject, null, false);
+				$this->AddInventaire($this->code_bouclier, 1, false);
 				$this->code_bouclier = NULL;
 				break;
 			case 'cuirasse':
-				$this->AddInventaire($this->code_cuirasse, $typeObject, null, false);
+				$this->AddInventaire($this->code_cuirasse, 1, false);
 				$this->code_cuirasse = NULL;
 				break;
 			case 'jambiere':
-				$this->AddInventaire($this->code_jambiere, $typeObject, null, false);
+				$this->AddInventaire($this->code_jambiere, 1, false);
 				$this->code_jambiere = NULL;
 				break;
 			case 'casque':
-				$this->AddInventaire($this->code_casque, $typeObject, null, false);
+				$this->AddInventaire($this->code_casque, 1, false);
 				$this->code_casque = NULL;
 				break;
 			case 'sac':
-				$this->AddInventaire($this->code_sac, $typeObject, null, false);
+				$this->AddInventaire($this->code_sac, 1, false);
 				$this->code_sac = NULL;
 				break;
 		}
@@ -262,27 +262,27 @@ class personnage{
 		$chk = true;
 		switch($typeObject){
 			case objArmement::TYPE_ARME:
-				if(!is_null($this->code_arme)){$this->AddInventaire($this->code_arme, $typeObject);}
+				if(!is_null($this->code_arme)){$this->AddInventaire($this->code_arme, 1, false);}
 				$this->code_arme = $numObject;
 				break;
 			case objArmement::TYPE_BOUCLIER:
-				if(!is_null($this->code_bouclier)){$this->AddInventaire($this->code_bouclier, $typeObject);}
+				if(!is_null($this->code_bouclier)){$this->AddInventaire($this->code_bouclier, 1, false);}
 				$this->code_bouclier = $numObject;
 				break;
 			case objArmement::TYPE_CUIRASSE:
-				if(!is_null($this->code_cuirasse)){$this->AddInventaire($this->code_cuirasse, $typeObject);}
+				if(!is_null($this->code_cuirasse)){$this->AddInventaire($this->code_cuirasse, 1, false);}
 				$this->code_cuirasse = $numObject;
 				break;
 			case objArmement::TYPE_JAMBIERE:
-				if(!is_null($this->code_jambiere)){$this->AddInventaire($this->code_jambiere, $typeObject);}
+				if(!is_null($this->code_jambiere)){$this->AddInventaire($this->code_jambiere, 1, false);}
 				$this->code_jambiere = $numObject;
 				break;
 			case objArmement::TYPE_CASQUE:
-				if(!is_null($this->code_casque)){$this->AddInventaire($this->code_casque, $typeObject);}
+				if(!is_null($this->code_casque)){$this->AddInventaire($this->code_casque, 1, false);}
 				$this->code_casque = $numObject;
 				break;
 			case objDivers::TYPE_SORT:
-				//if(!is_null($this->code_divers)){$this->AddInventaire($this->code_divers, $typeObject);}
+				//if(!is_null($this->code_divers)){$this->AddInventaire($this->code_divers, 1, false);}
 				if($this->LivreSorts == 'NoBook'){
 					unset($this->LstSorts);
 					$this->LstSorts[] = $numObject.'='.strtotime('now');
@@ -298,11 +298,11 @@ class personnage{
 				}
 				break;
 			case objDivers::TYPE_LIVRE:
-				if(!is_null($this->LivreSorts) AND $this->LivreSorts != 'NoBook'){$this->AddInventaire($this->LivreSorts, $typeObject);}
+				if(!is_null($this->LivreSorts) AND $this->LivreSorts != 'NoBook'){$this->AddInventaire($this->LivreSorts, 1, false);}
 				$this->LivreSorts = $numObject;
 				break;
 			case objDivers::TYPE_SAC:
-				if(!is_null($this->code_sac)){$this->AddInventaire($this->code_sac, $typeObject);}
+				if(!is_null($this->code_sac)){$this->AddInventaire($this->code_sac, 1, false);}
 				$this->code_sac = $numObject;
 				break;
 		}
@@ -329,7 +329,7 @@ class personnage{
 	}
 	
 	//Gestion du bolga
-	public function AddInventaire($codeObjet, $typeObjet = 'ObjetPouvantEtreGroupé', $nbObjet = 1, $chkLast = true){
+	public function AddInventaire($codeObjet, $nbObjet = 1, $chkLast = true){
 		$chk = false;
 		
 		//la structure est type1=nb1,type2=nb2 (exemple : cuir=6,longbaton=3)
@@ -581,7 +581,7 @@ class personnage{
 		return false;
 	}
 	Private function chkIfBatimentBloquant($position){
-		$TypeBatimentBloquant = array(2 /*Mur*/, 3 /*Tour*/);
+		$TypeBatimentBloquant = array(mur::ID_BATIMENT, tour::ID_BATIMENT);
 		$sql = "SELECT id_case_carte 
 				FROM table_carte 
 				WHERE 
@@ -799,7 +799,6 @@ class personnage{
 		//$sqlLstCmp = "SELECT cmp_lst_code FROM `table_competence_lst` WHERE cmp_lst_acces IN ('".GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class')."', 'Tous') ORDER BY cmp_lst_code ASC;";
 		$sqlLstCmp = "SELECT cmp_lst_code, cmp_lst_type 
 						FROM `table_competence_lst` 
-						WHERE (cmp_lst_acces IN ('%".GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class')."%', 'Tous') OR `cmp_lst_acces` LIKE '%".GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class')."%') 
 						ORDER BY cmp_lst_type, cmp_lst_code ASC;";
 		$rqtLstCmp = mysql_query($sqlLstCmp) or die (mysql_error().'<br />'.$sqlLstCmp);
 		
@@ -1007,6 +1006,14 @@ class personnage{
 				}
 			}
 		}
+	}
+	public function CheckIfSurMaison(){
+		if($this->GetCoordonnee() == implode(',', $this->maison_installe))
+		{
+			return true;
+		}
+		
+		return false;
 	}
 }
 ?>
