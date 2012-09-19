@@ -284,7 +284,7 @@ function ActionReprendre(&$check, $id, &$oJoueur, &$objManager){
 			if($check){
 				for ($i = 1; $i <= $_GET['qte']; $i++) {
 					$entrepot->RemoveContenu($_SESSION['main'][$id]['reprendre']);
-					$oJoueur->AddInventaire($_SESSION['main'][$id]['reprendre']);
+					$oJoueur->AddInventaire($_SESSION['main'][$id]['reprendre'], 1, false);
 				}
 					
 				$objManager->UpdateBatiment($entrepot);
@@ -369,7 +369,7 @@ function ActionDruide(&$chkErr, $id, personnage &$oJoueur, &$objManager){
 						$oJoueur->CleanInventaire('Hydromel', NULL, abs($value));
 					}
 					elseif($value > 0){
-						$oJoueur->AddInventaire('Hydromel', NULL, abs($value), false);
+						$oJoueur->AddInventaire('Hydromel', abs($value), false);
 					}
 					break;
 				case 'O':
@@ -385,12 +385,12 @@ function ActionDruide(&$chkErr, $id, personnage &$oJoueur, &$objManager){
 						$oJoueur->PerdreVie(abs($value));
 					}
 					elseif($value > 0){
-						$oJoueur->AddInventaire('ResVie'.abs($value), NULL, 1, false);
+						$oJoueur->AddInventaire('ResVie'.abs($value), 1, false);
 					}
 					break;
 				case 'D':
 					if($value > 0){
-						$oJoueur->AddInventaire('ResDep'.abs($value), NULL, 1, false);
+						$oJoueur->AddInventaire('ResDep'.abs($value), 1, false);
 					}
 					break;
 			}
@@ -398,7 +398,7 @@ function ActionDruide(&$chkErr, $id, personnage &$oJoueur, &$objManager){
 
 		//on recoit le parchemin du sort
 		if($_SESSION['main']['druide'][$id]['type'] != 'ressource'){
-			$oJoueur->AddInventaire($_SESSION['main']['druide'][$id]['type'], NULL, 1, false);
+			$oJoueur->AddInventaire($_SESSION['main']['druide'][$id]['type'], 1, false);
 		}
 
 		$objManager->UpdateBatiment($maison);
@@ -421,7 +421,7 @@ function ActionVenteMarche(&$check, $id, &$oJoueur, &$objManager){
 				break;
 			}
 				
-			$oJoueur->AddInventaire($_SESSION['main']['vente'][$id]['code'], $_SESSION['main']['vente'][$id]['type'], 1, false);
+			$oJoueur->AddInventaire($_SESSION['main']['vente'][$id]['code'], 1, false);
 			$oJoueur->MindOr($_SESSION['main']['vente'][$id]['prix']);
 				
 			$objMarche->RemoveMarchandise($_SESSION['main']['vente'][$id]['code']);
