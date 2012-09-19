@@ -44,8 +44,10 @@ if(!isset($_SESSION['joueur'])){
 	}
 }else{
 	
-	//$_SESSION['main']['uri']			= $codeUri;
 	$_SESSION['main']['deplacement']	= 'new';
+
+		//On créé la liste des quêtes
+	$_SESSION['QueteEnCours'] = ListQueteEnCours();
 	
 	if(!empty($_GET['page']) && is_file('control/'.$_GET['page'].'.php')){
 		include('control/'.$_GET['page'].'.php');
