@@ -990,7 +990,7 @@ function AfficheHistory(personnage &$oJoueur){
 //+---------------------------------+
 function ActionStock(&$check, personnage &$oJoueur){
 	if(isset($_SESSION['main']['objet']['code'])){
-		$oJoueur->AddInventaire($_SESSION['main']['objet']['code'], null, 1);
+		$oJoueur->AddInventaire($_SESSION['main']['objet']['code']);
 		unset($_SESSION['main']['objet']);
 	}else{
 		$check = false;
@@ -1024,12 +1024,17 @@ function ActionMove(&$check, personnage &$oJoueur, &$objManager){
 	}
 
 	//on vérifie si on a trouvé une quete
-	if(isset($_SESSION['QueteEnCours'])){
-		foreach($_SESSION['QueteEnCours'] as $Quete){
-			$Quete->ActionSurQuete($oJoueur);
-			$objManager->UpdateQuete($Quete);
+	var_dump($oJoueur->CheckIfSurMaison());
+	if($oJoueur->CheckIfSurMaison())
+	{
+		if(isset($_SESSION['QueteEnCours'])){
+			foreach($_SESSION['QueteEnCours'] as $Quete){
+				$Quete->ActionSurQuete($oJoueur);
+				$objManager->UpdateQuete($Quete);
+			}
 		}
 	}
+	
 
 	//on se fait voler par un voleur
 	$num = mt_rand(1, 1000);
@@ -1062,12 +1067,12 @@ function ActionChasser(&$check, personnage &$oJoueur, &$objManager){
 		//$maison = $oJoueur->GetObjSaMaison();
 		$oGibier = FoundGibier($_SESSION['chasser']);
 		
-		$oJoueur->AddInventaire($oGibier->GetCode(), NULL, 1, false);
+		$oJoueur->AddInventaire($oGibier->GetCode(), 1, false);
 		
 		//$maison->AddRessource(maison::TYPE_RES_NOURRITURE, $_SESSION['chasser']['nourriture']);
 		
 		/* if(!is_null($_SESSION['chasser']['cuir'])){
-			$oJoueur->AddInventaire('ResCuir', NULL, $_SESSION['chasser']['cuir'], false);
+			$oJoueur->AddInventaire('ResCuir', $_SESSION['chasser']['cuir'], false);
 		} */
 		if(!is_null($oGibier->GetAttaque()))
 		{

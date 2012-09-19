@@ -156,7 +156,7 @@ function ActionFabriquer(&$check, $id, personnage &$oJoueur, &$objManager){
 				echo 'Erreur GLX0004: Fonction ActionFabriquer - Pas assez de ressource';
 			}else{
 				//on ajoute le nouvel objet dans son bolga
-				$oJoueur->AddInventaire($_SESSION['main']['bricolage'][$id]['code'], $_SESSION['main']['bricolage'][$id]['type'], abs($_GET['qte']), false);
+				$oJoueur->AddInventaire($_SESSION['main']['bricolage'][$id]['code'], abs($_GET['qte']), false);
 				//on gagne des points
 				$oJoueur->UpdatePoints(abs(personnage::POINT_OBJET_FABRIQUE));
 			}

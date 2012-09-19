@@ -8,7 +8,10 @@ function AfficheAutreCompetences(personnage &$oJoueur, maison &$oMaison){
 	$nbComp = 0;
 
 	//$sqlLstCmp = "SELECT * FROM table_competence_lst WHERE cmp_lst_acces IN ('".GetInfoCarriere($oJoueur->GetCodeCarriere(), 'carriere_class')."', 'Tous') ORDER BY cmp_lst_code ASC;";
-	$sqlLstCmp = "SELECT * FROM table_competence_lst WHERE (cmp_lst_acces IN ('".GetInfoCarriere($oJoueur->GetCodeCarriere(), 'carriere_class')."', 'Tous') OR cmp_lst_acces LIKE '%".GetInfoCarriere($oJoueur->GetCodeCarriere(), 'carriere_class')."%') ORDER BY cmp_lst_code ASC;";
+	$sqlLstCmp = "SELECT * FROM table_competence_lst 
+				WHERE (cmp_lst_acces IN ('".GetInfoCarriere($oJoueur->GetCodeCarriere(), 'carriere_class')."', 'Tous') 
+					OR cmp_lst_acces LIKE '%".GetInfoCarriere($oJoueur->GetCodeCarriere(), 'carriere_class')."%') 
+				ORDER BY cmp_lst_code ASC;";
 	$rqtLstCmp = mysql_query($sqlLstCmp) or die (mysql_error().'<br />'.$sqlLstCmp);
 
 	while($cmp = mysql_fetch_array($rqtLstCmp, MYSQL_ASSOC)){
