@@ -107,14 +107,14 @@ class ressource extends batiment{
 		{
 			case self::NOM_RESSOURCE_PIERRE:
 				switch($this->intTypeContenu){
-					case 1:	$oCollecteur->AddInventaire(self::CODE_PIERRE, NULL, $qte, false); break(2);
+					case 1:	$oCollecteur->AddInventaire(self::CODE_PIERRE, $qte, false); break(2);
 					case 2: $oCollecteur->AddOr($qte);	break(2);
 				}
-			case self::NOM_RESSOURCE_BOIS:	$oCollecteur->AddInventaire(self::CODE_BOIS, NULL, $qte, false); break;
+			case self::NOM_RESSOURCE_BOIS:	$oCollecteur->AddInventaire(self::CODE_BOIS, $qte, false); break;
 			case self::NOM_RESSOURCE_OR:	$oCollecteur->AddOr($qte);	break;
 		} */
 		
-		$oCollecteur->AddInventaire($this->GetCodeRessource($this->intTypeContenu), NULL, $qte, false);
+		$oCollecteur->AddInventaire($this->GetCodeRessource($this->intTypeContenu), $qte, false);
 		
 		$this->intStock -= $qte;
 		

@@ -122,7 +122,7 @@ abstract class batiment{
 			case 'entrepot':
 				foreach($this->Contenu as $item){
 					$arItem = explode('=', $item);
-					$persoAttaquant->AddInventaire($arItem['0'], null, $arItem['1']);
+					$persoAttaquant->AddInventaire($arItem['0'], $arItem['1'], false);
 				}
 				break;
 				//Quand la banque est détruite, l'attaquant récupère l'or
