@@ -210,7 +210,7 @@ function ActionConvertir(&$check, $id, personnage &$oJoueur, &$objManager, $Qte)
 						}
 						break;
 					default:
-						$oJoueur->AddInventaire($arRessource[0], false, $arRessource[1]);
+						$oJoueur->AddInventaire($arRessource[0], $arRessource[1], false);
 					break;
 				}
 			}
