@@ -119,22 +119,22 @@ abstract class btProduction extends batiment{
 		$_SESSION['main'][get_class($this)]['production']	= $this->GetTypeContenu();
 		//$_SESSION['main'][get_class($this)]['vider']		= $this->GetStockContenu();
 		
-		$PositionBatiment	= implode(',', array_merge(array(parent::GetCarte()), parent::GetCoordonnee()));
-		$PositionJoueur		= implode(',', array_merge(array($oJoueur->GetCarte()), $oJoueur->GetPosition()));
+		//$PositionBatiment	= implode(',', $this->GetCoordonnee());
+		//$PositionJoueur		= implode(',', $oJoueur->GetCoordonnee());
 		
-		if($PositionBatiment == $PositionJoueur){
+		if($this->GetCoordonnee() == $oJoueur->GetCoordonnee()){
 			$txtAction = '
 				<td>
 					<form method="post" action="index.php?page=village">
 						<input type="hidden" name="action" value="viderstock'.strtolower(get_class($this)).'" />
-						<input type="hidden" name="anchor" value="'.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'" />
+						<input type="hidden" name="anchor" value="'.str_replace(',', '_', $this->GetCoordonnee()).'" />
 						<input type="submit" name="submit" value="Vider votre stock" />
 					</form>
 				</td>
 				<td>'
 					.'<form method="post" action="index.php?page=village" class="production">'
 						.'<input type="hidden" name="page" value="village" />'
-						.'<input type="hidden" name="anchor" value="'.implode('_', array_merge(array(parent::GetCarte()), parent::GetCoordonnee())).'" />'
+						.'<input type="hidden" name="anchor" value="'.str_replace(',', '_', $this->GetCoordonnee()).'" />'
 						.'<input type="hidden" name="action" value="production'.strtolower(get_class($this)).'" />'
 						.'<select name="type" onclick="document.getElementById(\'BtSubmit\').disabled=false;">'
 							.$this->GetListSelectOptionProducion()
