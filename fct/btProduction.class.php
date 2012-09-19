@@ -60,7 +60,7 @@ abstract class btProduction extends batiment{
 	public function ViderStock(personnage &$joueur){
 		if($this->GetStockContenu() > 0)
 		{
-			$joueur->AddInventaire($this->GetCodeRessource($this->GetTypeContenu()), NULL, $this->GetStockContenu(), false);
+			$joueur->AddInventaire($this->GetCodeRessource($this->GetTypeContenu()), $this->GetStockContenu(), false);
 		}
 		
 		$this->Contenu[1] -= $this->GetStockContenu();
