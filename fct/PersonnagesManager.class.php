@@ -126,7 +126,23 @@ class PersonnagesManager{
 		return $q->execute();
 	}
 	public function UpdateQuete(quete $quete){
-		$q = $this->db->prepare('UPDATE table_quetes SET 
+		if($quete->GetIDQuete() == 'New')
+		{
+			$q = $this->db->prepare('INSERT INTO table_quetes (
+				`id_quete_en_cours`, 
+				`quete_login`, 
+				`quete_id`, 
+				`quete_position`, 
+				`quete_vie`, 
+				`quete_reussi`, 
+				`date_start`, 
+				`date_end`)
+				VALUE(NULL, :Login, :ID_TYPE, :quete_position, :quete_vie, :quete_reussi, :date_start, :date_end);');
+				
+				$q->bindValue(':Login', $quete->GetLogin(), PDO::PARAM_STR);
+				$q->bindValue(':ID_TYPE', $quete->GetIDTypeQuete(), PDO::PARAM_INT);
+		}else{
+			$q = $this->db->prepare('UPDATE table_quetes SET 
 				quete_position = :quete_position, 
 				quete_vie = :quete_vie, 
 				quete_reussi = :quete_reussi, 
@@ -134,16 +150,20 @@ class PersonnagesManager{
 				date_end = :date_end, 
 				last_combat = :last_combat 
 				WHERE id_quete_en_cours = :id_quete_en_cours');
+				
+				$q->bindValue(':id_quete_en_cours', $quete->GetIDQuete(), PDO::PARAM_INT);
+				$q->bindValue(':last_combat', ($quete->GetDateCombat()?date('Y-m-d H:i:s',$quete->GetDateCombat()):NULL), PDO::PARAM_STR);
+		}
 		
-		$q->bindValue(':id_quete_en_cours', $quete->GetIDQuete(), PDO::PARAM_INT);
+		
 		$q->bindValue(':quete_position', implode(',',array_merge(array($quete->GetCarte()),$quete->GetPosition())), PDO::PARAM_STR);
 		$q->bindValue(':quete_vie', ($quete->GetVie()?$quete->GetVie():NULL), PDO::PARAM_INT);
 		$q->bindValue(':quete_reussi', ($quete->GetStatus()?$quete->GetStatus():NULL), PDO::PARAM_INT);
 		$q->bindValue(':date_start', ($quete->GetDateStart()?date('Y-m-d H:i:s',$quete->GetDateStart()):NULL), PDO::PARAM_STR);
 		$q->bindValue(':date_end', ($quete->GetDateEnd()?date('Y-m-d H:i:s',$quete->GetDateEnd()):NULL), PDO::PARAM_STR);
-		$q->bindValue(':last_combat', ($quete->GetDateCombat()?date('Y-m-d H:i:s',$quete->GetDateCombat()):NULL), PDO::PARAM_STR);
+		
 
-		return $q->execute();
+		return $q->execute() or die(print_r($q->errorInfo(), true));
 	}
 	public function UpdateMarche(marchant $marche){
 		$q = $this->db->prepare('UPDATE table_marche SET 
