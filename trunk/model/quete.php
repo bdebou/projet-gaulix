@@ -1,44 +1,9 @@
 <?php
-function CombienQueteDisponible($login, $niveau){
-	$sql = "SELECT * FROM table_quete_lst WHERE niveau<=$niveau;";
-	$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
-
-	if(mysql_num_rows($requete) > 0){
-		$NbQueteDisponible = 0;
-
-		while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
-			if(!CheckIfQueteEnCours($row['id_quete']) AND !CheckIfQueteDejaTermine($row['id_quete'], $login)){
-				$NbQueteDisponible++;
-			}
-		}
-		
-		return $NbQueteDisponible;
-	}
-
-	return 0;
-}
-function CheckIfQueteEnCours($NumQuete){
-	if(isset($_SESSION['QueteEnCours'])){
-		foreach($_SESSION['QueteEnCours'] as $quete){
-			if($quete->GetIDTypeQuete() == $NumQuete){
-				return true;
-			}
-		}
-	}
-	return false;
-}
-function CheckIfQueteDejaTermine($NumQuete, $login){
-	$sql = "SELECT id_quete_en_cours FROM table_quetes WHERE quete_login = '$login' AND quete_reussi IS NOT NULL AND quete_id = $NumQuete;";
-	$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
-	
-	if(mysql_num_rows($requete) > 0){
-		return true;
-	}
-	return false;
-}
-function SelectQuete(personnage &$oJoueur){
+function SelectQuete(personnage &$oJoueur, $bSurMaison){
 	$txt = null;
-	$sql = "SELECT * FROM table_quete_lst WHERE niveau<=".$oJoueur->GetNiveau().";";
+	$sql = "SELECT * 
+			FROM table_quete_lst 
+			WHERE quete_niveau<=".$oJoueur->GetNiveau()." AND quete_civilisation IN ('Tous', '".$oJoueur->GetCivilisation()."');";
 	$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
 	
 	if(mysql_num_rows($requete) > 0){
@@ -49,15 +14,22 @@ function SelectQuete(personnage &$oJoueur){
 		<table class="quetes">';
 		
 		while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
-			if(!CheckIfQueteEnCours($row['id_quete']) AND !CheckIfQueteDejaTermine($row['id_quete'], $oJoueur->GetLogin())){
+			
+			$oQuete = FoundQuete($row['id_quete'], $oJoueur->GetLogin());
+			
+			if(!$oQuete->CheckIfEnCours($oJoueur->GetLogin())/*  AND !$oQuete->CheckIfDejaTermine($oJoueur->GetLogin()) */)
+			{
 				$NbQueteDisponible++;
+				
+				
+				
 				if($nbCol == 0){
 					$txt .= '
 				<tr>';
 				}
 				
 				$txt .= '
-					<td>'.AfficheDescriptifQuete($row).'</td>';
+					<td>'.$oQuete->AfficheDescriptif($oJoueur, $oJoueur->GetObjSaMaison(), false, $bSurMaison).'</td>';
 					
 				$nbCol++;
 				
@@ -85,196 +57,76 @@ function SelectQuete(personnage &$oJoueur){
 		return '<p>Pas de nouvelle quête disponible. Passez au niveau suivant pour avoir de nouvelles quêtes.</p>';
 	}
 }
-function AfficheDescriptifQuete($quete){
-	global $CodeCouleurQuete;
+function ActionInscriptionQuete(&$check, $numQuete, personnage &$oJoueur, maison &$oMaison){
+	if(	count($_SESSION['QueteEnCours']) < quete::NB_QUETE_MAX
+		AND isset($_SESSION['quete'][$numQuete])
+		AND !$_SESSION['quete'][$numQuete])
+	{
+		$oNewQuete = FoundQuete($numQuete);
 
-	$nbInfo=0;
-	if(!is_null($quete['gain_or'])){
-		$nbInfo++;
-	}
-	if(!is_null($quete['gain_experience'])){
-		$nbInfo++;
-	}
-	if(!is_null($quete['gain_points'])){
-		$nbInfo++;
-	}
-
-	return '
-				<table class="fiche_quete">
-					<tr style="background:'.$CodeCouleurQuete[$quete['quete_type']].';">
-						<th colspan="'.$nbInfo.'">'.$quete['nom'].'</th>
-					</tr>
-					<tr><td colspan="'.$nbInfo.'">Gains</td></tr>
-					<tr>'
-	.(!is_null($quete['gain_or'])?'
-						<td style="width:'.intval(100 / $nbInfo).'%">
-							'.AfficheIcone('or').' : <b>'.$quete['gain_or'].'</b>
-						</td>'
-	:'')
-	.(!is_null($quete['gain_experience'])?'
-						<td style="width:'.intval(100 / $nbInfo).'%">
-							Exp : <b>'.$quete['gain_experience'].'</b>
-						</td>'
-	:'')
-	.(!is_null($quete['gain_points'])?'
-						<td style="width:'.intval(100 / $nbInfo).'%">
-							Points : <b>'.$quete['gain_points'].'</b>
-						</td>'
-	:'')
-	.'</tr>'
-	.((!is_null($quete['quete_duree']))?
-					'<tr>
-						<td colspan="'.$nbInfo.'">
-							Vous avez : <b>'.AfficheTempPhrase(DecoupeTemp($quete['quete_duree'])).'</b>
-						</td>
-					</tr>'
-	:'')
-	.'<tr>
-						<td class="description" colspan="'.$nbInfo.'">'
-	.$quete['description']
-	.(!is_null($quete['id_objet'])?'<p>Si vous remplissez votre quête à temps, vous recevrez ceci :'.AfficheInfoObjet($quete['id_objet']).'</p>':'')
-	.'</td>
-					</tr>
-					<tr>
-						<td colspan="'.$nbInfo.'">
-							<button 
-								type="button" 
-								onclick="window.location=\'index.php?page=quete&amp;action=inscription&amp;num_quete='.$quete['id_quete'].'\'"' 
-								.(count($_SESSION['QueteEnCours']) >= quete::NB_QUETE_MAX?'disabled=disabled ':'')
-								.'class="quete" >
-									Accepter
-							</button>
-						</td>
-					</tr>
-				</table>';
-}
-function InscriptionQuete($numQuete){
-	$sql = "SELECT * FROM table_quete_lst WHERE id_quete=$numQuete;";
-	$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
-	$infoQuete = mysql_fetch_array($requete, MYSQL_ASSOC);
-	$sqlAdd = "INSERT INTO table_quetes (
-		`id_quete_en_cours`, 
-		`quete_login`, 
-		`quete_id`, 
-		`quete_position`, 
-		`quete_vie`, 
-		`quete_reussi`, 
-		`date_start`, 
-		`date_end`)
-		VALUE(
-		NULL, 
-		'".$_SESSION['joueur']."', 
-		".$infoQuete['id_quete'].", 
-		'".SelectionPositionQuete()."', 
-		".(is_null($infoQuete['quete_vie'])?"NULL":$infoQuete['quete_vie']).", 
-		NULL, 
-		'".date('Y-m-d H:i:s')."', 
-		NULL
-		);";
-	$requete = mysql_query($sqlAdd) or die (mysql_error().'<br />'.$sqlAdd);
-
-}
-function SelectionPositionQuete(){
-	global $objManager;
-
-	$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
-
-	$carte = null;
-	if($oJoueur->GetNiveau() <= 3){
-		if(!is_null($oJoueur->GetMaisonInstalle())){
-			$arcarte = $oJoueur->GetMaisonInstalle();
-			$carte = $arcarte['0'];
+			//on inscrit le joueur à la quete
+		if($oNewQuete->Inscription($oJoueur, $oMaison))
+		{
+			
+			global $objManager;
+			$objManager->UpdateQuete($oNewQuete);
+			
+			unset($_SESSION['quete'][$numQuete]);
+			
 		}else{
-			$carte = $oJoueur->GetCarte();
+			$check = false;
+			echo 'Erreur GLX0003: Fonction ActionInscriptionQuete';
 		}
+		
+	}else{
+		$check = false;
+		echo 'Erreur GLX0002: Fonction ActionInscriptionQuete';
 	}
-	$free = FreeCaseCarte($carte);
-
-	$objManager->update($oJoueur);
-	unset($oJoueur);
-	return $free[array_rand($free)];
+	
+	
 }
-function ClotureQuete($IDQuete) {
-	$sqlBis = "UPDATE table_quetes SET quete_reussi = 1, date_end = '" . date('Y-m-d H:i:s') . "' WHERE id_quete_en_cours = " . $IDQuete . ";";
-	mysql_query($sqlBis) or die(mysql_error() . '<br />' . $sqlBis);
-}
-function AfficheAvancementQuete($QueteEnCours) {
-	global $CodeCouleurQuete;
-
-	$nbInfo = 0;
-	if (!is_null($QueteEnCours->GetGainOr())) {
-		$nbInfo++;
-	}
-	if (!is_null($QueteEnCours->GetGainExperience())) {
-		$nbInfo++;
-	}
-	if (!is_null($QueteEnCours->GetGainPoints())) {
-		$nbInfo++;
-	}
-
-	switch ($QueteEnCours->GetTypeQuete()) {
-		case 'monstre':
-		case 'romains':
-			$status = '<tr><td colspan="' . $nbInfo . '"><img alt="Barre de Vie" src="./fct/fct_image.php?type=vie&amp;value=' . $QueteEnCours->GetVie() . '&amp;max=' . $QueteEnCours->GetVieMax() . '" /></td></tr>';
-			break;
-		case 'recherche':
-		case 'objet':
-			if (!is_null($QueteEnCours->GetDuree())) {
-				$status = '
-					<tr>
-						<td colspan="' . $nbInfo . '">
-							Temps restant : <br /><div style="display:inline;" id="TimeToWaitQuete' . $QueteEnCours->GetIDQuete() . '"></div>'
-				. AfficheCompteurTemp('Quete' . $QueteEnCours->GetIDQuete(), 'index.php?page=quete&amp;action=annule&amp;num_quete='.$QueteEnCours->GetIDQuete(), ($QueteEnCours->GetDuree() - (strtotime('now') - $QueteEnCours->GetDateStart())))
-				. '</td>
-					</tr>';
+function ActionAnnulerQuete(&$check, $numQuete) {
+	if(isset($_SESSION['quete'][$numQuete]) AND $_SESSION['quete'][$numQuete])
+	{
+		foreach($_SESSION['QueteEnCours'] as $oCloseQuete)
+		{
+			if($oCloseQuete->GetIDTypeQuete() == $numQuete)
+			{
+				$oCloseQuete->FinishQuete();
+				
+				global $objManager;
+				$objManager->UpdateQuete($oCloseQuete);
 			}
-			break;
+		}
+		
+		ListQueteEnCours();
+		
+		unset($_SESSION['quete'][$numQuete]);
+	}else{
+		$check = false;
+		echo 'Erreur GLX0002: Fonction ActionAnnulerQuete';
 	}
-
-	return '
-	<table class="fiche_quete">
-		<tr style="background:' . $CodeCouleurQuete[$QueteEnCours->GetTypeQuete()] . ';">
-			<th colspan="' . $nbInfo . '">' . $QueteEnCours->GetNom() . '</th>
-		</tr>
-		<tr><td colspan="' . $nbInfo . '">Gains</td></tr>
-		<tr>'
-	. (!is_null($QueteEnCours->GetGainOr()) ?
-                    '<td style="width:' . intval(100 / $nbInfo) . '%">'
-	. AfficheIcone('or') . ' : <b>' . $QueteEnCours->GetGainOr() . '</b>
-				</td>' : '')
-	. (!is_null($QueteEnCours->GetGainExperience()) ?
-                    '<td style="width:' . intval(100 / $nbInfo) . '%">
-					Expérience : <b>' . $QueteEnCours->GetGainExperience() . '</b>
-				</td>' : '')
-	. (!is_null($QueteEnCours->GetGainPoints()) ?
-                    '<td style="width:' . intval(100 / $nbInfo) . '%">
-					Points : <b>' . $QueteEnCours->GetGainPoints() . '</b>
-				</td>' : '')
-	. '</tr>'
-	. (isset($status) ? $status : '')
-	. '<tr>
-			<td class="description" colspan="' . $nbInfo . '">'
-	. $QueteEnCours->GetDescription()
-	. (!is_null($QueteEnCours->GetCodeObjet()) ? AfficheInfoObjet($QueteEnCours->GetCodeObjet()) . '<p>Si vous remplissez votre quête à temps, vous recevrez ceci.</p>' : '')
-	. '</td>
-		</tr>
-		<tr>
-			<td colspan="' . $nbInfo . '" style="background:#b6ff6c;">
-				Toujours en cours
-			</td>
-		</tr>'
-	. ($_GET['page'] == 'quete' ?
-                    '<tr>
-			<td colspan="' . $nbInfo . '">
-				<button 
-					type="button" 
-					onclick="window.location=\'index.php?page=quete&amp;action=annule&amp;num_quete='.$QueteEnCours->GetIDQuete().'\'" 
-					class="quete" >
-						Annuler
-				</button>
-			</td>
-		</tr>' : '') .
-            '</table>';
+	
+}
+function ActionValiderQuete(&$check, $numQuete, personnage &$oJoueur, maison &$oMaison){
+	if(	isset($_SESSION['quete'][$numQuete])
+	AND $_SESSION['quete'][$numQuete])
+	{
+		foreach($_SESSION['QueteEnCours'] as $oQuete)
+		{
+			if($oQuete->GetIDTypeQuete() == $numQuete)
+			{
+				$oQuete->ValiderQuete($oJoueur, $oMaison);
+				
+				global $objManager;
+				$objManager->UpdateQuete($oQuete);
+			}
+		}
+		
+	}else{
+		$check = false;
+		echo 'Erreur GLX0002: Fonction ACtionValiderQuete';
+	}
 }
 
 
