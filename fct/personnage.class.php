@@ -81,20 +81,6 @@ class personnage{
 			$this->LstSorts = $tmpLst;
 		}
 		
-		//On verifie les quetes
-		if(!is_null($_SESSION['QueteEnCours']))
-		{
-			global $objManager;
-			
-			foreach($_SESSION['QueteEnCours'] as $oQuete)
-			{
-				$oQuete->ActionSurQuete($this);
-				
-				$objManager->UpdateQuete($oQuete);
-			}
-			
-			$_SESSION['QueteEnCours'] = ListQueteEnCours();
-		}
 	}
 	//Frapper un autre joueur et les conséquances
 	public function frapper(Personnage $persoCible){
