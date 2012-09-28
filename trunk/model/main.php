@@ -1024,14 +1024,11 @@ function ActionMove(&$check, personnage &$oJoueur, &$objManager){
 	}
 
 	//on vérifie si on a trouvé une quete
-	var_dump($oJoueur->CheckIfSurMaison());
-	if($oJoueur->CheckIfSurMaison())
-	{
-		if(isset($_SESSION['QueteEnCours'])){
-			foreach($_SESSION['QueteEnCours'] as $Quete){
-				$Quete->ActionSurQuete($oJoueur);
-				$objManager->UpdateQuete($Quete);
-			}
+	
+	if(isset($_SESSION['QueteEnCours'])){
+		foreach($_SESSION['QueteEnCours'] as $Quete){
+			$Quete->ActionSurQuete($oJoueur);
+			$objManager->UpdateQuete($Quete);
 		}
 	}
 	
