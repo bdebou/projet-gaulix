@@ -80,6 +80,21 @@ class personnage{
 			}
 			$this->LstSorts = $tmpLst;
 		}
+		
+		//On verifie les quetes
+		if(!is_null($_SESSION['QueteEnCours']))
+		{
+			global $objManager;
+			
+			foreach($_SESSION['QueteEnCours'] as $oQuete)
+			{
+				$oQuete->ActionSurQuete($this);
+				
+				$objManager->UpdateQuete($oQuete);
+			}
+			
+			$_SESSION['QueteEnCours'] = ListQueteEnCours();
+		}
 	}
 	//Frapper un autre joueur et les conséquances
 	public function frapper(Personnage $persoCible){
@@ -332,19 +347,32 @@ class personnage{
 	public function AddInventaire($codeObjet, $nbObjet = 1, $chkLast = true){
 		$chk = false;
 		
-		//la structure est type1=nb1,type2=nb2 (exemple : cuir=6,longbaton=3)
-		if(!is_null($this->arInventaire)){
-			foreach($this->arInventaire as $key=>$element){
-				$arTemp = explode('=', $element);
-				if(	$arTemp['0'] == $codeObjet/*  AND $this->CheckSiObjetPeutEtreGroupe($codeObjet, $typeObjet) */){
-					$arTemp['1'] += $nbObjet;
-					$this->arInventaire[$key] = implode('=', $arTemp);
-					$chk = true;
-					break;
+		if(strtolower($codeObjet) == strtolower(personnage::TYPE_RES_MONNAIE))
+		{
+			$this->AddOr($nbObjet);
+		}else{
+			//la structure est type1=nb1,type2=nb2 (exemple : cuir=6,longbaton=3)
+			if(!is_null($this->arInventaire))
+			{
+				foreach($this->arInventaire as $key=>$element)
+				{
+					$arTemp = explode('=', $element);
+					if(	$arTemp['0'] == $codeObjet/*  AND $this->CheckSiObjetPeutEtreGroupe($codeObjet, $typeObjet) */)
+					{
+						$arTemp['1'] += $nbObjet;
+						$this->arInventaire[$key] = implode('=', $arTemp);
+						$chk = true;
+						break;
+					}
 				}
 			}
+			
+			if(!$chk)
+			{
+				$this->arInventaire[] = $codeObjet.'='.$nbObjet;
+			}
 		}
-		if(!$chk){$this->arInventaire[] = $codeObjet.'='.$nbObjet;}
+		
 		if($chkLast){$this->SetLastObject(true,null);}
 	}
 	public function CleanInventaire($CodeObject, $full = false, $nb = 1){
