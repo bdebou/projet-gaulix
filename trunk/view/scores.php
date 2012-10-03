@@ -7,8 +7,8 @@
 			<th style="width:160px;" rowspan="2">Nom (Niveau)</th>
 			<th style="width:150px;" rowspan="2">Expérience</th>
 			<th style="width:150px;" rowspan="2"><?php echo AfficheIcone('vie');?></th>
-			<th rowspan="2"><?php echo AfficheIcone('attaque');?></th>
-			<th rowspan="2"><?php echo AfficheIcone('defense');?></th>
+			<th rowspan="2"><?php echo AfficheIcone(personnage::TYPE_PERFECT_ATTAQUE);?></th>
+			<th rowspan="2"><?php echo AfficheIcone(personnage::TYPE_PERFECT_DEFENSE);?></th>
 			<th colspan="3">Combats</th>
 		</tr>
 		<tr style="background:grey;">
