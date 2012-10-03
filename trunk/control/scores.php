@@ -1,7 +1,13 @@
 <?php
 include('model/scores.php');
 
-$lignes = AfficheLignesClassement();
+global $objManager;
+$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
+$lignes = AfficheLignesClassement($oJoueur->GetCivilisation());
+
+$objManager->update($oJoueur);
+
+unset($oJoueur);
 ?>
 
