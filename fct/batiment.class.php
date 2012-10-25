@@ -189,7 +189,7 @@ abstract class batiment{
 				case 'batiment_vie':			$this->EtatMax = (is_null($value)?NULL:intval($value)); break;
 				case 'batiment_prix':			$this->LstPrix = (is_null($value)?NULL:explode(',', $value)); break;
 				case 'batiment_points':			$this->NbPoints = intval($value); break;
-				case 'id_batiment':				$this->IDType = (int)$value; break;
+				case 'id_type':					$this->IDType = (int)$value; break;
 			}
 		}
 		
@@ -347,7 +347,7 @@ abstract class batiment{
 		else{return ($this->Distance + $this->Niveau);}
 	}
 	public function GetEtat(){					return $this->Etat;}
-	public function GetEtatMax(){				return ($this->EtatMax + (50 * ($this->Niveau - 1)));}
+	public function GetEtatMax(){				return $this->EtatMax;}
 	public function GetDateLastAction(){		return $this->DateLastAction;}
 	public function GetDetruit(){				return $this->Detruit;}
 	public function GetNiveau(){				return $this->Niveau;}
@@ -371,14 +371,27 @@ abstract class batiment{
 		}
 	}
 	public function GetCoutAmelioration(){
-		$classBatiment = get_class($this);
+		/* $classBatiment = get_class($this);
 		
 		switch(self::GetNiveau() + 1)
 		{
 			case 2:		return explode(',', $classBatiment::COUT_AMELIORATION_NIVEAU_2);
 			case 3:		return explode(',', $classBatiment::COUT_AMELIORATION_NIVEAU_3);
 			case 4:		return explode(',', $classBatiment::COUT_AMELIORATION_NIVEAU_4);
+		} */
+		
+		$sql = "SELECT batiment_prix FROM table_batiment 
+				WHERE id_type=".$this->GetIDType()." 
+					AND batiment_niveau=".($this->GetNiveau() +1).";";
+		$rqt = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
+		
+		if (mysql_num_rows($rqt) > 0)
+		{
+			$row = mysql_fetch_array($rqt, MYSQL_ASSOC);
+			
+			return explode(',', $row['batiment_prix']);
 		}
+		
 	}
 	public function GetCoutReparation($facteur = 1){
 		$temp = explode(',', $this::PRIX_REPARATION);
