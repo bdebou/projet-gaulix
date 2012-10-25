@@ -505,7 +505,7 @@ function AfficheListeBatimentAttaquable($sql, &$chkConstruction) {
 		$chkConstruction = false;   //on ne peut pas construire de batiment
 		$nbBatiment = 0;
 		while ($row = mysql_fetch_array($requete, MYSQL_ASSOC)) {
-			$sqlBatiment = "SELECT * FROM table_batiment WHERE id_batiment=" . $row['id_type_batiment'] . ";";
+			$sqlBatiment = "SELECT * FROM table_batiment WHERE id_type=" . $row['id_type_batiment'] . " AND batiment_niveau=".$row['niveau_batiment'].";";
 			$rqtBatiment = mysql_query($sqlBatiment) or die(mysql_error() . '<br />' . $sqlBatiment);
 			$rstBatiment = mysql_fetch_array($rqtBatiment, MYSQL_ASSOC);
 

@@ -22,7 +22,7 @@ class PersonnagesManager{
 		$requete = mysql_query($sql) or die ( mysql_error().'<br />'.$sql);
 		$carte = mysql_fetch_array($requete, MYSQL_ASSOC);
 		
-		$sql = "SELECT * FROM table_batiment WHERE id_batiment=".$carte['id_type_batiment'].";";
+		$sql = "SELECT * FROM table_batiment WHERE id_type=".$carte['id_type_batiment']." AND batiment_niveau=".$carte['niveau_batiment'].";";
 		$requete = mysql_query($sql) or die ( mysql_error().'<br />'.$sql);
 		$batiment = mysql_fetch_array($requete, MYSQL_ASSOC);
 		
@@ -148,17 +148,19 @@ class PersonnagesManager{
 				quete_reussi = :quete_reussi, 
 				date_start = :date_start, 
 				date_end = :date_end, 
+				status = :status, 
 				last_combat = :last_combat 
 				WHERE id_quete_en_cours = :id_quete_en_cours');
 				
 				$q->bindValue(':id_quete_en_cours', $quete->GetIDQuete(), PDO::PARAM_INT);
 				$q->bindValue(':last_combat', ($quete->GetDateCombat()?date('Y-m-d H:i:s',$quete->GetDateCombat()):NULL), PDO::PARAM_STR);
+				$q->bindValue(':status', (is_null($quete->GetStatus())?NULL:implode(',', $quete->GetStatus())), PDO::PARAM_STR);
 		}
 		
 		
 		$q->bindValue(':quete_position', implode(',',array_merge(array($quete->GetCarte()),$quete->GetPosition())), PDO::PARAM_STR);
 		$q->bindValue(':quete_vie', ($quete->GetVie()?$quete->GetVie():NULL), PDO::PARAM_INT);
-		$q->bindValue(':quete_reussi', ($quete->GetStatus()?$quete->GetStatus():NULL), PDO::PARAM_INT);
+		$q->bindValue(':quete_reussi', ($quete->GetFinish()?$quete->GetFinish():NULL), PDO::PARAM_INT);
 		$q->bindValue(':date_start', ($quete->GetDateStart()?date('Y-m-d H:i:s',$quete->GetDateStart()):NULL), PDO::PARAM_STR);
 		$q->bindValue(':date_end', ($quete->GetDateEnd()?date('Y-m-d H:i:s',$quete->GetDateEnd()):NULL), PDO::PARAM_STR);
 		
