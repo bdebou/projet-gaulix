@@ -42,6 +42,7 @@ class personnage{
 	Const NB_DEPLACEMENT_SUP		= 1;			// Nombre de point de déplacement gagné tout les x temp
 	Const VIE_MAX					= 300;			// Limite de vie maximum
 	Const TAUX_ATTAQUANT			= 1.15;			// Taux d'augmentation de l'attaquant
+	Const TAUX_VOL_ARGENT			= 0.10;			// Taux pour le montant de vol d'argent lors d'un combat perdu
 	
 	const TYPE_RES_MONNAIE			= 'Sesterce';
 	const TYPE_COMPETENCE			= 'Compétence';
@@ -49,8 +50,8 @@ class personnage{
 	Const TYPE_PERFECT_ATTAQUE		= 'Attaque';
 	Const TYPE_PERFECT_DEFENSE		= 'Defense';
 	
-	const CIVILISATION_ROMAIN		= 'romains';
-	const CIVILISATION_GAULOIS		= 'gaulois';
+	const CIVILISATION_ROMAIN		= 'Romains';
+	const CIVILISATION_GAULOIS		= 'Gaulois';
 	
 	//Les points
 	const POINT_COMBAT				= 10;
@@ -96,10 +97,11 @@ class personnage{
 		if($Valeur > $ValeurCible){
 				//La cible à perdu
 			$montant = $persoCible->GetArgent();
+			
 			if($persoCible->PerdreVie($Valeur-$ValeurCible,'combat')){
 				$this->AddOr($montant);
 			}else{
-				$montant = intval($persoCible->GetArgent() / 10);
+				$montant = intval($this->GetTauxVolArgent() * $persoCible->GetArgent());
 				$persoCible->AddExperience(1);
 				$this->AddOr($montant);
 				$persoCible->MindOr($montant);
@@ -1028,6 +1030,10 @@ class personnage{
 		}
 		
 		return false;
+	}
+	public function GetTauxVolArgent(){
+		
+		return self::TAUX_VOL_ARGENT;
 	}
 }
 ?>
