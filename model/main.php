@@ -261,7 +261,7 @@ function AfficheRedirectionBatiment(personnage &$oJoueur){
 	}
 }
 function AfficheActionViderStock(personnage &$oJoueur){
-	$batiment = FoundBatiment(false, false, $oJoueur->GetCoordonnee());
+	$batiment = FoundBatiment(false, $oJoueur->GetLogin(), $oJoueur->GetCoordonnee());
 	if(	!is_null($batiment)
 		AND in_array($batiment->GetIDType(), array(mine::ID_BATIMENT, ferme::ID_BATIMENT, carriere::ID_BATIMENT, potager::ID_BATIMENT/* , scierie::ID_BATIMENT */))
 		AND $batiment->GetStockContenu() == $batiment->GetStockMax()){
