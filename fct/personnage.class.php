@@ -1,39 +1,44 @@
 <?php
+/**
+ * Class de personnage Gaulois et Romain
+ * @author bruno.deboubers@gmail.com
+ *
+ */
 class personnage{
 
 	private	$id;
 	private $login;
 	private $mail;
-	private $position,
-			$vie,
-			$civilisation,
-			$village,
-			$carriere,
-			$val_attaque, $val_defense,
-			$argent,
-			$experience,
-			$niveau,
-			$deplacement,
-			$last_action,
-			$last_combat, 
-			$attaque_tour,
-			$chk_chasse, 
-			$chk_legion, 
-			$chk_object, 
-			$last_object, 
-			$code_casque, $code_arme, $code_bouclier, $code_jambiere, $code_cuirasse, $code_sac,
-			$LivreSorts, $LstSorts, 
-			$nb_combats, $nb_victoire, $nb_vaincu, $nb_mort, 
-			$arInventaire,
-			$date_perf_attaque, $tmp_perf_attaque,
-			$date_perf_defense, $tmp_perf_defense,
-			$maison_installe,
-			$clan,
-			$DateLastMessageLu,
-			$lstCompetences, 
-			$lstTypeCompetences, 
-			$not_attaque, $not_combat,
-			$nb_points;
+	private $position;
+	private $vie;
+	private $civilisation;
+	private $village;
+	private $carriere;
+	private $val_attaque, $val_defense;
+	private $argent;
+	private $experience;
+	private $niveau;
+	private $deplacement;
+	private $last_action;
+	private $last_combat; 
+	private $attaque_tour;
+	private $chk_chasse;
+	private $chk_legion; 
+	private $chk_object; 
+	private $last_object; 
+	private $code_casque, $code_arme, $code_bouclier, $code_jambiere, $code_cuirasse, $code_sac;
+	private $LivreSorts, $LstSorts;
+	private $nb_combats, $nb_victoire, $nb_vaincu, $nb_mort; 
+	private $arInventaire;
+	private $date_perf_attaque, $tmp_perf_attaque;
+	private $date_perf_defense, $tmp_perf_defense;
+	private $maison_installe;
+	private $clan;
+	private $DateLastMessageLu;
+	private $lstCompetences;
+	private $lstTypeCompetences; 
+	private $not_attaque, $not_combat;
+	private $nb_points;
 			
 	Const TAILLE_MINIMUM_BOLGA		= 20;			//La taille minimum du bolga
 	Const DUREE_SORT				= 432000;		// Limite de temp pour l'utilisation d'un sort (3600 * 24 *5).
@@ -49,6 +54,8 @@ class personnage{
 	
 	Const TYPE_PERFECT_ATTAQUE		= 'Attaque';
 	Const TYPE_PERFECT_DEFENSE		= 'Defense';
+	
+	Const TYPE_EXPERIENCE			= 'Experience';
 	
 	const CIVILISATION_ROMAIN		= 'Romains';
 	const CIVILISATION_GAULOIS		= 'Gaulois';
@@ -82,7 +89,30 @@ class personnage{
 			$this->LstSorts = $tmpLst;
 		}
 		
+		//on vérifie si on passee à la carrière suivante
+		if($this->CheckCarriere())
+		{
+			AddHistory($this->GetLogin(), $this->GetCarte(), $this->GetPosition(), 'Carrière', NULL, NULL, 'Vous êtes passé à la carrière: '.GetInfoCarriere($this->carriere, 'carriere_nom'));
+		}
 	}
+	
+	Private function CheckCarriere(){
+		$arCarriereInfo = GetInfoCarriere($this->GetCodeCarriere());
+		
+		if(!is_null($arCarriereInfo['carriere_debouchees']))
+		{
+			$lstCout = explode(',', $arCarriereInfo['carriere_competences']);
+			
+			if(CheckCout($lstCout, $this, $this->GetObjSaMaison()))
+			{
+				$this->carriere = $arCarriereInfo['carriere_debouchees'];
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	//Frapper un autre joueur et les conséquances
 	public function frapper(Personnage $persoCible){
 		
@@ -160,7 +190,7 @@ class personnage{
 				$this->experience++;
 			}elseif($this->experience==$this->GetMaxExperience()){
 				$this->UpNiveau();
-				$this->experience=0;
+				//$this->experience=0;
 			}
 		}
 	}
@@ -813,8 +843,13 @@ class personnage{
 		
 		//on crée la liste des compétences possible
 		//$sqlLstCmp = "SELECT cmp_lst_code FROM `table_competence_lst` WHERE cmp_lst_acces IN ('".GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class')."', 'Tous') ORDER BY cmp_lst_code ASC;";
+		
+		$CarriereClass = GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class');
+		
 		$sqlLstCmp = "SELECT cmp_lst_code, cmp_lst_type 
-						FROM `table_competence_lst` 
+						FROM `table_competence_lst`
+						WHERE (cmp_lst_acces IN ('".$CarriereClass."', 'Tous') 
+								OR cmp_lst_acces LIKE '%".$CarriereClass."%')  
 						ORDER BY cmp_lst_type, cmp_lst_code ASC;";
 		$rqtLstCmp = mysql_query($sqlLstCmp) or die (mysql_error().'<br />'.$sqlLstCmp);
 		
@@ -946,14 +981,28 @@ class personnage{
 	public function GetPosition(){			return array($this->position['1'], $this->position['2']);}
 	public function GetCarte(){				return $this->position['0'];}
 	public function GetCoordonnee(){		return implode(',', $this->position);}
-	public function GetMaxExperience(){		return (($this->niveau + 1) * 100);}
+	public function GetMaxExperience(){
+		//return (($this->niveau + 1) * 100);
+		$nb = 0;
+		for ($i = 0; $i <= $this->niveau; $i++)
+		{
+			$nb += ($i + 1) * 100;
+		}
+		return $nb;
+	}
 	public function GetNotifCombat(){		return $this->not_combat;}
 	public function GetNotifAttaque(){		return $this->not_attaque;}
 	public function GetNbPoints(){			return $this->nb_points;}
 	public function GetDateLasMessageLu(){	return $this->DateLastMessageLu;}
-	public function GetObjSaMaison(){		return FoundBatiment(1, $this->login);}
+	public function GetObjSaMaison(){		return FoundBatiment(maison::ID_BATIMENT, $this->login);}
 		//Les Compétences
-	public function GetNiveauCompetence($TypeCompetence){
+	
+	/**
+	 * Retourne le niveau maximum atteint dans un type de compétence donnée par $TypeCompetence
+	 * @param string $TypeCompetence <p>Nom du type de compétence</p>
+	 * @return number|NULL
+	 */
+	public function GetNiveauCompetence( $TypeCompetence){
 		
 		if(isset($this->lstTypeCompetences[$TypeCompetence]))
 		{
@@ -972,6 +1021,11 @@ class personnage{
 		
 		return NULL;
 	}
+	/**
+	 * Vérifie si la compétence est terminée
+	 * @param string $codeCompetence <p>Le code de la compétence à vérifier.</p>
+	 * @return boolean
+	 */
 	public function CheckCompetence($codeCompetence){
 		if(isset($this->lstCompetences[$codeCompetence]))
 		{
@@ -979,6 +1033,11 @@ class personnage{
 		}
 		return false;
 	}
+	/**
+	 * Retourne le type de compétence d'une compétence donnée
+	 * @param string $codeCompetence <p> le code de la compétence</p>
+	 * @return string|NULL
+	 */
 	public function GetTypeCompetence($codeCompetence){
 		foreach ($this->lstTypeCompetences as $Key=>$Type)
 		{
@@ -994,6 +1053,11 @@ class personnage{
 		
 		return NULL;
 	}
+	/**
+	 * Vérifie si pour un type de compétence, il y a déja au moins une compétence de terminée.
+	 * @param string $typeCompetence <p>Type de compétence</p>
+	 * @return boolean
+	 */
 	public function CheckTypeCompetence($typeCompetence){
 		if(isset($this->lstTypeCompetences[$typeCompetence]))
 		{
@@ -1008,6 +1072,11 @@ class personnage{
 		
 		return false;
 	}
+	/**
+	 * Retourne le code de la dernière compétence terminée dans un type de compétence donnée.
+	 * @param string $typeCompetence
+	 * @return string|NULL
+	 */
 	public function GetLastCompetenceFinish($typeCompetence){
 		$last = NULL;
 		if(isset($this->lstTypeCompetences[$typeCompetence]))
@@ -1018,11 +1087,24 @@ class personnage{
 				{
 					$last = $Competence;
 				}else{
-					return $last;
+					break;
 				}
 			}
 		}
+		return $last;
 	}
+	/**
+	 * Vérifie si la compétence donnée est disponnible dans la carrière du joueur actuel
+	 * @param string $CodeCompetence <p>Le code de la compétence à vérifier</p>
+	 * @return boolean
+	 */
+	public function CheckIfCompetenceAvailable($CodeCompetence){
+		return array_key_exists($CodeCompetence, $this->lstCompetences);
+	}
+	/**
+	 * Vérifie si le perso actuel est bien sur sa maison
+	 * @return boolean
+	 */
 	public function CheckIfSurMaison(){
 		if($this->GetCoordonnee() == implode(',', $this->maison_installe))
 		{
