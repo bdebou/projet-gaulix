@@ -579,7 +579,9 @@ function AfficheMenuConstruction(personnage &$oJoueur, &$chkConstruction) {
 			
 			global $lstNonBatiment, $lstBatimentsNonConstructible;
 			
-			$sqlBatiment = "SELECT * FROM table_batiment WHERE id_batiment NOT IN (".implode(", ", array_merge($lstNonBatiment, $lstBatimentsNonConstructible)).");";
+			$sqlBatiment = "SELECT * FROM table_batiment 
+								WHERE id_type NOT IN (".implode(", ", array_merge($lstNonBatiment, $lstBatimentsNonConstructible)).")
+									AND batiment_niveau=1;";
 			$rqtBatiment = mysql_query($sqlBatiment) or die(mysql_error() . '<br />' . $sqlBatiment);
 			
 			$txt = null;
@@ -591,7 +593,7 @@ function AfficheMenuConstruction(personnage &$oJoueur, &$chkConstruction) {
 
 			while ($row = mysql_fetch_array($rqtBatiment, MYSQL_ASSOC))
 			{
-				if (!ChkIfBatimentDejaConstruit($row['id_batiment']))
+				if (!ChkIfBatimentDejaConstruit($row['id_type']))
 				{
 					if ($chkStart)
 					{
@@ -611,7 +613,7 @@ function AfficheMenuConstruction(personnage &$oJoueur, &$chkConstruction) {
 					
 					if (CheckCout($LstPrix, $oJoueur, $maison))
 					{
-						$_SESSION['main'][$nbBatiment]['construire'] = $row['id_batiment'];
+						$_SESSION['main'][$nbBatiment]['construire'] = $row['id_type'];
 						//$_SESSION['main'][$nbBatiment]['prix'] = $row['batiment_prix'];
 						$_SESSION['main'][$nbBatiment]['prix'] = $LstPrix;
 						$txt .= '<a href="index.php?page=main&amp;action=construire&amp;id=' . $nbBatiment . '">' . $row['batiment_nom'] . '</a>';
