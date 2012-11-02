@@ -96,4 +96,23 @@ abstract class objMain{
 	public function GetType(){
 		return NULL;
 	}
+	/**
+	 * Vérifie si dans le cout de fabrication de l'objet, il n'y a pas besoin de compétence dont le joueur n'aura jamais à cause de la restriction de sa crrière choisie.
+	 * @param personnage $oJoueur
+	 * @return boolean
+	 */
+	Public function CheckIfAvailable(personnage $oJoueur){
+		foreach($this->Cout as $Cout)
+		{
+			$arCout = explode('=', $Cout);
+			if(QuelTypeObjet($arCout[0]) == personnage::TYPE_COMPETENCE)
+			{
+				if(!$oJoueur->CheckIfCompetenceAvailable($arCout[0]))
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 }
