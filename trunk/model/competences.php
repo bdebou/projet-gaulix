@@ -7,17 +7,19 @@ function AfficheAutreCompetences(personnage &$oJoueur, maison &$oMaison){
 					//<!--';
 	$nbComp = 0;
 
+	$CarriereClass = GetInfoCarriere($oJoueur->GetCodeCarriere(), 'carriere_class');
+	
 	//$sqlLstCmp = "SELECT * FROM table_competence_lst WHERE cmp_lst_acces IN ('".GetInfoCarriere($oJoueur->GetCodeCarriere(), 'carriere_class')."', 'Tous') ORDER BY cmp_lst_code ASC;";
 	$sqlLstCmp = "SELECT * FROM table_competence_lst 
-				WHERE (cmp_lst_acces IN ('".GetInfoCarriere($oJoueur->GetCodeCarriere(), 'carriere_class')."', 'Tous') 
-					OR cmp_lst_acces LIKE '%".GetInfoCarriere($oJoueur->GetCodeCarriere(), 'carriere_class')."%') 
+				WHERE (cmp_lst_acces IN ('".$CarriereClass."', 'Tous') 
+					OR cmp_lst_acces LIKE '%".$CarriereClass."%') 
 				ORDER BY cmp_lst_code ASC;";
 	$rqtLstCmp = mysql_query($sqlLstCmp) or die (mysql_error().'<br />'.$sqlLstCmp);
 
 	while($cmp = mysql_fetch_array($rqtLstCmp, MYSQL_ASSOC)){
 		
 		$chkFinis = false;
-		$NomOnglet = str_replace(array(' ', "'"), '_', $cmp['cmp_lst_type']);
+		$NomOnglet = str_replace(array(' ', "'", '&#39;'), '_', $cmp['cmp_lst_type']);
 		
 		//on récupère les info de la première compétence
 		if($NomOnglet != $NomPrecedent){
@@ -59,9 +61,7 @@ function AfficheAutreCompetences(personnage &$oJoueur, maison &$oMaison){
 				id="onglet_'.$NomOnglet.'_'.$cmp['cmp_lst_niveau'].'" 
 				onclick="javascript:change_onglet(\''.$NomOnglet.'\', \''.$cmp['cmp_lst_niveau'].'\');">'
 		.($chkFinis?AfficheIcone('check', 18).' ':'')
-		.ucfirst($cmp['cmp_lst_type'])
-		.' (Niveau '.$cmp['cmp_lst_niveau'].')
-			</span>';
+		.ucfirst($cmp['cmp_lst_nom']).'</span>';
 			
 	}
 	$txtJScript .= '
@@ -71,6 +71,8 @@ function AfficheAutreCompetences(personnage &$oJoueur, maison &$oMaison){
 	$txtFinish = null;
 	$numCol = 0;
 	$checkA = true;
+	
+	$nbColonne = 2;
 
 	foreach($arOnglets as $onglet => $data){
 
@@ -116,7 +118,7 @@ function AfficheAutreCompetences(personnage &$oJoueur, maison &$oMaison){
 
 		$numCol++;
 		//on ferme la ligne
-		if($numCol == 2){
+		if($numCol == $nbColonne){
 			$txt .= '</tr>';
 			$numCol = 0;
 			$checkA = true;
@@ -162,10 +164,8 @@ function AfficheInfoCompetence($competence, personnage &$oJoueur, maison &$oMais
 	}
 		
 	return '
-	<table class="competence">
-		<tr style="background:lightgrey;">
-			<th colspan="2">'.ucfirst($competence['cmp_lst_nom']).'</th>
-		</tr>'
+	<table class="competence">'
+		//.'<tr style="background:lightgrey;"><th colspan="2">'.ucfirst($competence['cmp_lst_nom']).'</th></tr>'
 		.(!is_null($competence['cmp_lst_description'])?'<tr><td colspan="2">'.$competence['cmp_lst_description'].'</td></tr>':NULL)
 		.'<tr>
 			<td>Niveau : '.$competence['cmp_lst_niveau'].'</td>
