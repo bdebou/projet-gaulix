@@ -4,11 +4,11 @@ include_once('model/menu.php');
 global $objManager, $chkDebug;
 $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
-$arBtMenu[0] = array('link' => './',							'name' => 'Principale');
+$arBtMenu[0] = array('link' => './',							'name' => 'Principal');
 $arBtMenu[1] = array('link' => './index.php?page=inventaire',	'name' => 'Bolga');
 $arBtMenu[2] = array('link' => './index.php?page=equipement',	'name' => 'Equipements');
 $arBtMenu[3] = array('link' => './index.php?page=competences',	'name' => 'Compétences');
-$arBtMenu[4] = array('link' => './index.php?page=bricolage',	'name' => 'Bricolage');
+$arBtMenu[4] = array('link' => './index.php?page=bricolage',	'name' => 'Artisanat');
 $arBtMenu[5] = array('link' => './index.php?page=quete',		'name' => 'Quêtes '.count($_SESSION['QueteEnCours']).'/'.(count($_SESSION['QueteEnCours']) + CombienQueteDisponible($oJoueur)));
 $arBtMenu[6] = array('link' => './index.php?page=scores',		'name' => 'Scores');
 $arBtMenu[7] = array('link' => './index.php?page=village',		'name' => 'Oppidum');
