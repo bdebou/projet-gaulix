@@ -4,18 +4,15 @@
 	global $objManager;
 	
 	$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
-	
 	$oMaison = $oJoueur->GetObjSaMaison();
 ?>
-<table class="perfectionnement">
-	<tr>
-		<td style="width:50%;">
-			<?php echo AfficheModulePerfectionnement(objArmement::TYPE_ATTAQUE, $oJoueur, $oMaison);?>
-		</td>
-		<td>
-			<?php echo AfficheModulePerfectionnement(objArmement::TYPE_DEFENSE, $oJoueur, $oMaison);?>
-		</td>
-	</tr>
+<div class="perfectionnement">
+	<?php echo AfficheModulePerfectionnement(objArmement::TYPE_ATTAQUE, $oJoueur, $oMaison);?>
+</div>
+<div class="perfectionnement">
+	<?php echo AfficheModulePerfectionnement(objArmement::TYPE_DEFENSE, $oJoueur, $oMaison);?>
+</div>
+	<table class="lst_competences">
 	<?php
 	$temp = AfficheAutreCompetences($oJoueur, $oMaison);
 	echo $temp[0];
