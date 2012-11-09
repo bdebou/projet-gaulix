@@ -1,5 +1,7 @@
 <?php
 function AfficheListeElementBricolage(personnage &$oJoueur, $Onglet = null){
+	global $lstTypeObjets;
+	
 	$txt = '
 	<div class="systeme_onglets">';
 	$TypePrecedent = null;
@@ -13,11 +15,14 @@ function AfficheListeElementBricolage(personnage &$oJoueur, $Onglet = null){
 	
 	$chkFirst = false;
 
+	//$CarriereClass = GetInfoCarriere($oJoueur->GetCodeCarriere(), 'carriere_class');
+	
 	$sql = "SELECT objet_code 
 			FROM table_objets 
 			WHERE objet_quete IS NULL 
 				AND objet_civilisation IN ('".$oJoueur->GetCivilisation()."', 'all')
 				AND objet_cout NOT LIKE 'cmp%' 
+				AND objet_type IN ('".implode("', '", $lstTypeObjets)."') 
 			ORDER BY objet_type, objet_nom ASC;";
 	
 	$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
@@ -26,37 +31,40 @@ function AfficheListeElementBricolage(personnage &$oJoueur, $Onglet = null){
 		
 		$oObjet = FoundObjet($row['objet_code']);
 		
-		//if($row['objet_type'] != $TypePrecedent){
-		if(get_class($oObjet) != $TypePrecedent){
-			$arOnglets['Span'] .= '
-			<span 
-				class="onglet_0 onglet" 
-				id="onglet_'.get_class($oObjet).'" 
-				onclick="javascript:change_onglet(\''.get_class($oObjet).'\');">'.ucfirst(substr(get_class($oObjet), 3)).'
-			</span>
-			';
-			
-			if($chkFirst){
-				$arOnglets['Contenu'] .= '</div>';
-			}else{
-				$FirstOnglet = get_class($oObjet);
+		if($oObjet->CheckIfAvailable($oJoueur))
+		{
+			//if($row['objet_type'] != $TypePrecedent){
+			if(get_class($oObjet) != $TypePrecedent){
+				$arOnglets['Span'] .= '
+				<span 
+					class="onglet_0 onglet" 
+					id="onglet_'.get_class($oObjet).'" 
+					onclick="javascript:change_onglet(\''.get_class($oObjet).'\');">'.ucfirst(substr(get_class($oObjet), 3)).'
+				</span>
+				';
+				
+				if($chkFirst){
+					$arOnglets['Contenu'] .= '</div>';
+				}else{
+					$FirstOnglet = get_class($oObjet);
+				}
+				
+				if(!is_null($Onglet) AND get_class($oObjet) == $Onglet){
+					$FirstOnglet = get_class($oObjet);
+				}
+				
+				$arOnglets['Contenu'] .= '<div class="contenu_onglet" id="contenu_onglet_'.get_class($oObjet).'">';
+				
+				$chkFirst = true;
+				
+				$TypePrecedent = get_class($oObjet);
+				//$nbBricolage = 0;
 			}
 			
-			if(!is_null($Onglet) AND get_class($oObjet) == $Onglet){
-				$FirstOnglet = get_class($oObjet);
-			}
-			
-			$arOnglets['Contenu'] .= '<div class="contenu_onglet" id="contenu_onglet_'.get_class($oObjet).'">';
-			
-			$chkFirst = true;
-			
-			$TypePrecedent = get_class($oObjet);
-			//$nbBricolage = 0;
+			$arOnglets['Contenu'] .= AfficheInfoObjetBricolage($oJoueur, $oObjet, $nbBricolage, $maison);
+			//$arOnglets['Contenu'] .= var_dump($oObjet);
+			$nbBricolage++;
 		}
-		
-		$arOnglets['Contenu'] .= AfficheInfoObjetBricolage($oJoueur, $oObjet, $nbBricolage, $maison);
-		//$arOnglets['Contenu'] .= var_dump($oObjet);
-		$nbBricolage++;
 	}
 	
 	$arOnglets['Contenu'] .= '
@@ -75,6 +83,14 @@ function AfficheListeElementBricolage(personnage &$oJoueur, $Onglet = null){
 	</script>';
 	return $txt;
 }
+/**
+ * Retourn le formulaire pour la fabrication d'un objet
+ * @param personnage $oJoueur
+ * @param objet $oObjet <p>Objet d'une sous-class de objMain</p>
+ * @param int $numObjet <p>Numéro de l'objet dans la liste</p>
+ * @param maison $maison
+ * @return string
+ */
 function AfficheInfoObjetBricolage(personnage &$oJoueur, &$oObjet, &$numObjet, maison &$maison){
 	$txt 			= null;
 	
@@ -91,7 +107,12 @@ function AfficheInfoObjetBricolage(personnage &$oJoueur, &$oObjet, &$numObjet, m
 		$nbLigne++;
 	}
 	
+	$_SESSION['Bricolage'][$numObjet]['Prix'] = $oObjet->GetCoutFabrication();
+	$_SESSION['Bricolage'][$numObjet]['type'] = get_class($oObjet);
+	$_SESSION['Bricolage'][$numObjet]['code'] = $oObjet->GetCode();
+	
 	$txt = '<form class="bricolage" action="index.php?page=bricolage" formmethod="post" method="post">
+			<input type="hidden" name="id" value="'.$numObjet.'" />
 		<table class="bricolage">
 			<tr>
 				<td rowspan="'.$nbLigne.'" style="width:120px; text-align:center;">'.$oObjet->AfficheInfoObjet(120).'</td>
@@ -117,52 +138,52 @@ function AfficheInfoObjetBricolage(personnage &$oJoueur, &$oObjet, &$numObjet, m
 		
 	return $txt;
 }
+/**
+ * ACTION - Fabrique l'objet si on a assez de ressource
+ * @param boolean $check <p>Boolean si il y a une erreur</p>
+ * @param int $id <p>Numéro de l'objet dans la liste</p>
+ * @param personnage $oJoueur
+ * @param PersonnageManager $objManager
+ */
 function ActionFabriquer(&$check, $id, personnage &$oJoueur, &$objManager){
 	global $lstPoints;
-	if(isset($_SESSION['main']['bricolage'][$id])){
+	//var_dump($_SESSION);
+	if(isset($_SESSION['Bricolage'][$id])){
 		//on trouve la maison
-		$maison = $oJoueur->GetObjSaMaison();
+		$oMaison = $oJoueur->GetObjSaMaison();
 
-		if(!is_null($maison)){
-			$LstPrix = explode(',', $_SESSION['main']['bricolage'][$id]['prix']);
+		if(!is_null($oMaison)){
+			//$LstPrix = explode(',', $_SESSION['main']['bricolage'][$id]['prix']);
 				
-			foreach($LstPrix as $Prix){
-				$arPrix = explode('=', $Prix);
-				//on vérifie si on a assez de ressource
-				if(!CheckIfAssezRessource(array($arPrix[0], ($arPrix[1] * abs($_GET['qte']))), $oJoueur, $maison)){
-					$check = false;
-					break;
-				}
-
-				if(in_array(QuelTypeRessource($arPrix[0]), array(maison::TYPE_RES_EAU_POTABLE, maison::TYPE_RES_NOURRITURE, personnage::TYPE_RES_MONNAIE))){
-					switch(QuelTypeRessource($arPrix[0]))
+			for($i = 1; $i <= abs($_POST['qte']); $i++)
+			{
+				if(CheckCout($_SESSION['Bricolage'][$id]['Prix'], $oJoueur, $oMaison))
+				{
+					foreach($_SESSION['Bricolage'][$id]['Prix'] as $Prix)
 					{
-						case maison::TYPE_RES_NOURRITURE:		$maison->MindRessource(maison::TYPE_RES_NOURRITURE, $arPrix[1] * abs($_GET['qte']));	break;
-						case maison::TYPE_RES_EAU_POTABLE:		$maison->MindRessource(maison::TYPE_RES_EAU_POTABLE, $arPrix[1] * abs($_GET['qte']));		break;
-						case personnage::TYPE_RES_MONNAIE:		$oJoueur->MindOr($arPrix[1] * abs($_GET['qte']));			break;
+						$arPrix = explode('=', $Prix);
+						UtilisationRessource($arPrix, $oJoueur, $oMaison);
 					}
-						
+					$nb = $i;
 				}else{
-					for($i=1;$i<=($arPrix[1] * abs($_GET['qte']));$i++){
-						$oJoueur->CleanInventaire($arPrix[0]);
-					}
+					break;
 				}
 			}
 				
-			$objManager->UpdateBatiment($maison);
-			unset($maison);
+			$objManager->UpdateBatiment($oMaison);
+			unset($oMaison);
 				
 			if(!$check){
 				echo 'Erreur GLX0004: Fonction ActionFabriquer - Pas assez de ressource';
 			}else{
 				//on ajoute le nouvel objet dans son bolga
-				$oJoueur->AddInventaire($_SESSION['main']['bricolage'][$id]['code'], abs($_GET['qte']), false);
+				$oJoueur->AddInventaire($_SESSION['Bricolage'][$id]['code'], $nb, false);
 				//on gagne des points
 				$oJoueur->UpdatePoints(abs(personnage::POINT_OBJET_FABRIQUE));
 			}
 
 				
-			unset($_SESSION['main']['bricolage']);
+			unset($_SESSION['Bricolage']);
 		}else{
 			$check = false;
 			echo 'Erreur GLX0003: Fonction ActionFabriquer - Pas de maison trouvée';
