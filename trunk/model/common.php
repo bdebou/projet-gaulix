@@ -13,7 +13,7 @@ function FoundBatiment($idType = false, $login = false, $Coordonnees = false) {
 		$carte = mysql_fetch_array($requete, MYSQL_ASSOC);
 		if(!in_array($carte['id_type_batiment'], $lstNonBatiment))
 		{	
-			$sql2 = "SELECT * FROM table_batiment WHERE id_batiment=" . $carte['id_type_batiment'] . ";";
+			$sql2 = "SELECT * FROM table_batiment WHERE id_type=" . $carte['id_type_batiment'] . " AND batiment_niveau=".$carte['niveau_batiment'].";";
 			$requete2 = mysql_query($sql2) or die(mysql_error() . '<br />' . $sql2);
 			
 			$batiment = mysql_fetch_array($requete2, MYSQL_ASSOC);
@@ -72,7 +72,12 @@ function FoundQuete($IDTypeQuete, $Login = false) {
 			$sqlBis = "SELECT * FROM table_quetes WHERE quete_id=$IDTypeQuete AND quete_login='$Login';";
 			$requeteBis = mysql_query($sqlBis) or die(mysql_error() . '<br />' . $sqlBis);
 				
-			$row = mysql_fetch_array($requeteBis, MYSQL_ASSOC);
+			if (mysql_num_rows($requeteBis) > 0)
+			{
+				$row = mysql_fetch_array($requeteBis, MYSQL_ASSOC);
+			}else{
+				$row = array();
+			}
 			
 		}else{
 			$row = array();
@@ -112,11 +117,16 @@ function ListQueteEnCours() {
 			$QueteNom = $infoQuete['quete_type'];
 			
 			$tmpQuete = new $QueteNom($row, $infoQuete);
+			
+			if($QuetePrecedente != $tmpQuete->GetIDTypeQuete())
+			{
+				$lstQueteEnCours[] = $tmpQuete;
+			}else{
+				$tmpQuete->FinishQuete();
+			}
 			$objManager->UpdateQuete($tmpQuete);
 			
-			$lstQueteEnCours[] = $tmpQuete;
-			
-			$QuetePrecedente = $row['quete_id'];
+			$QuetePrecedente = $tmpQuete->GetIDTypeQuete();
 		}
 		return $lstQueteEnCours;
 	}
@@ -141,7 +151,7 @@ function AfficheIcone($type, $HeightIcone = 20) {
 			break;
 		case strtolower(maison::TYPE_RES_EAU_POTABLE):
 			$FileName	= maison::TYPE_RES_EAU_POTABLE;
-			//$Name		= maison::TYPE_RES_EAU_POTABLE;
+			$Name		= maison::TYPE_RES_EAU_POTABLE;
 			break;
 		case 'marche_cancel':		$Name = 'Annuler transaction';								break;
 		case 'marche_accept':		$Name = 'Accepter transaction';								break;
@@ -270,7 +280,7 @@ function AfficheRecompenses($login = NULL, $alliance = NULL) {
 
 	return (!is_null($login) ? $txtGeneral . $txtMedalHonor : '') . (!is_null($alliance) ? $txtMedalAlliance : '');
 }
-function AfficheListePrix(array $lstPrix, personnage &$oJoueur = NULL, maison &$maison = NULL) {
+function AfficheListePrix($lstPrix, personnage &$oJoueur = NULL, maison &$maison = NULL) {
 	$chk = false;
 	$txt = NULL;
 	
@@ -302,6 +312,10 @@ function AfficheListePrix(array $lstPrix, personnage &$oJoueur = NULL, maison &$
 							$txt .= '<span style="color:' . $ColorPrix . ';">Compétence "' . GetInfoCompetence($Prix[0], 'cmp_lst_nom') . '"</span>';
 							break;
 						default:
+							if(substr($Prix[0], 0, 4) == 'LING')
+							{
+								$Prix[0] = strtolower(substr($oJoueur->GetCivilisation(), 0, 1)).$Prix[0];
+							}
 							$txt .= '<span style="color:' . $ColorPrix . ';">' . $Prix[1] . '</span> ' . AfficheIcone($Prix[0]);
 							break;
 					}
@@ -309,6 +323,37 @@ function AfficheListePrix(array $lstPrix, personnage &$oJoueur = NULL, maison &$
 					
 				}
 				$chk = true;
+			}else{
+				
+				if($chk)
+				{
+					$txt .= ', ';
+				}
+				
+				$oQuete = FoundQuete($Prix[1], $oJoueur->GetLogin());
+				
+				$ColorPrix = 'red';
+				
+				if(	!is_null($oQuete))
+				{
+					if($oQuete->CheckIfDejaTermine($oJoueur->GetLogin()))
+					{
+						$ColorPrix = 'black';
+					}
+				}else{
+					$oQuete = FoundQuete($Prix[1]);
+				}
+				
+				if(!is_null($oQuete))
+				{
+					$txt .= '<span style="color:' . $ColorPrix . ';">Quête "' . $oQuete->GetNom() . '"</span>';
+					
+				}else{
+					$txt .= '<span style="color:red;">Quête innexistante. Contactez Admin.</span>';
+				}
+				
+				$chk = true;
+				
 			}
 			
 		}
@@ -385,8 +430,15 @@ function DecoupeTemp($intTime) {
 	}
 	return array($nbJours, $nbHeures, $nbMinutes, $nbSecondes);
 }
+/**
+ * Déduis chaque ressource du nombre donné
+ * @param array $arRessource <p>array(code, nombre)</p>
+ * @param personnage $Joueur
+ * @param maison $Maison
+ */
 function UtilisationRessource(array $arRessource, personnage &$Joueur, maison &$Maison){
-	switch(QuelTypeRessource($arRessource[0])){
+	switch(QuelTypeObjet($arRessource[0]))
+	{
 		case maison::TYPE_RES_EAU_POTABLE:
 		case maison::TYPE_RES_NOURRITURE:
 			$Maison->MindRessource(QuelTypeRessource($arRessource[0]), $arRessource[1]);
@@ -395,6 +447,7 @@ function UtilisationRessource(array $arRessource, personnage &$Joueur, maison &$
 			$Joueur->MindOr($arRessource[1]);
 			break;
 		case personnage::TYPE_COMPETENCE:
+		case quete::TYPE_QUETE:
 			break;
 		default:
 			$Joueur->CleanInventaire($arRessource[0], false, $arRessource[1]);
@@ -405,14 +458,17 @@ function CheckIfAssezRessource(array $arRessource, personnage &$Joueur, maison &
 	switch(QuelTypeObjet($arRessource[0])){
 		case maison::TYPE_RES_NOURRITURE:
 		case maison::TYPE_RES_EAU_POTABLE:
-			if($Maison->GetRessource(QuelTypeRessource($arRessource[0])) >= $arRessource[1]){return true;}
-			return $Joueur->AssezElementDansBolga($arRessource[0], $arRessource[1]);
+			return ($Maison->GetRessource(QuelTypeRessource($arRessource[0])) >= $arRessource[1]);
+			//return $Joueur->AssezElementDansBolga($arRessource[0], $arRessource[1]);
 			break;
 		case personnage::TYPE_RES_MONNAIE:
-			if($Joueur->GetArgent() >= $arRessource[1]){return true;}
+			return ($Joueur->GetArgent() >= $arRessource[1]);
 			break;
 		case personnage::TYPE_COMPETENCE:
 			return $Joueur->CheckCompetence($arRessource[0]);
+			break;
+		case personnage::TYPE_EXPERIENCE:
+			return ($Joueur->GetExpPerso() >= $arRessource[1]);
 			break;
 		default:
 			return $Joueur->AssezElementDansBolga($arRessource[0], $arRessource[1]);
@@ -421,6 +477,12 @@ function CheckIfAssezRessource(array $arRessource, personnage &$Joueur, maison &
 	return false;
 }
 
+/**
+ * Vérifie si on se trouve bien sur un bâtiment donnée par $NumBatiment
+ * @param integer $NumBatiment <p>ID_type du batiment</p>
+ * @param string $position <p>Coordonnée complète de la position à vérifer</p>
+ * @return boolean
+ */
 function CheckIfOnEstSurUnBatiment($NumBatiment, $position){
 	//pour vérifier si on est sur un batiment X ou non
 	if(is_null(FoundBatiment($NumBatiment, NULL, $position))){
@@ -430,6 +492,11 @@ function CheckIfOnEstSurUnBatiment($NumBatiment, $position){
 	return true;
 }
 
+/**
+ * Retourne le type d'objet correspondant au $Code
+ * @param string $Code
+ * @return string
+ */
 function QuelTypeObjet($Code){
 	/* $Ressource = QuelTypeRessource($Code);
 	if(!is_null($Ressource))
@@ -440,9 +507,22 @@ function QuelTypeObjet($Code){
 	{
 		return $Ressource;
 	} */
-	
+	//on vérifie si c'est une ressource
 	Global $lstRessources;
-	if(in_array($Code, $lstRessources)){return $Code;}
+	if(in_array($Code, $lstRessources))
+	{
+		return $Code;
+	}
+	
+	//on vérifie les type de quêtes
+	switch ($Code)
+	{
+		case quete::TYPE_QUETE:
+		case qteBatiment::TYPE_QUETE_BATIMENT:
+		case qteCombat::TYPE_QUETE_MONSTRE:
+		case personnage::TYPE_EXPERIENCE:
+			return $Code;
+	}
 	
 	switch (substr($Code, 0, 5))
 	{
@@ -452,11 +532,11 @@ function QuelTypeObjet($Code){
 		case 'PotDe': return objDivers::TYPE_RES_DEP;
 	}
 	
-	switch (substr($Code, 0, 3))
+	if(substr($Code, 0, 3) == 'cmp')
 	{
-		case 'cmp' : return personnage::TYPE_COMPETENCE;
+		return personnage::TYPE_COMPETENCE;
 	}
-	
+
 	return 'Divers';
 }
 function QuelTypeRessource(&$Code) {
@@ -571,6 +651,12 @@ function GetInfoCompetence($code, $info = NULL){
 	
 	return null;
 }
+/**
+ * Retourne des info sur la carrière donnée par son code
+ * @param string $code <p>Le code de la carrière voulue</p>
+ * @param string $info [optional]<p>Nom du champ spécifique voulu.</p>
+ * @return <p>Retourne la valeur du champs spécifié par $info ou <array> avec toutes les infos si $info n'est pas spécifié. Mais retourne NULL si la carrière n'est pas trouvée.</p>
+ */
 function GetInfoCarriere($code, $info = null){
 	$sql = "SELECT * FROM table_carrieres_lst WHERE carriere_code='".$code."';";
 	$rqtMetier = mysql_query($sql) or die ( mysql_error() );
@@ -585,12 +671,19 @@ function GetInfoCarriere($code, $info = null){
 	}
 	return null;
 }
-function CheckCout(array $lstPrix, personnage &$oJoueur, maison &$maison){
+/**
+ * Vérifie si pour une liste d'objets, cout et autre, il y a assez pour utiliser.
+ * @param array $lstPrix <p>array(string (code=nb), string(code=nb))</p>
+ * @param personnage $oJoueur
+ * @param maison $maison
+ * @return boolean
+ */
+function CheckCout($lstPrix, personnage &$oJoueur, maison &$maison){
 	if(!is_null($lstPrix))
 	{
 		foreach($lstPrix as $Prix)
 		{
-			if(!CheckIfAssezRessource(explode('=',$Prix), $oJoueur, $maison))
+			if(!CheckIfAssezRessource(explode('=', $Prix), $oJoueur, $maison))
 			{
 				return false;
 			}
@@ -622,7 +715,7 @@ function ActionDeplacement(&$check, &$oJoueur){
 function ActionUtiliser(&$check, &$code = null, personnage &$oJoueur, &$objManager, $Qte = 1){
 	if(!is_null($code)){
 		if(!isset($_GET['page']) OR $_GET['page'] == 'main'){
-			$oJoueur->AddInventaire($code, QuelTypeObjet($code));
+			$oJoueur->AddInventaire($code);
 		}
 
 		$objObjet = FoundObjet($code);
