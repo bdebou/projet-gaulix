@@ -97,7 +97,7 @@ abstract class objMain{
 		return NULL;
 	}
 	/**
-	 * Vérifie si dans le cout de fabrication de l'objet, il n'y a pas besoin de compétence dont le joueur n'aura jamais à cause de la restriction de sa crrière choisie.
+	 * Vérifie si dans le cout de fabrication de l'objet, il n'y a pas besoin de compétence dont le joueur n'aura jamais à cause de la restriction de sa carrière choisie.
 	 * @param personnage $oJoueur
 	 * @return boolean
 	 */
