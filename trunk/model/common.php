@@ -29,6 +29,12 @@ function FoundBatiment($idType = false, $login = false, $Coordonnees = false) {
 	return null;
 	
 }
+/**
+ * Requete SQL pour trouver les infos d'un objet donner par $CodeObject et retourne une class de l'objet
+ * @param string $CodeObject <p>Code de l'objet</p>
+ * @param integer $nbObjet <p>Nombre d'obet. Default = 1</p>
+ * @return NULL|object <p>Class d'objet spécifique</p>
+ */
 function FoundObjet($CodeObject, $nbObjet = 1){
 	$sql = "SELECT * FROM table_objets WHERE objet_code='".strval($CodeObject)."';";
 	$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
@@ -636,6 +642,13 @@ function AfficheNbMessageAlliance($clan, $date){
 	$requete = mysql_query($sql) or die (mysql_error());
 	return mysql_num_rows($requete);
 }
+/**
+ * Requete SQL sur table+competence+lst.
+ * Retourne 1 ou toutes les infos d'une compétence donnée par son code.
+ * @param string $code <p>Code la compétence</p>
+ * @param string $info <p>Si on spécifie le nom du champ de la table, uniquement cette info sera retournée. Si non, une array avec toutes les infos. Default = NULL.</p>
+ * @return multitype:|Ambigous <>|NULL
+ */
 function GetInfoCompetence($code, $info = NULL){
 	$sql = "SELECT * FROM table_competence_lst WHERE cmp_lst_code='".$code."';";
 	$rqtCmp = mysql_query($sql) or die ( mysql_error() );
