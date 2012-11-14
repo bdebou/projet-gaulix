@@ -13,6 +13,7 @@ abstract class objMain{
 	private $Prix;
 	private $Cout;
 	private $Niveau;
+	Private $Competence;
 	
 	public function __construct($DataObjet, $nbObjet){
 		$this->Hydrate($DataObjet, $nbObjet);
@@ -25,18 +26,18 @@ abstract class objMain{
 		
 		foreach ($data as $key => $value){
 			switch ($key){
-				case 'id_objet':			$this->ID				= intval($value); break;
-				case 'objet_civilisation':	$this->Civilisation		= strval($value); break;
-				case 'objet_rarete':		$this->Rarete			= intval($value); break;
-				case 'objet_quete':			$this->IDQuete			= (is_null($value)?NULL:intval($value)); break;
-				case 'objet_code':			$this->Code				= strval($value); break;
-				case 'objet_nom':			$this->Nom				= strval($value); break;
-				case 'objet_description':	$this->Description		= (is_null($value)?NULL:strval($value)); break;
-				//case 'objet_competence':	$this->NbPoints = intval($value); break;
-				case 'objet_niveau':		$this->Niveau			= intval($value); break;
-				case 'objet_ressource':		$this->Ressource		= (is_null($value)?NULL:explode(',', $value)); break;
-				case 'objet_prix':			$this->Prix				= intval($value); break;
-				case 'objet_cout':			$this->Cout				= (is_null($value)?NULL:explode(',', $value)); break;
+				case 'id_objet':			$this->ID				= intval($value);								break;
+				case 'objet_civilisation':	$this->Civilisation		= strval($value);								break;
+				case 'objet_rarete':		$this->Rarete			= intval($value);								break;
+				case 'objet_quete':			$this->IDQuete			= (is_null($value)?NULL:intval($value));		break;
+				case 'objet_code':			$this->Code				= strval($value);								break;
+				case 'objet_nom':			$this->Nom				= strval($value);								break;
+				case 'objet_description':	$this->Description		= (is_null($value)?NULL:strval($value));		break;
+				case 'objet_niveau':		$this->Niveau			= intval($value);								break;
+				case 'objet_ressource':		$this->Ressource		= (is_null($value)?NULL:explode(',', $value));	break;
+				case 'objet_prix':			$this->Prix				= intval($value);								break;
+				case 'objet_cout':			$this->Cout				= (is_null($value)?NULL:explode(',', $value));	break;
+				case 'objet_competence':	$this->Competence		= (is_null($value)?NULL:strval($value));		break;
 			}
 		}
 		
@@ -114,5 +115,19 @@ abstract class objMain{
 			}
 		}
 		return true;
+	}
+	/**
+	* Retourne le code de la Compétence requise pour s'équiper de l'objet
+	* @return string|NULL
+	*/
+	public function GetCompetence(){
+		if(is_null($this->Competence))
+		{
+			return NULL;
+		}
+	
+		$arTemp = explode('=', $this->Competence);
+	
+		return $arTemp[0];
 	}
 }
