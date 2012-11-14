@@ -24,10 +24,9 @@ class objArmement extends objMain{
 		{
 			switch($key)
 			{
-				case 'objet_attaque':		$this->Attaque			= (is_null($value)?0:intval($value)); break;
-				case 'objet_defense':		$this->Defense			= (is_null($value)?0:intval($value)); break;
-				case 'objet_distance':		$this->Distance			= (is_null($value)?0:intval($value)); break;
-				
+				case 'objet_attaque':		$this->Attaque			= (is_null($value)?0:intval($value));		break;
+				case 'objet_defense':		$this->Defense			= (is_null($value)?0:intval($value));		break;
+				case 'objet_distance':		$this->Distance			= (is_null($value)?0:intval($value));		break;
 			}
 		}
 	}
@@ -72,6 +71,16 @@ class objArmement extends objMain{
 					height="'.$intHeightImg.'px"
 				 />';
 	}
+	Public Function AfficheInfoTrTd(){
+		$txt = NULL;
+		$txt .= '<tr>';
+		$txt .= '<td>'.AfficheIcone(self::TYPE_ATTAQUE).' : '.$this->GetAttaque().'</td>';
+		$txt .= '<td>'.AfficheIcone(self::TYPE_DEFENSE).' : '.$this->GetDefense().'</td>';
+		$txt .= '<td>'.AfficheIcone(self::TYPE_DISTANCE).' : '.$this->GetDistance().'</td>';
+		$txt .= '</tr>';
+		
+		return $txt;
+	}
 	//Les GETS
 	//========
 	Public function GetType(){
@@ -94,4 +103,5 @@ class objArmement extends objMain{
 	public function GetDistance(){
 		return $this->Distance;
 	}
+
 }
