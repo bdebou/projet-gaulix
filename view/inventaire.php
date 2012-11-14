@@ -31,13 +31,12 @@
 	</table>
 </div>
 <?php
-/* global $objManager;
-$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']); */
 
-$lstObjetParCategory = NULL;
 if(!is_null($oJoueur->GetLstInventaire()))
 {
 	$lstObjetParCategory = CreateListObjet($oJoueur->GetLstInventaire());
+}else{
+	$lstObjetParCategory = NULL;
 }
 
 $id = 0;
@@ -105,24 +104,15 @@ foreach($lstTypeObjets as $Category)
 			switch($Category)
 			{
 				case 'Construction':
-					
-					break;
 				case 'Divers':
-					
-					break;
 				case 'Ressource':
-					
 					break;
 				case 'Armement':
-					$txtInfoArmement = '<tr>'
-											.'<td>'.AfficheIcone(objArmement::TYPE_ATTAQUE).' : '.$objObjet->GetAttaque().'</td>'
-											.'<td>'.AfficheIcone(objArmement::TYPE_DEFENSE).' : '.$objObjet->GetDefense().'</td>'
-											.'<td>'.AfficheIcone(objArmement::TYPE_DISTANCE).' : '.$objObjet->GetDistance().'</td>'
-										.'</tr>';
+					$txtInfoArmement = $objObjet->AfficheInfoTrTd();
 					$nbColonne = 3;
 					$nbLigne = 5;
 					$nbLigne++;
-					$txtEquiper = '<input type="submit" name="action" value="Equiper" />';
+					$txtEquiper = AfficheBtEquiper($oJoueur, $objObjet);
 					break;
 			}
 			
