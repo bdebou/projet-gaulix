@@ -52,7 +52,32 @@ function AfficheRessource($type, personnage &$oJoueur){
 
 	return AfficheIcone($type) . ' : ' . $maison->GetRessource($type) . $txtBt;
 }
-
+/**
+ * Retourne la string pour afficher ou non le bouton "Equiper"
+ * @param personnage $oJoueur
+ * @param objArmement $oObjet
+ * @return string
+ */
+function AfficheBtEquiper(personnage &$oJoueur, objArmement &$oObjet){
+	$txtBtEquiper = '<input type="submit" name="action" value="Equiper" />';
+	
+	if(!is_null($oObjet->GetCompetence()))
+	{
+		if($oJoueur->CheckIfCompetenceAvailable($oObjet->GetCompetence()))
+		{
+			if($oJoueur->CheckCompetence($oObjet->GetCompetence()))
+			{
+				return $txtBtEquiper;
+			}else{
+				return '<span style="color:red;">Compétence "' . GetInfoCompetence($oObjet->GetCompetence(), 'cmp_lst_nom') . '"</span>';
+			}
+		}else{
+			return 'Vous ne pourrez jamais vous équiper de cet objet.';
+		}
+	}
+	
+	return $txtBtEquiper;
+}
 //+---------------------------------+
 //|				ACTIONS				|
 //+---------------------------------+
