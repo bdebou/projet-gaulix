@@ -1,22 +1,9 @@
 <?php
 class Gibier extends objRessource{
-//class Gibier{
 
 	private $Attaque;
-	private $GainNourriture = null;
-	private $GainCuir = null;
 			
 	Const TYPE_CMP_MAIN		= 'Chasse';
-	Const TYPE_CMP_CUIR		= 'Travail du cuir';
-	Const TYPE_CMP_NOUR		= 'Cuisine';
-	
-	const CMP_CHASSE_1		= 'cmpCha1';
-	const CMP_CHASSE_2		= 'cmpCha2';
-	const CMP_CHASSE_3		= 'cmpCha3';
-	const CMP_CHASSE_4		= 'cmpCha4';
-	
-	Const CODE_GAIN_NOUR	= maison::TYPE_RES_NOURRITURE;
-	Const CODE_GAIN_CUIR	= 5;
 	
 	// Initialisation de l'objet
 	public function __construct(array $donnees){
@@ -34,12 +21,6 @@ class Gibier extends objRessource{
 		}
 	}
 	// -------------------- GET info ----------------------
-	public function GetCodeCompetenceRequise(){
-		$Cout = $this->GetCoutFabrication();
-		$tmp = explode('=', $Cout[0]);
-		
-		return $tmp[0];
-	}
 	Public function GetAttaque(){
 		return $this->Attaque;
 	}
