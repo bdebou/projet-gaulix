@@ -39,6 +39,7 @@ class personnage{
 	private $lstTypeCompetences; 
 	private $not_attaque, $not_combat;
 	private $nb_points;
+	Private $ListQuetesTerminees;
 			
 	Const TAILLE_MINIMUM_BOLGA		= 20;			//La taille minimum du bolga
 	Const DUREE_SORT				= 432000;		// Limite de temp pour l'utilisation d'un sort (3600 * 24 *5).
@@ -77,6 +78,12 @@ class personnage{
 			$this->AddDeplacement(self::NB_DEPLACEMENT_SUP * intval((strtotime('now') - $this->last_action) / self::TEMP_DEPLACEMENT_SUP),'new');
 		}
 		
+		//On crée la liste des compétences
+		$this->CreateListCompetence();
+		
+		//On crée la liste des quêtes terminées
+		$this->CreateListQuete();
+		
 		//on vérifie si les sorts sont toujours d'actualité
 		if(!is_null($this->LstSorts)){
 			
@@ -96,6 +103,19 @@ class personnage{
 		}
 	}
 	
+	Private function CreateListQuete(){
+		$sqlLst = "SELECT quete_id
+						FROM `table_quetes`
+						WHERE quete_login='".$this->GetLogin()."'
+							AND quete_reussi IS NOT NULL;";
+		$rqtLst = mysql_query($sqlLst) or die (mysql_error().'<br />'.$sqlLst);
+		
+		if(mysql_num_rows($rqtLst) > 0){
+			while($arQuete = mysql_fetch_array($rqtLst, MYSQL_ASSOC)){
+				$this->ListQuetesTerminees[] = $arQuete['quete_id'];
+			}
+		}
+	}
 	Private function CheckCarriere(){
 		$arCarriereInfo = GetInfoCarriere($this->GetCodeCarriere());
 		
@@ -230,34 +250,61 @@ class personnage{
 		if($this->vie > self::VIE_MAX){$this->vie = self::VIE_MAX;}
 	}
 
-	Public function DesequiperPerso($typeObject){
-		switch($typeObject){
-			case 'arme':
-				$this->AddInventaire($this->code_arme, 1, false);
-				$this->code_arme = NULL;
-				break;
-			case 'bouclier':
-				$this->AddInventaire($this->code_bouclier, 1, false);
-				$this->code_bouclier = NULL;
-				break;
-			case 'cuirasse':
-				$this->AddInventaire($this->code_cuirasse, 1, false);
-				$this->code_cuirasse = NULL;
-				break;
-			case 'jambiere':
-				$this->AddInventaire($this->code_jambiere, 1, false);
-				$this->code_jambiere = NULL;
-				break;
-			case 'casque':
-				$this->AddInventaire($this->code_casque, 1, false);
-				$this->code_casque = NULL;
-				break;
-			case 'sac':
-				$this->AddInventaire($this->code_sac, 1, false);
-				$this->code_sac = NULL;
-				break;
-		}
+	Public function DesequiperPerso($CodeObject){
+		$lstType = array(objArmement::TYPE_ARME, objArmement::TYPE_BOUCLIER, objArmement::TYPE_CASQUE, objArmement::TYPE_CUIRASSE, objArmement::TYPE_JAMBIERE, objDivers::TYPE_SAC);
 		
+		foreach($lstType as $Type)
+		{
+			switch($Type)
+			{
+				case objArmement::TYPE_ARME:
+					if($this->code_arme === $CodeObject)
+					{
+						$this->Desequiper($this->code_arme);
+						break(2);
+					}
+					break;
+				case objArmement::TYPE_BOUCLIER:
+					if($this->code_bouclier === $CodeObject)
+					{
+						$this->Desequiper($this->code_bouclier);
+						break(2);
+					}
+					break;
+				case objArmement::TYPE_CUIRASSE:
+					if($this->code_cuirasse === $CodeObject)
+					{
+						$this->Desequiper($this->code_cuirasse);
+						break(2);
+					}
+					break;
+				case objArmement::TYPE_JAMBIERE:
+					if($this->code_jambiere === $CodeObject)
+					{
+						$this->Desequiper($this->code_jambiere);
+						break(2);
+					}
+					break;
+				case objArmement::TYPE_CASQUE:
+					if($this->code_casque === $CodeObject)
+					{
+						$this->Desequiper($this->code_casque);
+						break(2);
+					}
+					break;
+				case objDivers::TYPE_SAC:
+					if($this->code_sac === $CodeObject)
+					{
+						$this->Desequiper($this->code_sac);
+						break(2);
+					}
+					break;
+			}
+		}
+	}
+	private function Desequiper(&$Code){
+		$this->AddInventaire($Code, 1, false);
+		$Code = NULL;
 	}
 	//La gestion de l'or
 	public function AddOr($or){
@@ -271,24 +318,55 @@ class personnage{
 	}
 	
 	//les Compétences
-	private function CreateListCompetence($list, $lstStatus = array(NULL)){
+	private function CreateListCompetence(){
+		//on crée la liste des compétences possible
+		$CarriereClass = GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class');
 		
-		foreach($list as $cmp){
-			if(in_array($cmp[0], $lstStatus))
-			{
-				$this->lstCompetences[$cmp[0]] = true;
-			}else
-			{
-				$this->lstCompetences[$cmp[0]] = false;
+		$sqlLstCmp = "SELECT cmp_lst_code, cmp_lst_type
+										FROM `table_competence_lst`
+										WHERE (cmp_lst_acces IN ('".$CarriereClass."', 'Tous') 
+												OR cmp_lst_acces LIKE '%".$CarriereClass."%')  
+										ORDER BY cmp_lst_type, cmp_lst_code ASC;";
+		$rqtLstCmp = mysql_query($sqlLstCmp) or die (mysql_error().'<br />'.$sqlLstCmp);
+		
+		if(mysql_num_rows($rqtLstCmp) > 0){
+			while($item = mysql_fetch_array($rqtLstCmp, MYSQL_ASSOC)){
+				$lst[] = array($item['cmp_lst_code'], $item['cmp_lst_type']);
 			}
-			
-			$this->lstTypeCompetences[$cmp[1]][] = $cmp[0];
-			
 		}
 		
-		/* foreach($lstStatus as $cmp){
-			$this->lstCompetences[$cmp[1]][$cmp[0]] = true;
-		} */
+		//On récupère les infos à propos des compétences
+		$sqlCmp = "SELECT cmp_code
+									FROM table_competence 
+									WHERE cmp_login='".$this->login."' AND cmp_finish=1;";
+		$rqtCmp = mysql_query($sqlCmp) or die (mysql_error().'<br />'.$sqlCmp);
+		
+		$status[] = NULL;
+		if(mysql_num_rows($rqtCmp) > 0){
+			while($cmp = mysql_fetch_array($rqtCmp, MYSQL_ASSOC)){
+				$status[] = $cmp['cmp_code'];
+			}
+			//$this->UpdateCompetences($competences);
+		}
+		
+		unset($status[0]);
+		
+		if(mysql_num_rows($rqtLstCmp) > 0)
+		{
+			foreach($lst as $cmp)
+			{
+				if(in_array($cmp[0], $status))
+				{
+					$this->lstCompetences[$cmp[0]] = true;
+				}else
+				{
+					$this->lstCompetences[$cmp[0]] = false;
+				}
+				
+				$this->lstTypeCompetences[$cmp[1]][] = $cmp[0];
+				
+			}
+		}
 	}
 	
 	public function EquiperPerso($numObject, $typeObject){
@@ -362,6 +440,13 @@ class personnage{
 	}
 	
 	//Gestion du bolga
+	/**
+	 * Ajout dans l'inventaire l'objet par son $codeObjet avec un nombre d'unité de $nbObjet.
+	 * On bloque ou non la possibilité de trouver un autre objet.
+	 * @param string $codeObjet <p>Le code de l'objet</p>
+	 * @param integer $nbObjet <p>Default = 1</p>
+	 * @param boorlean $chkLast <p>Default = true. Set la valeur bloquant la possibilité de trouver un autre objet</p>
+	 */
 	public function AddInventaire($codeObjet, $nbObjet = 1, $chkLast = true){
 		$chk = false;
 		
@@ -841,42 +926,6 @@ class personnage{
 			}
 		}
 		
-		//on crée la liste des compétences possible
-		//$sqlLstCmp = "SELECT cmp_lst_code FROM `table_competence_lst` WHERE cmp_lst_acces IN ('".GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class')."', 'Tous') ORDER BY cmp_lst_code ASC;";
-		
-		$CarriereClass = GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class');
-		
-		$sqlLstCmp = "SELECT cmp_lst_code, cmp_lst_type 
-						FROM `table_competence_lst`
-						WHERE (cmp_lst_acces IN ('".$CarriereClass."', 'Tous') 
-								OR cmp_lst_acces LIKE '%".$CarriereClass."%')  
-						ORDER BY cmp_lst_type, cmp_lst_code ASC;";
-		$rqtLstCmp = mysql_query($sqlLstCmp) or die (mysql_error().'<br />'.$sqlLstCmp);
-		
-		if(mysql_num_rows($rqtLstCmp) > 0){
-			while($item = mysql_fetch_array($rqtLstCmp, MYSQL_ASSOC)){
-				$lst[] = array($item['cmp_lst_code'], $item['cmp_lst_type']);
-			}
-		}
-		
-		//On récupère les infos à propos des compétences
-		$sqlCmp = "SELECT cmp_code 
-					FROM table_competence 
-					WHERE cmp_login='".$this->login."' AND cmp_finish=1;";
-		$rqtCmp = mysql_query($sqlCmp) or die (mysql_error().'<br />'.$sqlCmp);
-		
-		$status[] = NULL;
-		if(mysql_num_rows($rqtCmp) > 0){
-			while($cmp = mysql_fetch_array($rqtCmp, MYSQL_ASSOC)){
-				$status[] = $cmp['cmp_code'];
-			}
-			//$this->UpdateCompetences($competences);
-		}
-		unset($status[0]);
-		if(mysql_num_rows($rqtLstCmp) > 0){
-			$this->CreateListCompetence($lst, $status);
-		}
-		
 	}
 	// -------------------- GET info ----------------------
 	public Function GetCombienElementDansBolga($CodeResBesoin) {
@@ -1116,6 +1165,15 @@ class personnage{
 	public function GetTauxVolArgent(){
 		
 		return self::TAUX_VOL_ARGENT;
+	}
+	/**
+	 * Retourne TRUE si la quête ID est trouvée dans la liste des quêtes terminées
+	 * @param integer $idQuete
+	 * @return boolean
+	 */
+	public function CheckIfQueteTerminee($idQuete){
+		
+		return in_array($idQuete, $this->ListQuetesTerminees);
 	}
 }
 ?>
