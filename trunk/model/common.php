@@ -144,7 +144,9 @@ function AfficheIcone($type, $HeightIcone = 20) {
 	$Name = NULL;
 	$FileName = $type;
 
-	switch (strtolower($type)) {
+	switch (strtolower($type))
+	{
+		case strtolower(personnage::TYPE_EXPERIENCE):
 		case strtolower(objArmement::TYPE_ATTAQUE):
 		case strtolower(objArmement::TYPE_DEFENSE):
 		case strtolower(objArmement::TYPE_DISTANCE):
