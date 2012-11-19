@@ -215,10 +215,10 @@ function AfficheIcone($type, $HeightIcone = 20) {
 	return '<img src="./img/icones/ic_' . $FileName . '.png" alt="Icone (' . strtolower($Name) . ')" title="' . ucfirst(strtolower($Name)) . '" height="' . $HeightIcone . 'px" />';
 }
 function CorrectDataInfoBulle($txtInfoBulle) {
-	$txt = str_replace('"', '&quot;', $txtInfoBulle);
+	$txt = str_replace(array('"', '&#34;'), '&quot;', $txtInfoBulle);
 	$txt = str_replace('<', '&lt;', $txt);
 	$txt = str_replace('>', '&gt;', $txt);
-	$txt = str_replace("'", "\'", $txt);
+	$txt = str_replace(array("'", "&#39;"), "\'", $txt);
 	return $txt;
 }
 function AfficheRecompenses($login = NULL, $alliance = NULL) {
@@ -478,6 +478,8 @@ function CheckIfAssezRessource(array $arRessource, personnage &$Joueur, maison &
 		case personnage::TYPE_EXPERIENCE:
 			return ($Joueur->GetExpPerso() >= $arRessource[1]);
 			break;
+		case quete::TYPE_QUETE:
+			return $Joueur->CheckIfQueteTerminee($arRessource[1]);
 		default:
 			return $Joueur->AssezElementDansBolga($arRessource[0], $arRessource[1]);
 			break;
@@ -529,6 +531,7 @@ function QuelTypeObjet($Code){
 		case qteBatiment::TYPE_QUETE_BATIMENT:
 		case qteCombat::TYPE_QUETE_MONSTRE:
 		case personnage::TYPE_EXPERIENCE:
+		case quete::TYPE_QUETE:
 			return $Code;
 	}
 	
