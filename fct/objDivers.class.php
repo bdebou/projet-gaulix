@@ -6,8 +6,8 @@ class objDivers extends objMain{
 	const TYPE_RES_VIE		= 'Vie';
 	
 	const TYPE_SORT			= 'sort';
-	const TYPE_LIVRE		= 'livre';
-	const TYPE_SAC			= 'sac';
+	const TYPE_LIVRE		= 'Livre';
+	const TYPE_SAC			= 'Sac';
 	
 	public function __construct(array $data, $nb){
 		date_default_timezone_set('Europe/Brussels');
