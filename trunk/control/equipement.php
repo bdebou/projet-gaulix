@@ -5,15 +5,26 @@ global $objManager, $chkDebug;
 
 $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
+$ChkDebugVar = false;
+
+if($chkDebug AND $ChkDebugVar){	var_dump($_SESSION['Equipement']);}
+if($chkDebug AND $ChkDebugVar){	var_dump($_GET);}
+if($chkDebug AND $ChkDebugVar){	var_dump($_POST);}
+if($chkDebug AND $ChkDebugVar){	echo '<hr />';}
+
 $chkErr = true;
 $CheckRetour = false;
 
-if(isset($_GET['action'])){
-	switch($_GET['action']){
-		case 'unuse':			ActionUnuse($chkErr, $oJoueur); break;
+if(isset($_POST['action'])){
+	switch($_POST['action']){
+		case 'unUse':			ActionUnuse($chkErr, $_POST['id'], $oJoueur); break;
 	}
-	unset($_GET['action']);
+	unset($_POST['action']);
 	$CheckRetour = true;
+}
+
+if($chkDebug AND ($ChkDebugVar OR !$chkErr)){
+	var_dump($_SESSION['Bricolage']);
 }
 
 $objManager->update($oJoueur);

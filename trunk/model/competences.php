@@ -154,8 +154,7 @@ function AfficheInfoCompetence($competence, personnage &$oJoueur, maison &$oMais
 	
 	$check = false;
 	
-	if(CheckCout(explode(',', $competence['cmp_lst_prix']), $oJoueur, $oMaison)
-		)
+	if(CheckCout(explode(',', $competence['cmp_lst_prix']), $oJoueur, $oMaison))
 	{
 		$check = true;
 		$_SESSION['competences'][$competence['cmp_lst_code']]['prix']				= explode(',', $competence['cmp_lst_prix']);
