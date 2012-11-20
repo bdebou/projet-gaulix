@@ -12,11 +12,11 @@ if($oJoueur->GetDisPerso() > 0){echo '<p>Grace à votre arme employée, vous pouve
 	<tr>
 	<td style="width:300px; border:1px solid black;">
 	<table class="corps">
-		<tr><td colspan="2"></td><td class="membre" style="height:30px;"><?php echo AfficheEquipement(1, $oJoueur);?></td><td colspan="2">&nbsp;</td></tr>
-		<tr><td class="membre" style="height:80px; width: 15px;"><?php echo AfficheEquipement(5, $oJoueur);?></td><td colspan="3" class="membre" style=""><?php echo AfficheEquipement(4, $oJoueur);?></td><td class="membre" style="height:80px; width: 15px;"><?php echo AfficheEquipement(2, $oJoueur);?></td></tr>
-		<tr><td>&nbsp;</td><td class="membre" style="height: 80px;"><?php echo AfficheEquipement(3, $oJoueur);?></td><td>&nbsp;</td><td class="membre" style="height: 80px;"><?php echo AfficheEquipement(3, $oJoueur);?></td><td>&nbsp;</td></tr>
+		<tr><td colspan="2"></td><td class="membre" style="height:30px;"><?php echo AfficheEquipement(objArmement::TYPE_CASQUE, $oJoueur);?></td><td colspan="2">&nbsp;</td></tr>
+		<tr><td class="membre" style="height:80px; width: 15px;"><?php echo AfficheEquipement(objArmement::TYPE_ARME, $oJoueur);?></td><td colspan="3" class="membre" style=""><?php echo AfficheEquipement(objArmement::TYPE_CUIRASSE, $oJoueur);?></td><td class="membre" style="height:80px; width: 15px;"><?php echo AfficheEquipement(objArmement::TYPE_BOUCLIER, $oJoueur);?></td></tr>
+		<tr><td>&nbsp;</td><td class="membre" style="height: 80px;"><?php echo AfficheEquipement(objArmement::TYPE_JAMBIERE, $oJoueur);?></td><td>&nbsp;</td><td class="membre" style="height: 80px;"><?php echo AfficheEquipement(objArmement::TYPE_JAMBIERE, $oJoueur);?></td><td>&nbsp;</td></tr>
 		<tr><td colspan="5">&nbsp;</td></tr>
-		<tr><td class="membre"><?php echo AfficheEquipement(7, $oJoueur);?></td><td colspan="3">&nbsp;</td><td class="membre"><?php echo AfficheEquipement(6, $oJoueur);?></td></tr>
+		<tr><td class="membre"><?php echo AfficheEquipement(objDivers::TYPE_LIVRE, $oJoueur);?></td><td colspan="3">&nbsp;</td><td class="membre"><?php echo AfficheEquipement(objDivers::TYPE_SAC, $oJoueur);?></td></tr>
 	</table>
 	</td>
 	<td style="border:1px solid black;">

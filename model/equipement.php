@@ -2,48 +2,57 @@
 function AfficheEquipement($type, personnage &$oJoueur) {
 	$SizeHeight = 50;
 
-	switch ($type) {
-		case '1': $CodeObjet = $oJoueur->GetCasque();	break;
-		case '2': $CodeObjet = $oJoueur->GetBouclier();	break;
-		case '3': $CodeObjet = $oJoueur->GetJambiere();	break;
-		case '4':
-			$CodeObjet = $oJoueur->GetCuirasse();
-			$SizeHeight = 150;
-			break;
-		case '5':
-			$CodeObjet = $oJoueur->GetArme();
-			$SizeHeight = 150;
-			break;
-		case '6': $CodeObjet = $oJoueur->GetSac();		break;
-		case '7': $CodeObjet = $oJoueur->GetLivre();	break;
+	$CodeObjet = GetCodeEquipement($type, $oJoueur);
+	
+	if(in_array($type, array(objArmement::TYPE_CUIRASSE, objArmement::TYPE_ARME)))
+	{
+		$SizeHeight = 150;
 	}
 
-	if (is_null($CodeObjet)) {
+	if (is_null($CodeObjet))
+	{
 		return '&nbsp;';
+	}elseif(in_array($type, array(objDivers::TYPE_LIVRE)) AND $CodeObjet === 'NoBook')
+	{
+		if(is_null($oJoueur->GetLstSorts()))
+		{
+			return '&nbsp;';
+		}else{
+			$arSort = explode('=', current($oJoueur->GetLstSorts()));
+			$oObjet = FoundObjet($arSort[0]);
+		}
+	}else{
+		$oObjet = FoundObjet($CodeObjet);
 	}
 
-	//if ($_SESSION['main']['uri'] == 3
-	if ($_GET['page'] == 'inventaire'
-	AND count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga()
-	AND !in_array($type, array(7))) {
+	//on vérifie si on a assez de place dans son bolga pour reprendre l'objet
+	if(	count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga()
+		AND !in_array($type, array(objDivers::TYPE_LIVRE)))
+	{
 		$chkLink = true;
-	} else {
+	}else{
 		$chkLink = false;
 	}
 
-	if (in_array($type, array(7))) {
-		if ($CodeObjet == 'NoBook') {
-			if (is_null($oJoueur->GetLstSorts())) {
+	//Dans le cas du livre de sorts
+	if(in_array($type, array(objDivers::TYPE_LIVRE)))
+	{
+		if($CodeObjet == 'NoBook')
+		{
+			if(is_null($oJoueur->GetLstSorts()))
+			{
 				return '&nbsp;';
-			} else {
+			}else{
 				$arSort = explode('=', current($oJoueur->GetLstSorts()));
 				$CodeObjet = $arSort[0];
 			}
-		} else {
+		}else{
 			//on affiche le livre
-			if(!is_null($oJoueur->GetLstSorts())){
+			if(!is_null($oJoueur->GetLstSorts()))
+			{
 				$InfoBulle = '<table class="equipement">';
-				foreach ($oJoueur->GetLstSorts() as $Sort) {
+				foreach ($oJoueur->GetLstSorts() as $Sort)
+				{
 					$arSort = explode('=', $Sort);
 					$sql = "SELECT * FROM table_objets WHERE objet_code='" . strval($arSort[0]) . "';";
 					$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
@@ -56,25 +65,45 @@ function AfficheEquipement($type, personnage &$oJoueur) {
 					. '</tr>';
 				}
 				$InfoBulle .= '</table>';
-			}else{$InfoBulle = '<table class="equipement"><tr><th>Votre livre est vide.</th></tr></table>';
+			}else{
+				$InfoBulle = '<table class="equipement"><tr><th>Votre livre est vide.</th></tr></table>';
 			}
 		}
 
 		return ($chkLink ?'
-			<a href="./fct/main.php?action=unuse&amp;id=' . $type . '">' : '')
+			<a href="./fct/main.php?action=unuse&amp;id=' . $type . '">' : NULL)
 		. '<img src="./img/objets/' . $CodeObjet . '.png" '
 		. 'height="' . $SizeHeight . '" '
 		. 'alt="Livre de sort" '
 		. 'onmouseover="montre(\'' . CorrectDataInfoBulle($InfoBulle) . '\');" '
 		. 'onmouseout="cache();" '
 		. '/>'
-		. ($chkLink ?'</a>' : '');
-	} else {
+		. ($chkLink ?'</a>' : NULL);
+	}else{
 		return ($chkLink ?'
-    		<a href="./fct/main.php?action=unuse&amp;id=' . $type . '">' : '')
-		.AfficheInfoObjet($CodeObjet, $SizeHeight)
-		. ($chkLink ?'</a>' : '');
+    		<a href="./fct/main.php?action=unuse&amp;id=' . $type . '">' : NULL)
+		.$oObjet->AfficheInfoObjet($SizeHeight)
+		. ($chkLink ?'</a>' : NULL);
 	}
+}
+
+/**
+ * Retourn le code de l'objet corrspondant
+ * @param string $type 
+ * @param personnage $oJoueur
+ * @return NULL|string
+ */
+function GetCodeEquipement($type, personnage &$oJoueur){
+	switch ($type) {
+		case objArmement::TYPE_CASQUE:		return $oJoueur->GetCasque();
+		case objArmement::TYPE_BOUCLIER:	return $oJoueur->GetBouclier();
+		case objArmement::TYPE_JAMBIERE:	return $oJoueur->GetJambiere();
+		case objArmement::TYPE_CUIRASSE:	return $oJoueur->GetCuirasse();
+		case objArmement::TYPE_ARME:		return $oJoueur->GetArme();
+		case objDivers::TYPE_SAC:			return $oJoueur->GetSac();
+		case objDivers::TYPE_LIVRE:			return $oJoueur->GetLivre();
+	}
+	return NULL;
 }
 function AfficheDescriptifEquipement(personnage &$oJoueur){
 	$txt = '
@@ -82,48 +111,58 @@ function AfficheDescriptifEquipement(personnage &$oJoueur){
 		<tr style="background:lightgrey;">
 			<td colspan="8">&nbsp;</td>
 		</tr>';
-	for($i=1;$i<=5;$i++){
-		switch($i){
-			case 1: $CodeObjet = $oJoueur->GetCasque();		$txtNom = 'Casque';		break;
-			case 2: $CodeObjet = $oJoueur->GetArme();		$txtNom = 'Arme';		break;
-			case 3: $CodeObjet = $oJoueur->GetCuirasse();	$txtNom = 'Cuirasse';	break;
-			case 4: $CodeObjet = $oJoueur->GetBouclier();	$txtNom = 'Bouclier';	break;
-			case 5: $CodeObjet = $oJoueur->GetJambiere();	$txtNom = 'Jambière';	break;
-		}
-		if(!is_null($CodeObjet)){
-			//$sql = "SELECT * FROM table_bricolage WHERE objet_code='".$CodeObjet."';";
-			$sql = "SELECT * FROM table_objets WHERE objet_code='".$CodeObjet."';";
-			$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
-			$result = mysql_fetch_array($requete, MYSQL_ASSOC);
+	$lstType = array(objArmement::TYPE_CASQUE, objArmement::TYPE_ARME, objArmement::TYPE_CUIRASSE, objArmement::TYPE_BOUCLIER, objArmement::TYPE_JAMBIERE);
+	$id = 0;
+	foreach($lstType as $type)
+	{
+		$CodeObjet = GetCodeEquipement($type, $oJoueur);
+		
+		if(!is_null($CodeObjet))
+		{
+			$oObjet = FoundObjet($CodeObjet);
+
+			$_SESSION['Equipement'][$id] = $CodeObjet;
+			
 			$txt .= '
-		<tr>
-			<td rowspan="3" style="width:80px;">
-				<a href="index.php?page=equipement&amp;action=unuse&amp;id='.$i.'">'.AfficheInfoObjet($result['objet_code'], 100).'</a>
-			</td>
-			<td>'.$result['objet_nom'].'</td>
-			<td colspan="2">'.AfficheIcone('attaque').' : '.$result['objet_attaque'].'</td>
-			<td colspan="2">'.AfficheIcone('defense').' : '.$result['objet_defense'].'</td>
-			<td colspan="2">'.AfficheIcone('distance').' : '.$result['objet_distance'].'</td>
-		</tr>
-		<tr>
-			<td rowspan="2">'.$result['objet_description'].'</td>
-			<td colspan="3">Niv = '.$result['objet_niveau'].'</td>
-			<td colspan="3">'.AfficheIcone('or').' : '.$result['objet_prix'].'</td>
-		</tr>
-		<tr>
-			<td colspan="6"><a href="index.php?page=equipement&amp;action=unuse&amp;id='.$i.'">Remettre dans mon Bolga</a></td>
-		</tr>
-		<tr style="background:lightgrey;">
-			<td colspan="8">&nbsp;</td>
-		</tr>';
+				<tr>
+					<td rowspan="3" style="width:80px;">
+						<a href="index.php?page=equipement&amp;action=unuse&amp;id='.$id.'">'.$oObjet->AfficheInfoObjet(100).'</a>
+					</td>
+					<td>'.$oObjet->GetNom().'</td>'
+					.$oObjet->AfficheInfoTd(2)
+					.'
+				</tr>
+				<tr>
+					<td rowspan="2">'.$oObjet->GetDescription().'</td>
+					<td colspan="3">Niv = '.$oObjet->GetNiveau().'</td>
+					<td colspan="3">'.AfficheIcone(personnage::TYPE_RES_MONNAIE).' : '.$oObjet->GetPrix().'</td>
+				</tr>
+				<tr>
+					<td colspan="6">
+						<form class="equipement" action="index.php?page=equipement" formmethod="post" method="post">
+							<input type="hidden" name="id" value="'.$id.'" />
+							<input type="hidden" name="action" value="unUse" />
+							<input type="submit" name="submit" value="Remettre dans mon Bolga"'.((CheckIfAssezRessource(array($oObjet->GetCode(), 1), $oJoueur, $oJoueur->GetObjSaMaison()) OR count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga())?NULL:' disabled="disabled"').' />
+						</form>
+					</td>
+				</tr>
+				<tr style="background:lightgrey;">
+					<td colspan="8">&nbsp;</td>
+				</tr>';
+			$id++;
 		}else{
 			$txt .= '
 		<tr>
-			<td rowspan="3" style="width:100px;">'
-			.$txtNom.'</td><td>Nom</td><td colspan="2">Attaque</td><td colspan="2">Defense</td><td colspan="2">Distance</td>
+			<td rowspan="3" style="width:100px;">'.$type.'</td>
+			<td>Nom</td>
+			<td colspan="2">Attaque</td>
+			<td colspan="2">Defense</td>
+			<td colspan="2">Distance</td>
 		</tr>
 		<tr>
-			<td rowspan="2">Description</td><td colspan="3">Niveau</td><td colspan="3">Prix</td>
+			<td rowspan="2">Description</td>
+			<td colspan="3">Niveau</td>
+			<td colspan="3">Prix</td>
 		</tr>
 		<tr>
 			<td colspan="6">Actions</td>
@@ -132,6 +171,7 @@ function AfficheDescriptifEquipement(personnage &$oJoueur){
 			<td colspan="8">&nbsp;</td>
 		</tr>';
 		}
+		
 	}
 	$txt .= '
 	</table>';
@@ -140,18 +180,12 @@ function AfficheDescriptifEquipement(personnage &$oJoueur){
 //+---------------------------------+
 //|				ACTIONS				|
 //+---------------------------------+
-function ActionUnuse(&$check, personnage &$oJoueur){
-	if(isset($_GET['id'])){
-		switch($_GET['id']){
-			case 1:	$type = 'casque';	break;
-			case 2:	$type = 'arme';		break;
-			case 3:	$type = 'cuirasse';	break;
-			case 4:	$type = 'bouclier';	break;
-			case 5:	$type = 'jambiere';	break;
-			case 6:	$type = 'sac';		break;
-		}
-		$oJoueur->DesequiperPerso($type);
-		unset($_GET['id']);
+function ActionUnuse(&$check, $id, personnage &$oJoueur){
+	if(!is_null($id)){
+		
+		$oJoueur->DesequiperPerso($_SESSION['Equipement'][$id]);
+		
+		unset($_SESSION['Equipement'][$id]);
 	}else{
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionUnuse';
