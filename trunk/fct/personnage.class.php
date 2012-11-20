@@ -61,6 +61,10 @@ class personnage{
 	const CIVILISATION_ROMAIN		= 'Romains';
 	const CIVILISATION_GAULOIS		= 'Gaulois';
 	
+	Const CARRIERE_CLASS_GUERRIER	= 'Guerrier';
+	Const CARRIERE_CLASS_DRUIDE		= 'Druide';
+	Const CARRIERE_CLASS_ARTISAN	= 'Artisan';
+	
 	//Les points
 	const POINT_COMBAT				= 10;
 	const POINT_NIVEAU_TERMINE		= 15;
@@ -114,6 +118,8 @@ class personnage{
 			while($arQuete = mysql_fetch_array($rqtLst, MYSQL_ASSOC)){
 				$this->ListQuetesTerminees[] = $arQuete['quete_id'];
 			}
+		}else{
+			$this->ListQuetesTerminees = NULL;
 		}
 	}
 	Private function CheckCarriere(){
@@ -1172,7 +1178,10 @@ class personnage{
 	 * @return boolean
 	 */
 	public function CheckIfQueteTerminee($idQuete){
-		
+		if(is_null($this->ListQuetesTerminees))
+		{
+			return false;
+		}
 		return in_array($idQuete, $this->ListQuetesTerminees);
 	}
 }
