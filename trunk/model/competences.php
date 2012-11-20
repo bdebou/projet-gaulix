@@ -237,6 +237,12 @@ function GoPerfectionnement($type, personnage &$oJoueur, maison &$oMaison){
 		case objArmement::TYPE_DEFENSE:	$temp = $oJoueur->GetDefPerso();	break;
 	}
 	
+	//Si c'est un guerrier on augmente sa limite de perfectionnement.
+	if(GetInfoCarriere($oJoueur->GetCodeCarriere(), 'carriere_class') === personnage::CARRIERE_CLASS_GUERRIER)
+	{
+		$StepPerf = 10;
+	}
+	
 	$nbPerfDone = $temp['0']-10;
 	
 	$prix = intval($PrixDepart * exp($nbPerfDone / 8));
