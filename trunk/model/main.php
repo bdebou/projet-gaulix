@@ -236,7 +236,7 @@ function AfficheActions(personnage &$oJoueur) {
 		echo AfficheListeBatimentAttaquable($SQLCarte, $chkConstruction = true);
 
 		//=== On affiche le légionnaire
-		echo AfficheCombatLegionnaire($oJoueur);
+		echo AfficheAttaqueBrigand($oJoueur);
 	} else {   //la Maison n'est pas encore installé
 		echo '
 		<p>Votre Maison n\'est pas encore installée. Installez la où vous voulez et ensuite vous pourrez attaquer d\'autre gaulois.</p>
@@ -327,32 +327,43 @@ function AfficheCollecteRessource(personnage &$oJoueur) {
 		return NULL;
 	}
 	//Dans quel etat est la ressource?
-	//Si la ressource est libre
+
 	if (is_null($objRessource->GetCollecteur()))
 	{
+		//Si la ressource est libre
 		if (!is_null($objRessource->GetCompetenceRequise())
 			AND !$oJoueur->CheckCompetence($objRessource->GetCompetenceRequise()))
 		{
 			$txt = '<p>Vous devez avoir une compétence <u>'. GetInfoCompetence($objRessource->GetCompetenceRequise(), 'cmp_lst_nom').'</u> pour ramasser ' . $objRessource->GetTextRessource() . '</p><hr />';
 		} else {
-			//$txt = null;
-			$txt = '<p style="text-align:center;">'
+			if(	CheckIfAssezRessource(array($objRessource->GetCodeRessource(ressource::TYPE_NORMAL), 1), $oJoueur, $oJoueur->GetObjSaMaison())
+				OR count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga())
+			{
+				$txt = '<p style="text-align:center;">'
 				. '<a href="index.php?page=main&amp;action=ressource&amp;id='.ressource::TYPE_NORMAL.'">'
 				. 'Collecter ' . $objRessource->GetQuantiteCollecte($oJoueur->GetLastCompetenceFinish($oJoueur->GetTypeCompetence($objRessource->GetCompetenceRequise()))) . ' ' . AfficheIcone(strtolower($objRessource->GetCodeRessource()))
 				. '</a>'
 				. '</p>';
-			
-			//Si on est sur une ressource de pierre, on peut collecter aussi de l'or
-			if ($objRessource->GetNomType() == ressource::NOM_RESSOURCE_PIERRE
-				AND $oJoueur->CheckCompetence(ressource::COMPETENCE_POUR_OR))
-			{
-				$txt .= '<p style="text-align:center;">'
-				. '<a href="index.php?page=main&amp;action=ressource&amp;id='.ressource::TYPE_OR.'">'
-				. 'Collecter ' . $objRessource->GetQuantiteCollecte($oJoueur->GetLastCompetenceFinish($oJoueur->GetTypeCompetence($objRessource->GetCompetenceRequise(ressource::TYPE_OR))), ressource::TYPE_OR) . ' ' . AfficheIcone(strtolower($objRessource->GetCodeRessource(ressource::TYPE_OR)))
-				. '</a>'
-				. '</p>';
+			}else{
+				$txt = '<p>Vous n\'avez pas assez de place dans votre bolga pour commencer à récolter cette ressource. Allez videz un peu votre Bolga et revenez.</p>';
 			}
-			$txt .= '<hr />';
+				//Si on est sur une ressource de pierre, on peut collecter aussi de l'or
+				if ($objRessource->GetNomType() == ressource::NOM_RESSOURCE_PIERRE
+				AND $oJoueur->CheckCompetence(ressource::COMPETENCE_POUR_OR))
+				{
+					if(	CheckIfAssezRessource(array($objRessource->GetCodeRessource(ressource::TYPE_NORMAL), 1), $oJoueur, $oJoueur->GetObjSaMaison())
+						OR count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga())
+					{
+						$txt .= '<p style="text-align:center;">'
+							. '<a href="index.php?page=main&amp;action=ressource&amp;id='.ressource::TYPE_OR.'">'
+							. 'Collecter ' . $objRessource->GetQuantiteCollecte($oJoueur->GetLastCompetenceFinish($oJoueur->GetTypeCompetence($objRessource->GetCompetenceRequise(ressource::TYPE_OR))), ressource::TYPE_OR) . ' ' . AfficheIcone(strtolower($objRessource->GetCodeRessource(ressource::TYPE_OR)))
+							. '</a>'
+							. '</p>';
+					}else{
+						$txt = '<p>Vous n\'avez pas assez de place dans votre bolga pour commencer à récolter cette ressource. Allez videz un peu votre Bolga et revenez.</p>';
+					}
+				}
+				$txt .= '<hr />';
 		}
 	} else {
 		
@@ -396,13 +407,13 @@ function AfficheGibierAChasser(personnage &$oJoueur) {
 	$txt = null;
 	if(!$oJoueur->GetChkChasse())
 	{
-		$codeGibier = GibierTrouve($oJoueur);
+		$oGibier = GibierTrouve($oJoueur);
 		
-		if (!is_null($codeGibier))
+		if (!is_null($oGibier))
 		{
-			$oGibier = FoundGibier($codeGibier);
+			//$oGibier = FoundGibier($codeGibier);
 			
-			if (!is_null($oJoueur->GetNiveauCompetence(Gibier::TYPE_CMP_MAIN)))
+			if ($oJoueur->CheckCompetence($oGibier->GetCompetence()))
 			{
 				/* $_SESSION['chasser']['nourriture'] = $Gibier->GetGainNourriture($oJoueur->GetNiveauCompetence(Gibier::TYPE_CMP_NOUR));
 				$_SESSION['chasser']['cuir'] = $Gibier->GetGainCuir($oJoueur->GetNiveauCompetence(Gibier::TYPE_CMP_CUIR));
@@ -539,7 +550,12 @@ function AfficheListeBatimentAttaquable($sql, &$chkConstruction) {
 	}
 	return $txt;
 }
-Function AfficheCombatLegionnaire(personnage &$oJoueur) {
+Function AfficheAttaqueBrigand(personnage &$oJoueur) {
+	$sql = "SELECT * FROM table_objets 
+			WHERE objet_type='Ennemi'";
+	$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
+	$result = mysql_fetch_array($requete, MYSQL_ASSOC);
+	
 	$num = mt_rand(1, 100);
 	if ($num == 50 AND !$oJoueur->GetChkLegionnaire()) {
 		$_SESSION['main']['legionnaire'] = new Legionnaire($oJoueur->GetNiveau());
@@ -554,6 +570,21 @@ Function AfficheCombatLegionnaire(personnage &$oJoueur) {
 			<hr />';
 	}
 }
+/* Function AfficheCombatLegionnaire(personnage &$oJoueur) {
+	$num = mt_rand(1, 100);
+	if ($num == 50 AND !$oJoueur->GetChkLegionnaire()) {
+		$_SESSION['main']['legionnaire'] = new Legionnaire($oJoueur->GetNiveau());
+		//$_SESSION['main']['laisser'] = 'legionnaire';
+		$oJoueur->SetLegionnaire(true);
+		return '<p style="display:inline;">' . AfficheIcone('attention') . ' Légion romaine en vue!<br />Voulez-vous l\'attaquer ?'
+		. '<ul style="display:inline; list-style-type:none; padding:0px; text-align:center;">'
+		. '<li style="display:inline;"><a style="margin-left:20px;" href="index.php?page=main&amp;action=legionnaire">Attaquer</a></li>'
+		. '<li style="display:inline; margin-left:20px;"><a href="index.php?page=main&amp;action=laisser&amp;type=legionnaire">Laisser</a></li>'
+		. '</ul>
+			</p>
+			<hr />';
+	}
+} */
 function AfficheMenuConstruction(personnage &$oJoueur, &$chkConstruction) {
 	if (is_null($oJoueur->GetMaisonInstalle())) {
 		//La Maison n'est pas encore installée
@@ -717,26 +748,40 @@ function ZoneAttaqueTour($position, $distance, $carte){
 	}
 	return $lstCoordonnee;
 }
+/**
+ * Sélectionne les objets possible de trouver.
+ * Crée une table de probabilité de les trouvés grâce à la valeur objet_rarete
+ * Trouve un nombre entre 0 et exp(NiveauJoueur ou 5)
+ * Si le numéro existe dans la table, on renvoie le CodeObjet
+ * @param personnage $oJoueur
+ * @return string CodeObjet|NULL
+ */
 function ObjetTrouve(personnage &$oJoueur) {
+	global $lstTypeObjets;
 	$sqlObj = 	"SELECT objet_code, objet_niveau, objet_rarete 
 				FROM table_objets 
 				WHERE objet_civilisation IN ('".$oJoueur->GetCivilisation()."', 'all')
-					AND objet_rarete > 0;";
+					AND objet_rarete > 0
+					AND objet_type IN ('".implode("', '", $lstTypeObjets)."');";
+	
 	$requeteObj = mysql_query($sqlObj) or die(mysql_error() . '<br />' . $sqlObj);
 	
 	//on crée une table contenant les infos des objets
 	unset($arObjets);
 	
-	while ($row = mysql_fetch_array($requeteObj, MYSQL_ASSOC)) {
+	while ($row = mysql_fetch_array($requeteObj, MYSQL_ASSOC))
+	{
 		for($i=1; $i <= $row['objet_rarete']; $i++)
 		{
-			$arObjets[] = array('objet_code' => $row['objet_code'], 'objet_niveau' => $row['objet_niveau']);
+			//$arObjets[] = array('objet_code' => $row['objet_code'], 'objet_niveau' => $row['objet_niveau']);
+			$arObjets[] = $row;
 		}
 	}
 	//on prend un nombre aléatoire
 	$num = mt_rand(0, count($arObjets) + intval(exp(($oJoueur->GetNiveau() > 5 ? 5 : $oJoueur->GetNiveau()))));
 	
-	if (isset($arObjets[$num])/*  AND $arObjets[$num]['objet_niveau'] <= $oJoueur->GetNiveau() */) {
+	if (isset($arObjets[$num])/*  AND $arObjets[$num]['objet_niveau'] <= $oJoueur->GetNiveau() */)
+	{
 		return $arObjets[$num]['objet_code'];
 	}
 	
@@ -793,6 +838,11 @@ function AfficheActionPossible(personnage &$oJoueur, objMain &$objObjet) {
 
 	return $txt;
 }
+/**
+ * Sélectionne un gibier par sa rareté.
+ * @param personnage $oJoueur
+ * @return Gibier|NULL
+ */
 Function GibierTrouve(personnage &$oJoueur) {
 
 	$sqlGibier = "SELECT objet_code, objet_rarete FROM table_objets WHERE objet_civilisation='gibier';";
@@ -816,9 +866,9 @@ Function GibierTrouve(personnage &$oJoueur) {
 	{
 		$oGibier = FoundGibier($arGibier[$num]);
 		
-		if($oJoueur->CheckCompetence($oGibier->GetCodeCompetenceRequise()))
+		if($oJoueur->CheckCompetence($oGibier->GetCompetence()))
 		{
-			return $arGibier[$num];
+			return $oGibier;
 		}
 	}
 	return null;
