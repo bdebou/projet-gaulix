@@ -5,15 +5,15 @@ class objArmement extends objMain{
 	private $Defense;
 	private $Distance;
 	
-	const TYPE_ATTAQUE		= 'attaque';
-	const TYPE_DEFENSE		= 'defense';
-	const TYPE_DISTANCE		= 'distance';
+	const TYPE_ATTAQUE		= 'Attaque';
+	const TYPE_DEFENSE		= 'Defense';
+	const TYPE_DISTANCE		= 'Distance';
 	
-	const TYPE_BOUCLIER		= 'bouclier';
-	const TYPE_JAMBIERE		= 'jambiere';
-	const TYPE_ARME			= 'arme';
-	const TYPE_CASQUE		= 'casque';
-	const TYPE_CUIRASSE		= 'cuirasse';
+	const TYPE_BOUCLIER		= 'Bouclier';
+	const TYPE_JAMBIERE		= 'Jambiere';
+	const TYPE_ARME			= 'Arme';
+	const TYPE_CASQUE		= 'Casque';
+	const TYPE_CUIRASSE		= 'Cuirasse';
 	
 	public function __construct(array $data, $nb){
 		date_default_timezone_set('Europe/Brussels');
@@ -71,13 +71,22 @@ class objArmement extends objMain{
 					height="'.$intHeightImg.'px"
 				 />';
 	}
-	Public Function AfficheInfoTrTd(){
+	/**
+	 * Retourne une ligne d'un tableau pour afficher les infos de l'armement
+	 * @param integer $ColSpan
+	 * @param boolean $Ligne
+	 * @return string
+	 */
+	Public Function AfficheInfoTd($ColSpan = NULL, $Ligne = false){
 		$txt = NULL;
-		$txt .= '<tr>';
-		$txt .= '<td>'.AfficheIcone(self::TYPE_ATTAQUE).' : '.$this->GetAttaque().'</td>';
-		$txt .= '<td>'.AfficheIcone(self::TYPE_DEFENSE).' : '.$this->GetDefense().'</td>';
-		$txt .= '<td>'.AfficheIcone(self::TYPE_DISTANCE).' : '.$this->GetDistance().'</td>';
-		$txt .= '</tr>';
+		
+		if($Ligne){$txt .= '<tr>';}
+		
+		$txt .= '<td'.(!is_null($ColSpan)?' colspan="'.$ColSpan.'"':NULL).'>'.AfficheIcone(self::TYPE_ATTAQUE).' : '.$this->GetAttaque().'</td>';
+		$txt .= '<td'.(!is_null($ColSpan)?' colspan="'.$ColSpan.'"':NULL).'>'.AfficheIcone(self::TYPE_DEFENSE).' : '.$this->GetDefense().'</td>';
+		$txt .= '<td'.(!is_null($ColSpan)?' colspan="'.$ColSpan.'"':NULL).'>'.AfficheIcone(self::TYPE_DISTANCE).' : '.$this->GetDistance().'</td>';
+		
+		if($Ligne){$txt .= '</tr>';}
 		
 		return $txt;
 	}
