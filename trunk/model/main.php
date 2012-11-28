@@ -1204,7 +1204,7 @@ function ActionConstruire(&$check, $id, personnage &$oJoueur, &$objManager){
 	if($_SESSION['main'][$id]['construire'] == maison::ID_BATIMENT)
 	{
 		//On construit sa maison
-		$oJoueur->MaisonInstalle($oJoueur->GetCoordonnee());
+		$oJoueur->SetMaisonInstalle($oJoueur->GetCoordonnee());
 		// on recupère les info du batiment
 		$sql = "SELECT * FROM table_batiment WHERE id_batiment=".maison::ID_BATIMENT.";";
 		$requete = mysql_query($sql) or die ( mysql_error() );
@@ -1235,7 +1235,7 @@ function ActionConstruire(&$check, $id, personnage &$oJoueur, &$objManager){
 				$objManager->UpdateBatiment($maison);
 				
 				// on recupère les info du batiment
-				$sql = "SELECT * FROM table_batiment WHERE id_batiment=".$_SESSION['main'][$id]['construire'].";";
+				$sql = "SELECT * FROM table_batiment WHERE id_type=".$_SESSION['main'][$id]['construire']." AND batiment_niveau=1;";
 				$requete = mysql_query($sql) or die ( mysql_error() );
 				$batiment = mysql_fetch_array($requete, MYSQL_ASSOC);
 				

@@ -598,7 +598,7 @@ class personnage{
 		
 		if($type != 'objet'){$this->last_action=strtotime('now');}
 	}
-	public function MaisonInstalle($coordonnee){
+	public function SetMaisonInstalle($coordonnee){
 		$this->maison_installe = explode(',', $coordonnee);
 	}
 	public function MaisonDetruit(){
