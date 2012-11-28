@@ -2,6 +2,8 @@
 global $objManager;
 $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
+include_once('model/options.php');
+
 $CheckRetour = false;
 
 $chgpassword = new ChangePassword();
@@ -25,14 +27,14 @@ if(isset($_POST['chg_email'])){
 }
 //========================
 if(isset($_POST['SupprimerCpt']) and $_POST['SupprimerCpt'] == 'Supprimer'){
-	include('model/options.php');
+	//include('model/options.php');
 	Supprimer_Compte($oJoueur);
 	//header('location: index.php?page=unconnect');
 	return '<script type="text/javascript">window.location="index.php?page=unconnect";</script>';
 }
 //=========================
 if(isset($_POST['ChgNot'])){
-	include('model/options.php');
+	//include('model/options.php');
 	ChangeNotification($oJoueur);
 	$CheckRetour = true;
 }

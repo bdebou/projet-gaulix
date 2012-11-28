@@ -1,8 +1,8 @@
 <?php
 function Supprimer_Compte(personnage &$oJoueur){
-	global $objManager;
+	global $objManager, $lstBatimentConstructible;
 		//on supprimer les batiments du joueur
-	$sql = "SELECT id_case_carte FROM  table_carte WHERE login='" . $oJoueur->GetLogin() . "' AND id_type_batiment NOT IN (7, 8, 10, 11, 12, 13, 14, 15, 16, 17);";
+	$sql = "SELECT id_case_carte FROM  table_carte WHERE login='" . $oJoueur->GetLogin() . "' AND id_type_batiment IN (".implode(", ", $lstBatimentConstructible).");";
 	$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
 	while ($row = mysql_fetch_array($requete, MYSQL_ASSOC)) {
 		$sqlRemove = "DELETE FROM table_carte WHERE id_case_carte=".intval($row['id_case_carte']).";";
@@ -11,13 +11,18 @@ function Supprimer_Compte(personnage &$oJoueur){
 	}
 		
 		//on libère les ressources qui sont peut-etre encore en cours
-	if(isset($_SESSION['main']['ressource'])){
-		if($_SESSION['main']['ressource']->GetCollecteur() == $oJoueur->GetLogin()){
-			$_SESSION['main']['ressource']->FreeRessource($oJoueur);
-		}
-		$objManager->UpdateBatiment($_SESSION['main']['ressource']);
 		
-		unset($_SESSION['main']['ressource']);
+	$objRessource = FoundBatiment(NULL, NULL, $oJoueur->GetCoordonnee());
+	
+	if(	!is_null($objRessource)
+		AND get_class($objRessource) != 'ressource')
+	{
+		if($objRessource->GetCollecteur() == $oJoueur->GetLogin()){
+			$objRessource->FreeRessource($oJoueur);
+		}
+		$objManager->UpdateBatiment($objRessource);
+		
+		unset($objRessource);
 	}
 		
 		//on reset la liste des quetes

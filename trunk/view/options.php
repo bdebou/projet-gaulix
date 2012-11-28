@@ -1,6 +1,6 @@
 <?php
-include('control/forms/options.php');
-include('model/options.php');
+include_once('control/forms/options.php');
+include_once('model/options.php');
 ?>
 <div class="main">
 <h1>Options</h1>
