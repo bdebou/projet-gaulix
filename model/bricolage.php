@@ -91,7 +91,7 @@ function AfficheListeElementBricolage(personnage &$oJoueur, $Onglet = null){
  * @param maison $maison
  * @return string
  */
-function AfficheInfoObjetBricolage(personnage &$oJoueur, &$oObjet, &$numObjet, maison &$maison){
+function AfficheInfoObjetBricolage(personnage &$oJoueur, &$oObjet, &$numObjet, maison &$maison = NULL){
 	$txt 			= null;
 	
 	$ChkCompetence	= false;

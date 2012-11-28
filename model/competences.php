@@ -1,5 +1,5 @@
 <?php
-function AfficheAutreCompetences(personnage &$oJoueur, maison &$oMaison){
+function AfficheAutreCompetences(personnage &$oJoueur, maison &$oMaison = NULL){
 
 	$NomPrecedent = null;
 	$txtJScript = '
@@ -150,7 +150,7 @@ function AfficheAvancementCompetence($competence, $info, &$chkFinis){
 		.$txtStatus
 	.'</table>';
 }
-function AfficheInfoCompetence($competence, personnage &$oJoueur, maison &$oMaison){
+function AfficheInfoCompetence($competence, personnage &$oJoueur, maison &$oMaison = NULL){
 	
 	$check = false;
 	
@@ -185,7 +185,7 @@ function AfficheInfoCompetence($competence, personnage &$oJoueur, maison &$oMais
 	</table>';
 	
 }
-function AfficheModulePerfectionnement($type, personnage &$oJoueur, maison &$oMaison){
+function AfficheModulePerfectionnement($type, personnage &$oJoueur, maison &$oMaison = NULL){
 	
 	if(	($type == objArmement::TYPE_ATTAQUE AND is_null($oJoueur->GetDatePerfect(personnage::TYPE_PERFECT_ATTAQUE)))
 		OR
@@ -226,12 +226,12 @@ function AfficheModulePerfectionnement($type, personnage &$oJoueur, maison &$oMa
 		//header('location: index.php?page=competences&action=Perf'.ucfirst(substr($type, 0, 3)));
 	}
 }
-function GoPerfectionnement($type, personnage &$oJoueur, maison &$oMaison){
+function GoPerfectionnement($type, personnage &$oJoueur, maison &$oMaison = NULL){
 	$nbMaxPerf	= 25;
 	$PrixDepart	= 50;
 	$check		= false;
 	$StepPerf	= 5;
-	
+		
 	switch($type){
 		case objArmement::TYPE_ATTAQUE:	$temp = $oJoueur->GetAttPerso();	break;
 		case objArmement::TYPE_DEFENSE:	$temp = $oJoueur->GetDefPerso();	break;
@@ -257,7 +257,7 @@ function GoPerfectionnement($type, personnage &$oJoueur, maison &$oMaison){
 		<tr><td>Vous avez atteint le maximum.</td></tr>
 	</table>';
 	}elseif($nbPerfDone < (($oJoueur->GetNiveau() + 1) * $StepPerf)
-			AND CheckCout(array(personnage::TYPE_RES_MONNAIE.'='.$prix), $oJoueur, $oMaison)/* $oJoueur->GetArgent() >= $prix */)
+			AND CheckCout(array(personnage::TYPE_RES_MONNAIE.'='.$prix), $oJoueur, $oMaison))
 	{
 		$check=true;
 	}

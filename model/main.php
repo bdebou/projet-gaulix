@@ -809,7 +809,7 @@ function AfficheActionPossible(personnage &$oJoueur, objMain &$objObjet) {
 			.'<ul style="list-style-type:none; padding:0px; text-align:center;">';
 	
 	//on vérifie si le bolga n'est pas plein
-	if(	CheckIfAssezRessource(array($objObjet->GetCode(), 1), $oJoueur, $oJoueur->GetObjSaMaison())
+	if(	CheckIfAssezRessource(array($objObjet->GetCode(), 1), $oJoueur)
 		OR count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga())
 	{
 		$txt .= $txtRamasser;
