@@ -21,7 +21,13 @@
 	<?php echo $temp[1];?>
 </div>
 <?php 
-	$objManager->UpdateBatiment($oMaison);
 	$objManager->update($oJoueur);
-	unset($oJoueur, $oMaison);
+	
+	if(!is_null($oMaison))
+	{
+		$objManager->UpdateBatiment($oMaison);
+		unset($oMaison);
+	}
+	
+	unset($oJoueur);
 ?>

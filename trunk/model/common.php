@@ -309,7 +309,7 @@ function AfficheListePrix($lstPrix, personnage &$oJoueur = NULL, maison &$maison
 				{
 					$ColorPrix = 'black';
 				
-					if (!is_null($oJoueur) AND !is_null($maison) AND !CheckIfAssezRessource($Prix, $oJoueur, $maison))
+					if ((!is_null($oJoueur) OR !is_null($maison)) AND !CheckIfAssezRessource($Prix, $oJoueur, $maison))
 					{
 						$ColorPrix = 'red';
 					}
@@ -462,11 +462,14 @@ function UtilisationRessource(array $arRessource, personnage &$Joueur, maison &$
 			break;
 	}
 }
-function CheckIfAssezRessource(array $arRessource, personnage &$Joueur, maison &$Maison){
+function CheckIfAssezRessource(array $arRessource, personnage &$Joueur, maison &$Maison = NULL){
 	switch(QuelTypeObjet($arRessource[0])){
 		case maison::TYPE_RES_NOURRITURE:
 		case maison::TYPE_RES_EAU_POTABLE:
-			return ($Maison->GetRessource(QuelTypeRessource($arRessource[0])) >= $arRessource[1]);
+			if(!is_null($Maison))
+			{
+				return ($Maison->GetRessource(QuelTypeRessource($arRessource[0])) >= $arRessource[1]);
+			}
 			//return $Joueur->AssezElementDansBolga($arRessource[0], $arRessource[1]);
 			break;
 		case personnage::TYPE_RES_MONNAIE:
@@ -696,7 +699,7 @@ function GetInfoCarriere($code, $info = null){
  * @param maison $maison
  * @return boolean
  */
-function CheckCout($lstPrix, personnage &$oJoueur, maison &$maison){
+function CheckCout($lstPrix, personnage &$oJoueur, maison &$maison = NULL){
 	if(!is_null($lstPrix))
 	{
 		foreach($lstPrix as $Prix)
