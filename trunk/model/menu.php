@@ -6,8 +6,15 @@ function CombienQueteDisponible(personnage &$oJoueur){
 	if(mysql_num_rows($requete) > 0){
 		$NbQueteDisponible = 0;
 
+		
 		while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
-			if(!CheckIfQueteEnCours($row['id_quete']) AND !CheckIfQueteDejaTermine($row['id_quete'], $oJoueur->GetLogin())){
+			
+			$oQuete = FoundQuete($row['id_quete'], $oJoueur->GetLogin());
+			
+			if(	!$oQuete->CheckIfEnCours($oJoueur->GetLogin())
+				AND !$oQuete->CheckIfDejaTermine($oJoueur->GetLogin())
+				AND (is_null($oQuete->GetCodeCmpQuete()) OR $oJoueur->CheckIfCompetenceAvailable($oQuete->GetCodeCmpQuete())))
+			{
 				$NbQueteDisponible++;
 			}
 		}
@@ -17,27 +24,5 @@ function CombienQueteDisponible(personnage &$oJoueur){
 
 	return 0;
 }
-function CheckIfQueteEnCours($NumQuete){
-	if(isset($_SESSION['QueteEnCours']))
-	{
-		foreach($_SESSION['QueteEnCours'] as $quete)
-		{
-			if($quete->GetIDTypeQuete() == $NumQuete)
-			{
-				return true;
-			}
-		}
-	}
-	return false;
-}
-function CheckIfQueteDejaTermine($NumQuete, $login){
-	$sql = "SELECT id_quete_en_cours FROM table_quetes WHERE quete_login = '$login' AND quete_reussi IS NOT NULL AND quete_id = $NumQuete;";
-	$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
 
-	if(mysql_num_rows($requete) > 0)
-	{
-		return true;
-	}
-	return false;
-}
 ?>
