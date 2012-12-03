@@ -212,7 +212,7 @@ function AfficheIcone($type, $HeightIcone = 20) {
 	}
 	
 
-	return '<img src="./img/icones/ic_' . $FileName . '.png" alt="Icone (' . strtolower($Name) . ')" title="' . ucfirst(strtolower($Name)) . '" height="' . $HeightIcone . 'px" />';
+	return '<img src="./img/icones/ic_' . $FileName . '.png" alt="Icone (' . strtolower($Name) . ')" title="' . ucfirst(strtolower($Name)) . '" height="' . $HeightIcone . '" />';
 }
 function CorrectDataInfoBulle($txtInfoBulle) {
 	$txt = str_replace(array('"', '&#34;'), '&quot;', $txtInfoBulle);
