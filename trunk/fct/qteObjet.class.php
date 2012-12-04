@@ -16,6 +16,7 @@ class qteObjet extends quete{
 	public function hydrate(array $Quete, array $InfoQuete){
 		
 	}
+
 	public function ActionSurQuete(personnage &$oJoueur){
 		if(is_null($this->CreateListObjectNeed()))
 		{
@@ -44,14 +45,7 @@ class qteObjet extends quete{
 	}
 	
 	Private function QueteAccomplie(personnage &$oJoueur){
-		if(!is_null($this->GetGain()))
-		{
-			foreach($this->GetGain() as $Gain)
-			{
-				$arGain = explode('=', $Gain);
-				$oJoueur->AddInventaire($arGain[0], $arGain[1], false);
-			}
-		}
+		$this->RecupereGains($oJoueur);
 		
 		$this->FinishQuete();
 		
