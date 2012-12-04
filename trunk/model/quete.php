@@ -1,5 +1,5 @@
 <?php
-function SelectQuete(personnage &$oJoueur, $bSurMaison){
+function SelectQuete(personnage &$oJoueur){
 	$txt = null;
 	$sql = "SELECT * 
 			FROM table_quete_lst 
@@ -17,7 +17,9 @@ function SelectQuete(personnage &$oJoueur, $bSurMaison){
 			
 			$oQuete = FoundQuete($row['id_quete'], $oJoueur->GetLogin());
 			
-			if(!$oQuete->CheckIfEnCours($oJoueur->GetLogin())/*  AND !$oQuete->CheckIfDejaTermine($oJoueur->GetLogin()) */)
+			if(	!$oQuete->CheckIfEnCours($oJoueur->GetLogin())
+				AND !$oQuete->CheckIfDejaTermine($oJoueur->GetLogin())
+				AND (is_null($oQuete->GetCodeCmpQuete()) OR $oJoueur->CheckIfCompetenceAvailable($oQuete->GetCodeCmpQuete())))
 			{
 				$NbQueteDisponible++;
 				
@@ -29,7 +31,7 @@ function SelectQuete(personnage &$oJoueur, $bSurMaison){
 				}
 				
 				$txt .= '
-					<td>'.$oQuete->AfficheDescriptif($oJoueur, $oJoueur->GetObjSaMaison(), false, $bSurMaison).'</td>';
+					<td>'.$oQuete->AfficheDescriptif($oJoueur, $oJoueur->GetObjSaMaison(), false).'</td>';
 					
 				$nbCol++;
 				
@@ -57,7 +59,7 @@ function SelectQuete(personnage &$oJoueur, $bSurMaison){
 		return '<p>Pas de nouvelle quête disponible. Passez au niveau suivant pour avoir de nouvelles quêtes.</p>';
 	}
 }
-function ActionInscriptionQuete(&$check, $numQuete, personnage &$oJoueur, maison &$oMaison){
+function ActionInscriptionQuete(&$check, $numQuete, personnage &$oJoueur, maison &$oMaison = NULL){
 	if(	count($_SESSION['QueteEnCours']) < quete::NB_QUETE_MAX
 		AND isset($_SESSION['quete'][$numQuete])
 		AND !$_SESSION['quete'][$numQuete])
@@ -108,7 +110,7 @@ function ActionAnnulerQuete(&$check, $numQuete) {
 	}
 	
 }
-function ActionValiderQuete(&$check, $numQuete, personnage &$oJoueur, maison &$oMaison){
+function ActionValiderQuete(&$check, $numQuete, personnage &$oJoueur, maison &$oMaison = NULL){
 	if(	isset($_SESSION['quete'][$numQuete])
 	AND $_SESSION['quete'][$numQuete])
 	{
