@@ -97,6 +97,8 @@ class InscriptionStepB{
 					'".$_SESSION['inscription']['civilisation']."', 
 					'".$_SESSION['inscription']['login']."');";
 		mysql_query($sql) or die ( mysql_error().'<br />'.$sql);
+		
+		unset($_SESSION['inscription']);
 	}
 	
 	public function loadForm($data){
@@ -183,14 +185,20 @@ class InscriptionStepB{
 	public function GetSendCheck(){			return $this->SendCheck;}
 	public function GetMessage(){			return $this->Message;}
 	private function GetInfoVillage($strVillage){
-		$sql = "SELECT login, niveau, carriere FROM table_joueurs WHERE civilisation='".$_SESSION['inscription']['civilisation']."' AND village='".$strVillage."';";
+		//$sql = "SELECT login, niveau, carriere FROM table_joueurs WHERE civilisation='".$_SESSION['inscription']['civilisation']."' AND village='".$strVillage."';";
+		$sql = "SELECT villages_citoyen FROM table_villages WHERE villages_civilisation='".$_SESSION['inscription']['civilisation']."' AND villages_nom='".$strVillage."';";
 		$rqtVillage = mysql_query($sql) or die ( mysql_error() );
 		
 		$nbVillageois = 0;
 		$txtListVillageois = '<ul class="liste_villageois">';
 		while($row = mysql_fetch_array($rqtVillage, MYSQL_ASSOC)){
-			$txtListVillageois .= '<li>'.$row['login'].' ('.GetInfoCarriere($row['carriere'], 'carriere_nom').').</li>';
+			global $objManager;
+			$oJoueur = $objManager->GetPersoLogin($row['villages_citoyen']);
+			
+			$txtListVillageois .= '<li>'.$row['villages_citoyen'].' ('.GetInfoCarriere($oJoueur->GetCodeCarriere(), 'carriere_nom').').</li>';
+			
 			$nbVillageois++;
+			
 			if($nbVillageois > self::NB_MAX_VILLAGEOIS){break;}
 		}
 		$txtListVillageois .= '</ul>';
@@ -203,7 +211,8 @@ class InscriptionStepB{
 		return $txt;
 	}
 	public function GetListeVillages(){
-		$sql = "SELECT village FROM table_joueurs WHERE civilisation='".$_SESSION['inscription']['civilisation']."' ORDER BY village ASC;";
+		//$sql = "SELECT village FROM table_joueurs WHERE civilisation='".$_SESSION['inscription']['civilisation']."' ORDER BY village ASC;";
+		$sql = "SELECT villages_nom FROM table_villages WHERE villages_civilisation='".$_SESSION['inscription']['civilisation']."' ORDER BY villages_nom ASC;";
 		$rqtVillage = mysql_query($sql) or die ( mysql_error() );
 		
 		if(mysql_num_rows($rqtVillage) > 0){
@@ -212,16 +221,16 @@ class InscriptionStepB{
 			$info = NULL;
 			
 			while($row = mysql_fetch_array($rqtVillage, MYSQL_ASSOC)){
-				if($row['village'] != $precedent){
+				if($row['villages_nom'] != $precedent){
 					$info[] = '<tr>
 								<td>
-									<input required="required" type="radio" name="village" value="'.strtolower($row['village']).'" />
+									<input required="required" type="radio" name="village" value="'.strtolower($row['villages_nom']).'" />
 								</td>
 								<td>'
-									.$this->GetInfoVillage($row['village'])
+									.$this->GetInfoVillage($row['villages_nom'])
 								.'</td>
 							</tr>';
-					$precedent = $row['village'];
+					$precedent = $row['villages_nom'];
 				}
 				
 			}
