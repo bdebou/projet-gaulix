@@ -108,7 +108,7 @@ foreach($lstTypeObjets as $Category)
 				case 'Ressource':
 					break;
 				case 'Armement':
-					$txtInfoArmement = $objObjet->AfficheInfoTrTd();
+					$txtInfoArmement = $objObjet->AfficheInfoTd(NULL, true);
 					$nbColonne = 3;
 					$nbLigne = 5;
 					$nbLigne++;
