@@ -20,6 +20,7 @@ function AfficheListeDesClans(personnage &$oJoueur){
 		</tr>';
 	
 	$sql = "SELECT * FROM table_alliance WHERE membre_actif IS NULL ORDER BY nom_clan ASC;";
+	//$sql = "SELECT * FROM table_villages WHERE villages_nom='".."' ORDER BY villages_nom ASC;";
 	$requete = mysql_query($sql) or die (mysql_error());
 	
 	if(mysql_num_rows($requete)>0){
@@ -168,7 +169,7 @@ function AfficheLigneCouleur($Color, $IDLigne){
 //=====================
 //Gestion des Alliances
 //=====================
-function ActionSupprimerClan(&$objManager, &$oJoueur, $NomClan){
+function ActionSupprimerClan(&$objManager, personnage &$oJoueur, $NomClan){
 	if(isset($NomClan)){
 		//on désinscrit tous les membres
 		$sql = "SELECT id_alliance, membre_clan FROM `table_alliance` WHERE nom_clan='".htmlspecialchars($NomClan, ENT_QUOTES)."' AND chef_clan='".$_SESSION['joueur']."';";
@@ -205,7 +206,7 @@ function ActionDesinscrireMembreClan(&$objManager, $NomClan, $Membre){
 		unset($persoMembre);
 	}
 }
-function ActionDesinscriptionClan(&$oJoueur, $NomClan){
+function ActionDesinscriptionClan(personnage &$oJoueur, $NomClan){
 	if(isset($NomClan)){
 		//on met à jour la liste des membres
 		$sql = "UPDATE `table_alliance` SET membre_actif=1 WHERE nom_clan='".htmlspecialchars($NomClan, ENT_QUOTES)."' AND membre_clan='".$oJoueur->GetLogin()."';";
@@ -214,7 +215,7 @@ function ActionDesinscriptionClan(&$oJoueur, $NomClan){
 		$oJoueur->DesinscriptionClan();
 	}
 }
-function ActionInscriptionClan(&$oJoueur, $NomClan, $ChefClan){
+function ActionInscriptionClan(personnage &$oJoueur, $NomClan, $ChefClan){
 	if(isset($NomClan) AND isset($ChefClan)){
 		//on ajoute le membre à la liste des membres
 		$sql = "INSERT INTO `table_alliance` (`id_alliance`, `chef_clan`, `nom_clan`, `membre_clan`, `date_inscription`, `membre_actif`)
@@ -224,7 +225,7 @@ function ActionInscriptionClan(&$oJoueur, $NomClan, $ChefClan){
 		$oJoueur->InscriptionClan('1');
 	}
 }
-function ActionAjoutClan(&$oJoueur, $AddClan){
+function ActionAjoutClan(personnage &$oJoueur, $AddClan){
 	if(isset($AddClan) AND !empty($AddClan) AND !is_null($AddClan)){
 		if(!CheckIfClanExiste($AddClan)){
 			//on ajoute le clan
