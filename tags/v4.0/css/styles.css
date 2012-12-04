@@ -1,0 +1,502 @@
+*{
+	font-family: "MedievalSharp", "Palatino Linotype", "Book Antiqua", Palatino, serif;
+}
+
+body{
+	width: 840px;
+	margin: 20px auto 20px auto;
+	background: url("../img/bcg/parchemin01.gif") no-repeat center top, url("../img/bcg/parchemin03.gif") no-repeat center bottom;
+	background-color: DarkOliveGreen;
+    font-family: Arial,Helvetica,sans-serif;
+}
+div.container{
+	background: url('../img/bcg/parchemin02.gif') repeat-y center;
+	padding: 0px 20px 0px 20px;
+}
+div.version,
+div.actions,
+div.menu{
+	clear: both;
+}
+div.loginstatus,
+div.module_social,
+div.menu,
+div.mouvements,
+div.main,
+div.pub,
+div.carte,
+div.login,
+div.perfectionnement,
+div.fiche_quete{
+	float: left;
+}
+div.module_social,
+div.statistiques{
+	float: right;
+}
+div.login,
+div.loginstatus, div.loginstatus table,
+div.mouvements,
+div.actions,
+div.pub,
+div.menu,
+div.main,
+div.statistiques{
+	border-collapse: collapse;
+	border: 2px solid black;
+}
+div.main,
+div.loginstatus,
+div.module_social,
+div.statistiques{
+	padding: 3px;
+}
+div.loginstatus,
+div.mouvements,
+div.actions,
+div.pub,
+div.menu,
+div.main,
+div.module_social,
+div.carte,
+div.statistiques,
+div.fiche_quete{
+	margin: 2px;
+}
+div.history,
+div.village,
+div.login,
+div.main,
+div.mouvements,
+div.loginstatus{
+	height: auto;
+}
+div.mouvements,
+div.actions,
+div.login{
+	width: auto;
+}
+div.fiche_quete{
+	width: 250px;
+}
+div.login{
+	width: 180px;
+	margin: 0px 5px 5px 0px;
+	background: green;
+}
+div.loginstatus,
+div.menu,
+div.main{
+	width: 788px;
+}
+div.loginstatus{
+	background: red;
+}
+div.carte{
+	width: 465px;
+	text-align: center;
+}
+div.pion{
+	margin: auto;
+	width: 15px;
+	height: 15px;
+}
+div.actions{
+	height: 170px;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+div.pub{
+	width: 310px;
+	height: 250px;
+	text-align: center;
+	overflow: hidden;
+}
+div.menu{
+	padding-left: 3px;
+	padding-right: 3px;
+}
+div.equipement{
+	margin-left: auto;
+	margin-right: auto;
+}
+div.statistiques{
+	height: 100px;
+	width : 200px;
+}
+div.loginstatus span.login{
+	 font-weight: bold;
+	 text-transform: uppercase;
+}
+
+div.Main_Ressources,
+div.Ressource,
+div.Divers,
+div.Armement,
+div.Construction{
+	border: 3px double black;
+	overflow-x: hidden;
+	float: left;
+	margin: 2px;
+	padding: 3px;
+}
+div.Main_Ressources{
+	border: none;
+	width: 778px;
+	/* height: 150px; */
+	overflow-y: hidden;
+}
+div.perfectionnement{
+	width: 393px;
+	height: 300px;
+}
+div.Ressource,
+div.Divers,
+div.Armement,
+div.Construction{
+	width: 378px;
+	height: 250px;
+	overflow-y: auto; 
+}
+
+/*  Les Onglets */
+.onglet{
+	display:inline-block;
+	margin-left:1px;
+	margin-right:1px;
+	padding:3px;
+	border:1px solid black;
+	cursor:pointer;
+}
+.onglet_0{
+	background:#bbbbbb;
+	border-bottom:1px solid black;
+}
+.onglet_1{
+	background:#dddddd;
+	border-bottom:0px solid black;
+	padding-bottom:4px;
+}
+.contenu_onglet{
+	border:1px solid black;
+	margin-top:-1px;
+	padding:5px;
+	display:none;
+}
+.Contenu_Info{
+	padding:15px;
+	display:none;
+}
+/*	Les tables	*/
+table.options,
+table.mouvements,
+table.regles_credit, table.regles_credit td,
+table.quetes, table.quetes td{
+	border: none;
+}
+table.InfoBulle{
+	width: 190px;
+}
+table.regles_competences td.regles_competences_niveau{
+	width: 100px;
+}
+table.mouvements{
+	width: 220px;
+	height: 185px;
+}
+table.equipement, 
+table.village, 
+table.ressources, 
+table.clans,
+table.inventaire,
+table.bricolage,
+table.options,
+table.classement,
+table.fiche_quete,
+table.druide,
+table.module_social,
+table.regles_credit,
+table.quetes,
+table.chat_clan,
+table.regles_competences,
+table.loginstatus,
+table.statistiques,
+table.lst_village,
+table.lst_carriere,
+table.inscription,
+table.objet,
+table.Main_Ressources,
+table.lst_competences{
+	width: 100%;
+}
+table.village, table.village td, table.village th, 
+table.ressources, table.ressources td, table.ressources th, 
+table.equipement, table.equipement td,
+table.clans, table.clans td, table.clans th, 
+table.fiche_quete, table.fiche_quete td, table.fiche_quete th, 
+table.history, table.history th, table.history td,
+table.classement, table.classement td, table.classement th,
+table.scores, table.scores td, table.scores th,
+table.experience, table.experience td, table.experience th,
+table.points, table.points td, table.points th,
+table.equipements, table.equipements td, table.equipements th,
+table.inventaire , table.inventaire th, table.inventaire td, table.inventaire td.tdtitre, table.inventaire td.corp,
+table.carte, table.carte td,
+table.corps td.membre,
+table.competence, table.competence td,
+table.bricolage, table.bricolage td, table.bricolage th,
+table.notification, table.notification td, table.notification th,
+table.druide, table.druide td,
+table.mouvements, table.mouvements td,
+table.marchandise, table.marchandise td, table.marchandise th,
+table.InfoBulle, table.InfoBulle td, table.InfoBulle th,
+table.chat_clan, table.chat_clan th, table.chat_clan td,
+table.regles_competences, table.regles_competences th, table.regles_competences td,
+table.loginstatus td,
+table.statistiques, table.statistiques td,
+table.inscription td.info
+table.lst_village, table.lst_village td,
+table.lst_carriere, table.lst_carriere td,
+table.objet, table.objet td, table.objet th,
+table.Main_Ressources, table.Main_Ressources td{
+	border-collapse: collapse;
+	border: 1px solid black;
+}
+table.equipement td, table.equipements td, table.equipements th,
+table.village td,
+table.carte_petite td,
+table.carte td,
+table.inventaire th, table.inventaire td, table.inventaire td.corp,
+table.experience td, table.experience th,
+table.points td, table.points th,
+table.corps td.membre,
+table.scores td, table.scores th,
+table.classement td, table.classement th,
+table.notification td, table.notification th,
+table.mouvements td,
+table.marchandise td, table.marchandise th,
+table.module_social td,
+table.quetes td,
+table.fiche_quete td,
+table.InfoBulle th, table.InfoBulle td,
+table.loginstatus td,
+table.statistiques td,
+table.objet td.action_inventaire,
+table.Main_Ressources td,
+table.bricolage td.action_bricolage{
+	text-align: center;
+}
+table.fiche_quete td.description{
+	text-align: left;
+}
+table.notification td,
+table.quetes td,
+table.Main_Ressources td{
+	padding: 5px;
+}
+table.regles_competences th{
+	background: grey;
+}
+table.notification th,
+table.inscription td.info{
+	background: lightgrey;
+}
+table.inventaire td.corp{
+	width: 300px;
+}
+table.history,
+table.mouvements{
+	margin: 5px;
+}
+table.lst_competences td,
+table.regles_credit td,
+table.quetes td{
+	width: 50%;
+}
+table.all_cartes{
+	margin-left: auto;
+	margin-right: auto;
+	border-spacing: 0px;
+	background-image: url('../img/carte/mini/gaule.png');
+	border-collapse: collapse;
+	border: 1px solid black;
+}
+table.all_cartes td{
+	padding: 0px;
+	border-collapse: collapse;
+	border: 1px solid black;
+}
+table.carte_petite,
+table.carte{
+	margin: 0px;
+	border-collapse: collapse;
+	border: none;
+	/*background-image: url('../img/bcg/herbe.gif');*/
+}
+table.carte td{
+	width: 32px;
+	height: 32px;
+	padding: 0px;
+	border: 1px solid black;
+}
+table.carte_petite td{
+	padding: 0px;
+	
+	/*AVEC le cadrillage*/
+	
+	/* width: 10px;
+	height: 10px;
+	border: 1px solid black;
+	line-height:10px; */
+	
+	/*SANS le cadrillage*/
+	
+	width: 11px;
+	height: 11px;
+	line-height: 11px;
+	border: none;
+	
+}
+table.objet{
+	margin-bottom: 3px;
+}
+table.objet td.action_inventaire{
+	width: 90px;
+}
+table.inventaire th{
+	text-decoration: underline;
+}
+table.inventaire td.tdtitre{
+	background: grey;
+	text-align: left;
+}
+table.corps{
+	margin-left: auto;
+	margin-right: auto;
+	width:150px;
+}
+table.equipements{
+	float: left;
+	margin: 5px;
+}
+table.competence,
+table.options tr,
+table.regles_credit tr,
+table.quetes tr{
+	vertical-align: top;
+}
+table.corps td,
+table.lst_competences{
+	border: none;
+}
+table.competence{
+	margin: 5px;
+}
+table.competence td,
+table.perfectionnement td{
+	padding: 5px;
+}
+table.bricolage{
+	margin-bottom: 3px;
+}
+/*	InfoBulle	*/
+.infobulle{
+	position: absolute;	
+	visibility : hidden;
+	padding: 10px;
+	font-family: Verdana, Arial;
+	font-size: 10px;
+	background-color: #FFFFCC;
+	max-width: 250px;
+	z-index: 5;
+}
+
+/* Les FORMS */
+form.production{
+	display: inline;
+}
+form.nouveau_troc fieldset{
+	width:600px;
+	display:inline
+}
+form.nouveau_troc fieldset input{
+	width:40px;
+	margin-right:20px;
+}
+form.nouveau_troc fieldset.donner{
+	background:lightgreen;
+}
+form.nouveau_troc fieldset.recevoir{
+	background:lightcoral;
+}
+form.inventaire input,
+form.bricolage input{
+	width: 85px;
+}
+
+/* Les BUTTON */
+button.bt-menu{
+	float: left;
+	width: 125px;
+	height: 30px;
+	margin: 3px;
+	display: block;
+	font-size: 1em;
+	font-weight: bold;
+}
+.perfect {
+	-moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	box-shadow:inset 0px 1px 0px 0px #ffffff;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
+	background:-moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf');
+	background-color:#ededed;
+	-moz-border-radius:6px;
+	-webkit-border-radius:6px;
+	border-radius:6px;
+	border:1px solid #dcdcdc;
+	display:inline-block;
+	color:#4d4b4d;
+	font-family:arial;
+	font-size:10px;
+	font-weight:bold;
+	padding:4px 10px;
+	text-decoration:none;
+	text-shadow:1px 1px 0px #ffffff;
+}.perfect:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) );
+	background:-moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfdfdf', endColorstr='#ededed');
+	background-color:#dfdfdf;
+}.perfect:active {
+	position:relative;
+	top:1px;
+}
+iframe.pub{
+	border: none;
+	padding: 0px;
+	margin: 0px;
+	width: 317px;
+	height: 255px;
+}
+button.inventaire,
+button.marche,
+button.entrepot{
+	font-size: 10px;
+	width: 100px;
+	display: inline;
+}
+button.mouvements{
+	width: 50px;
+	height: 30px;
+}
+button.bricollage{
+	width: 150px;
+}
+button.quete{
+	width: 200px;
+}
+.important{
+	color: red;
+}
