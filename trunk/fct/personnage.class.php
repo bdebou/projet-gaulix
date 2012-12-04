@@ -40,6 +40,7 @@ class personnage{
 	private $not_attaque, $not_combat;
 	private $nb_points;
 	Private $ListQuetesTerminees;
+	Private $ListQuetesEnCours;
 			
 	Const TAILLE_MINIMUM_BOLGA		= 20;			//La taille minimum du bolga
 	Const DUREE_SORT				= 432000;		// Limite de temp pour l'utilisation d'un sort (3600 * 24 *5).
@@ -57,6 +58,7 @@ class personnage{
 	Const TYPE_PERFECT_DEFENSE		= 'Defense';
 	
 	Const TYPE_EXPERIENCE			= 'Experience';
+	Const TYPE_VIE					= 'Vie';
 	
 	const CIVILISATION_ROMAIN		= 'Romains';
 	const CIVILISATION_GAULOIS		= 'Gaulois';
@@ -107,6 +109,9 @@ class personnage{
 		}
 	}
 	
+	/**
+	 * Crée la liste des quêtes terminées
+	 */
 	Private function CreateListQuete(){
 		$sqlLst = "SELECT quete_id
 						FROM `table_quetes`
@@ -122,6 +127,10 @@ class personnage{
 			$this->ListQuetesTerminees = NULL;
 		}
 	}
+	/**
+	 * Vérifie et passe à la carrière suivante
+	 * @return boolean
+	 */
 	Private function CheckCarriere(){
 		$arCarriereInfo = GetInfoCarriere($this->GetCodeCarriere());
 		
@@ -139,8 +148,12 @@ class personnage{
 		return false;
 	}
 	
-	//Frapper un autre joueur et les conséquances
-	public function frapper(Personnage $persoCible){
+	/**
+	 * Combat entre le joueur et le $persoCible.
+	 * @param personnage $persoCible
+	 * @return array[2 string] <ol><li>string >> text résultat combat attaquant</li><li>string >> text résultat combat cible</li></ol> 
+	 */
+	public function frapper(personnage $persoCible){
 		
 		$arAttCible		= $persoCible->GetAttPerso();
 		$arDefCible		= $persoCible->GetDefPerso();
@@ -166,6 +179,7 @@ class personnage{
 			$this->AddExperience(5);
 			$this->UpdateScores(1,0);
 			$this->UpdatePoints(abs(self::POINT_COMBAT));
+			
 			
 			$persoCible->UpdateScores(0,1);
 			$persoCible->UpdatePoints((abs(self::POINT_COMBAT) * -1));
@@ -202,6 +216,18 @@ class personnage{
 		}
 	}
 	
+	private function CheckQueteCombatEnCours(){
+		if(!is_null($_SESSION['QueteEnCours']))
+		{
+			foreach($_SESSION['QueteEnCours'] as $oQuete)
+			{
+				if(get_class($oQuete) == 'qteCombat')
+				{
+					
+				}
+			}
+		}
+	}
 	//On met à jour les scores après le combat
 	public function UpdateScores($Gagner, $Perdu){
 		$this->nb_victoire+=$Gagner;
@@ -210,6 +236,11 @@ class personnage{
 	}
 	
 	//on augment l'espérience
+	/**
+	 * Augmente l'expérience du joueur de $nbExp
+	 * Et augment le niveau du joueur si le GetMaxExperience est atteint
+	 * @param integer $nbExp
+	 */
 	public function AddExperience($nbExp){
 		for($i=1;$i<=$nbExp;$i++){
 			if($this->experience < $this->GetMaxExperience()){
@@ -220,6 +251,9 @@ class personnage{
 			}
 		}
 	}
+	/**
+	 * Augmente le niveau de 1 et met à jour quelques autres valeurs comme la vie augmente de 10 et ajoute des points 
+	 */
 	private function UpNiveau(){
 		if((self::VIE_MAX - $this->vie) >= 10){
 			$tmp = 10;
@@ -251,6 +285,7 @@ class personnage{
 			return false;
 		}
 	}
+	
 	public function GagnerVie($nb){
 		$this->vie += $nb;
 		if($this->vie > self::VIE_MAX){$this->vie = self::VIE_MAX;}
@@ -1161,7 +1196,8 @@ class personnage{
 	 * @return boolean
 	 */
 	public function CheckIfSurMaison(){
-		if($this->GetCoordonnee() == implode(',', $this->maison_installe))
+		if(	!is_null($this->maison_installe)
+			AND $this->GetCoordonnee() == implode(',', $this->maison_installe))
 		{
 			return true;
 		}
