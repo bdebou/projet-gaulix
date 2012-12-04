@@ -9,8 +9,8 @@ $oMaison = $oJoueur->GetObjSaMaison();
 	<p>Voici la liste des quêtes qui vous sont proposées. Acceptez une ou plusieurs quêtes et bonne chance!</p>
 	<p><?php echo AfficheIcone('attention');?> Les quêtes ne peuvent s'accomplir que une seule fois. Si vous l'annulée, elle sera perdue.</p>
 	
-	<?php if($oJoueur->GetCoordonnee() != $oMaison->GetCoordonnee()){?>
-		<p class="important"><?php echo AfficheIcone('attention');?>Vous devez vous placer sur votre <img src="./img/carte/<?php echo $oMaison->GetImgName();?>.png" /> pour vous <u>inscrire</u> à une nouvelle quête ou <u>valider</u> une en cours.</p>
+	<?php if(is_null($oMaison) OR $oJoueur->GetCoordonnee() != $oMaison->GetCoordonnee()){?>
+		<p class="important"><?php echo AfficheIcone('attention');?>Vous devez vous placer sur votre <img src="./img/carte/maison-a.png" /> pour vous <u>inscrire</u> à une nouvelle quête ou <u>valider</u> une en cours.</p>
 	<?php }?>
 	
 		<h2>Quêtes en cours</h2>
@@ -20,7 +20,7 @@ $oMaison = $oJoueur->GetObjSaMaison();
 				<?php
 				Foreach($_SESSION['QueteEnCours'] as $Quete){
 					//echo '<td>'.AfficheAvancementQuete($Quete, $oJoueur).'</td>';
-					echo '<td>'.$Quete->AfficheDescriptif($oJoueur, $oMaison, true, $oJoueur->GetCoordonnee() == $oMaison->GetCoordonnee()).'</td>';
+					echo '<td>'.$Quete->AfficheDescriptif($oJoueur, $oMaison, true).'</td>';
 				}
 				?>
 				</tr>
@@ -30,13 +30,18 @@ $oMaison = $oJoueur->GetObjSaMaison();
 		<?php }?>
 		<h2>Et les quêtes disponibles</h2>
 		<?php
-		echo SelectQuete($oJoueur, $oJoueur->GetCoordonnee() == $oMaison->GetCoordonnee());
+		echo SelectQuete($oJoueur);
 		?>
 	
 </div>
 
 <?php 
-$objManager->UpdateBatiment($oMaison);
+if(!is_null($oMaison))
+{
+	$objManager->UpdateBatiment($oMaison);
+	unset($oMaison);
+}
+
 $objManager->update($oJoueur);
-unset($oJoueur, $oMaison);
+unset($oJoueur);
 ?>
