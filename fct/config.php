@@ -1,6 +1,7 @@
 <?php 
 global 	$NumVersion, $nbLigneCarte, $nbColonneCarte, $db, $temp_combat, $arCouleurs, $lstBatimentConstructionUnique, $MAX_essai, $lstPoints,
-		$objManager, $CodeCouleurQuete, $lstNonBatiment, $chkDebug, $lstBatimentsNonConstructible, $lstTypeObjets;
+		$objManager, $CodeCouleurQuete, $lstNonBatiment, $chkDebug, $lstBatimentsNonConstructible, $lstTypeObjets, $lstRessources, $LstBatimentMultiConstruction,
+		$lstBatimentConstructible;
 
 date_default_timezone_set('Europe/Brussels');
 
@@ -17,39 +18,47 @@ $nbCarteH			= 5;					// Nombre de carte horizontale
 $nbCarteV			= 5;					// Nombre de carte Verticale
 $temp_combat		= 3600 * 1;				// Temp entre chaque combat
 
-$chkDebug			= true;
+$chkDebug			= false;
 
 //les couleurs
-$arCouleurs			= array('Attaque'		=> '#FF0000',					// Red 
-							'Defense'		=> '#32CD32',					// LimeGreen
-							'Nourriture'	=> '#808000',					// Olive
-							'Pierre'		=> '#708090',					// SlateGray
-							'Bois'			=> '#8B4513',					// SaddleBrown
-							'Hydromel'		=> '#F0E68C',					// Khaki
-							'Vie'			=> '#FFA07A',					// LightSalmon
-							'Experience'	=> '#6495ED',					// CornflowerBlue
-							'Or'			=> '#FFD700');					// Gold
+$arCouleurs			= array(personnage::TYPE_PERFECT_ATTAQUE	=> '#FF0000',		// Red 
+							personnage::TYPE_PERFECT_DEFENSE	=> '#32CD32',		// LimeGreen
+							'Distance'							=> '#c0c0c0',
+							maison::TYPE_RES_EAU_POTABLE		=> '#92ccff',		// bleu clair
+							maison::TYPE_RES_NOURRITURE			=> '#808000',		// Olive
+							'Vie'								=> '#FFA07A',		// LightSalmon
+							personnage::TYPE_EXPERIENCE			=> '#6495ED',		// CornflowerBlue
+							personnage::TYPE_RES_MONNAIE		=> '#FFD700');		// Gold
 
 //Listes des batiments que l'on ne peut construire que 1 seule fois
-$lstBatimentConstructionUnique	= array(1,		//Maison
-										4,		//Entrepot
-										5,		//Potager
-										6,		//Ferme
-										9,		//Marche
-										10,		//Mine
-										16);	//Carrière de pierre
+$lstBatimentConstructionUnique	= array(maison::ID_BATIMENT,
+										entrepot::ID_BATIMENT,
+										potager::ID_BATIMENT,
+										ferme::ID_BATIMENT,
+										marche::ID_BATIMENT,
+										mine::ID_BATIMENT,
+										carriere::ID_BATIMENT);
+
+//Liste des bâtiments que l'on peut contruire plusieurs fois.
+$LstBatimentMultiConstruction	= array(tour::ID_BATIMENT,
+										mur::ID_BATIMENT);
+
+//Liste des bâtiments constructible
+$lstBatimentConstructible		= array_merge($lstBatimentConstructionUnique, $LstBatimentMultiConstruction);
+
+//Liste des ressources
+$lstRessources					= array(maison::TYPE_RES_EAU_POTABLE,
+										maison::TYPE_RES_NOURRITURE,
+										personnage::TYPE_RES_MONNAIE);
 
 //Liste des batiments Non constructible
-$lstBatimentsNonConstructible	= array(7/*Res Pierre*/, 8/*Res Bois*/);
-$lstNonBatiment					= array(11 /*Mer*/, 12 /*Côtes*/, 13 /*Rivière*/, 14/*Montagne*/, 15/*Dolmen*/);	
+$lstBatimentsNonConstructible	= array(ressource::ID_BATIMENT_BOIS, ressource::ID_BATIMENT_EAU, ressource::ID_BATIMENT_PIERRE);
+$lstNonBatiment					= array(mer::ID_BATIMENT, cote::ID_BATIMENT, riviere::ID_BATIMENT, montagne::ID_BATIMENT, dolmen::ID_BATIMENT);	
 
 //Liste des type d'objets
-$lstTypeObjets					= array('Ressource', 'Divers', 'Armement', 'Construction');
+$lstTypeObjets					= array('Ressource', 'Armement', 'Construction', 'Divers');
 //Liste des couleurs pour les quetes
-$CodeCouleurQuete	= array('monstre'	=> '#ff6464',
-							'recherche'	=> '#82ff82',
-							'objet'		=> '#8a8aff',
-							'livre'		=> '#8a8aff',
+$CodeCouleurQuete	= array('livre'		=> '#8a8aff',
 							'romains'	=> '#ff6464');
 
 //Liste des Points
