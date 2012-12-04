@@ -1,21 +1,49 @@
 <?php
 include_once('model/quete.php');
 
-$_SESSION['QueteEnCours'] = FoundQueteEnCours();
+global $chkDebug, $objManager;
+$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
-$CheckA = false;
+$oMaison = $oJoueur->GetObjSaMaison();
+
+$ChkDebugVar = true;
+
+if($chkDebug AND $ChkDebugVar){
+	echo '$_SESSION[\'quete\']<br />';var_dump($_SESSION['quete']);echo '<br />';
+	echo '$_GET<br />';var_dump($_GET);echo '<br />';
+	echo '$_POST<br />';var_dump($_POST);echo '<br />';
+	echo '<hr />';
+}
+
+$chkErr = true;
+$CheckRetour = false;
 
 if(isset($_GET['action'])){
 	switch($_GET['action']){
-		case 'inscription':		InscriptionQuete($_GET['num_quete']);	break;
-		case 'annule':			ClotureQuete($_GET['num_quete']);		break;
+		case 'inscription':		ActionInscriptionQuete($chkErr, $_GET['num_quete'], $oJoueur, $oMaison);	break;
+		//case 'annule':			ActionAnnulerQuete($chkErr, $_GET['num_quete']);		break;
+		case 'valider':			ActionValiderQuete($chkErr, $_GET['num_quete'], $oJoueur, $oMaison);		break;
 	}
+	
 	unset($_GET['action']);
-	$CheckA = true;
+	
+	$CheckRetour = true;
 }
 
-if($CheckA){
-	//header('location: index.php?page=quete');
+if($chkDebug AND $ChkDebugVar){
+	var_dump($_SESSION['quete']);
+}
+
+$objManager->update($oJoueur);
+if(!is_null($oMaison)){$objManager->UpdateBatiment($oMaison);}
+
+unset($oJoueur, $oMaison);
+
+if($chkDebug OR !$chkErr){
+	echo '<br /><a href="index.php?page=quete">Retour</a>';
+}elseif($CheckRetour AND !$chkDebug){
+	//header('location: index.php?page=main');
 	echo '<script type="text/javascript">window.location="index.php?page=quete";</script>';
 }
+
 ?>
