@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 
-<html lang="fr">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+	<!--[if IE]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 	<meta name="keywords" content="gaulix" />
 	<meta name="description" content="Gaulix est un Web Game totalement gratuit. Vous incarnez un personnage gaulois. Il doit construire sa maison et peut construire aussi d\'autre batiment. Mais pour cela il lui faut des ressources que vous devrez collecter, apprendre des compétences pour fabriquer des armes, ... Bonne Chance!!!" />
 	
