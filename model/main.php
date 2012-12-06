@@ -1206,7 +1206,7 @@ function ActionConstruire(&$check, $id, personnage &$oJoueur, &$objManager){
 		//On construit sa maison
 		$oJoueur->SetMaisonInstalle($oJoueur->GetCoordonnee());
 		// on recupère les info du batiment
-		$sql = "SELECT * FROM table_batiment WHERE id_batiment=".maison::ID_BATIMENT.";";
+		$sql = "SELECT * FROM table_batiment WHERE id_type=".maison::ID_BATIMENT." AND batiment_niveau=1;";
 		$requete = mysql_query($sql) or die ( mysql_error() );
 		$batiment = mysql_fetch_array($requete, MYSQL_ASSOC);
 

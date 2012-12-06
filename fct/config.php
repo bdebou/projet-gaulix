@@ -10,7 +10,7 @@ $DB_utilisateur		= 'gaulix_be'; 			// Nom de l'utilisateur de la base
 $DB_motdepasse		= 'A3hwDpwdVTPpC3B9'; 	// Mot de passe pour accèder à la base
 $DB_base			= 'gaulix_be'; 			// Nom de la base
 
-$NumVersion			= '4.0';				// Num Version
+$NumVersion			= '4.0.1';				// Num Version
 $MAX_essai			= 3;					// Nombre maximum d'essai de connection
 $nbLigneCarte		= 13;					// Nombre de ligne de la carte
 $nbColonneCarte		= 13;					// Nombre de colonne de la carte
