@@ -1,13 +1,26 @@
-Index: main.php
+Index: trunk/model/main.php
 ===================================================================
---- main.php	(revision 296)
-+++ main.php	(working copy)
+--- trunk/model/main.php	(revision 313)
++++ trunk/model/main.php	(working copy)
 @@ -1206,7 +1206,7 @@
  		//On construit sa maison
  		$oJoueur->SetMaisonInstalle($oJoueur->GetCoordonnee());
  		// on recupère les info du batiment
 -		$sql = "SELECT * FROM table_batiment WHERE id_batiment=".maison::ID_BATIMENT.";";
-+		$sql = "SELECT * FROM table_batiment WHERE id_batiment=".maison::ID_BATIMENT." AND batiment_niveau=1;";
++		$sql = "SELECT * FROM table_batiment WHERE id_type=".maison::ID_BATIMENT." AND batiment_niveau=1;";
  		$requete = mysql_query($sql) or die ( mysql_error() );
  		$batiment = mysql_fetch_array($requete, MYSQL_ASSOC);
  
+Index: trunk/fct/config.php
+===================================================================
+--- trunk/fct/config.php	(revision 313)
++++ trunk/fct/config.php	(working copy)
+@@ -10,7 +10,7 @@
+ $DB_motdepasse		= 'A3hwDpwdVTPpC3B9'; 	// Mot de passe pour accèder à la base
+ $DB_base			= 'gaulix_be'; 			// Nom de la base
+ 
+-$NumVersion			= '4.0';				// Num Version
++$NumVersion			= '4.0.1';				// Num Version
+ $MAX_essai			= 3;					// Nombre maximum d'essai de connection
+ $nbLigneCarte		= 13;					// Nombre de ligne de la carte
+ $nbColonneCarte		= 13;					// Nombre de colonne de la carte
