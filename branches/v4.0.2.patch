@@ -1,0 +1,17 @@
+Index: common.php
+===================================================================
+--- common.php	(revision 317)
++++ common.php	(working copy)
+@@ -320,10 +320,10 @@
+ 							$txt .= '<span style="color:' . $ColorPrix . ';">Compétence "' . GetInfoCompetence($Prix[0], 'cmp_lst_nom') . '"</span>';
+ 							break;
+ 						default:
+-							if(substr($Prix[0], 0, 4) == 'LING')
++							/* if(substr($Prix[0], 0, 4) == 'LING')
+ 							{
+ 								$Prix[0] = strtolower(substr($oJoueur->GetCivilisation(), 0, 1)).$Prix[0];
+-							}
++							} */
+ 							$txt .= '<span style="color:' . $ColorPrix . ';">' . $Prix[1] . '</span> ' . AfficheIcone($Prix[0]);
+ 							break;
+ 					}
