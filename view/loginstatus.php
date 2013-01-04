@@ -28,14 +28,14 @@ $arDis = $oJoueur->GetDisPerso();
 			<td>
 				<button type="button" onclick="window.location='./index.php?page=unconnect'" style="width:120px;">Se déconnecter</button>
 			</td>
-			<td colspan="2" style="background-color:<?php echo $arCouleurs['Attaque'];?>;">
-				<?php echo AfficheIcone('attaque');?> : <?php echo $arAtt['0'];?> (<?php echo $arAtt['1'];?>)
+			<td colspan="2" style="background-color:<?php echo $arCouleurs[objArmement::TYPE_ATTAQUE];?>;">
+				<?php echo AfficheIcone(objArmement::TYPE_ATTAQUE);?> : <?php echo $arAtt['0'];?> (<?php echo $arAtt['1'];?>)
 			</td>
-			<td colspan="2" style="background-color:<?php echo $arCouleurs['Defense'];?>;">
-				<?php echo AfficheIcone('defense');?> : <?php echo $arDef['0'];?> (<?php echo $arDef['1'];?>)
+			<td colspan="2" style="background-color:<?php echo $arCouleurs[objArmement::TYPE_DEFENSE];?>;">
+				<?php echo AfficheIcone(objArmement::TYPE_DEFENSE);?> : <?php echo $arDef['0'];?> (<?php echo $arDef['1'];?>)
 			</td>
-			<td colspan="2" style="background-color:<?php echo $arCouleurs['Distance'];?>;">
-				<?php echo AfficheIcone('distance');?> : <?php echo $arDis;?>
+			<td colspan="2" style="background-color:<?php echo $arCouleurs[objArmement::TYPE_DISTANCE];?>;">
+				<?php echo AfficheIcone(objArmement::TYPE_DISTANCE);?> : <?php echo $arDis;?>
 			</td>
 		</tr>
 	</table>
