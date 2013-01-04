@@ -93,11 +93,11 @@ function AffichageJoueurSurGrille(&$grille, $numCarte){
 function AffichageQueteSurGrille(&$grille, $numCarte, $AllCartes){
 	foreach($_SESSION['QueteEnCours'] as $Quete){
 		
-		if($numCarte == $Quete->GetCarte() AND in_array($Quete->GetTypeQuete(), array('romains'))){
+		if($numCarte == $Quete->GetCarte() AND $Quete->GetVisibilite()){
 			
 			$arPosition = $Quete->GetPosition();
 			$InfoBulle = '<b>'.$Quete->GetNom().'</b>';
-			$grille[intval($arPosition[0])][intval($arPosition[1])]['batiment'] = ' onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulle).'\');" onmouseout="cache();" style="background: url(\'./img/quetes/icones/'.($AllCartes?'mini/':'').$Quete->GetTypeQuete().'.png\') no-repeat center;"';
+			$grille[intval($arPosition[0])][intval($arPosition[1])]['batiment'] = ' onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulle).'\');" onmouseout="cache();" style="background: url(\'./img/quetes/icones/'.($AllCartes?'mini/':'').$Quete->GetImgNom().'.png\') no-repeat center;"';
 			
 		}
 	}
