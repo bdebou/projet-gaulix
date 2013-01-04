@@ -54,9 +54,8 @@ class personnage{
 	const TYPE_RES_MONNAIE			= 'Sesterce';
 	const TYPE_COMPETENCE			= 'Compétence';
 	
-	Const TYPE_PERFECT_ATTAQUE		= 'Attaque';
-	Const TYPE_PERFECT_DEFENSE		= 'Defense';
-	Const TYPE_PERFECT_DISTANCE		= 'Distance';
+	Const TYPE_PERFECT_ATTAQUE		= objArmement::TYPE_ATTAQUE;
+	Const TYPE_PERFECT_DEFENSE		= objArmement::TYPE_DEFENSE;
 	
 	Const TYPE_EXPERIENCE			= 'Experience';
 	Const TYPE_VIE					= 'Vie';
