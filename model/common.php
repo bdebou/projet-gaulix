@@ -298,7 +298,7 @@ function AfficheListePrix($lstPrix, personnage &$oJoueur = NULL, maison &$maison
 		{
 			$Prix = explode('=', $arPrix);
 			
-			if(	$Prix[0] != 'QUEST')
+			if(	$Prix[0] != quete::TYPE_QUETE)
 			{
 				if($chk)
 				{
