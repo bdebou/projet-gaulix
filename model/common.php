@@ -510,7 +510,7 @@ function CheckIfOnEstSurUnBatiment($NumBatiment, $position){
  * @param string $Code
  * @return string
  */
-function QuelTypeObjet($Code){
+function QuelTypeObjet(&$Code){
 	/* $Ressource = QuelTypeRessource($Code);
 	if(!is_null($Ressource))
 	{
@@ -520,6 +520,19 @@ function QuelTypeObjet($Code){
 	{
 		return $Ressource;
 	} */
+
+	//On transforme le lingot généric par le lingot romain ou gaulois
+	if(substr($Code, 0, 4) === 'LING')
+	{
+		$sql = "SELECT civilisation FROM table_joueurs WHERE `login`='".$_SESSION['joueur']."'";
+		$requete = mysql_query($sql) or die(mysql_error() . $sql);
+		if (mysql_num_rows($requete) > 0)
+		{
+			$row = mysql_fetch_array($requete, MYSQL_ASSOC);
+			$Code = strtolower(substr($row['civilisation'], 0, 1)).$Code;
+		}
+	}
+	
 	//on vérifie si c'est une ressource
 	Global $lstRessources;
 	if(in_array($Code, $lstRessources))
