@@ -46,7 +46,11 @@ class marche extends batiment{
 				$result = mysql_fetch_array($requete, MYSQL_ASSOC);
 					
 				if(substr($arMarchandise[0],0,3) != 'Res' AND !in_array($result['objet_type'], array('objet', 'sac'))){
-					$txtAttaque = '<tr><td>'.AfficheIcone('attaque',12).' : '.$result['objet_attaque'].'</td><td>'.AfficheIcone('defense',12).' : '.$result['objet_defense'].'</td><td>'.AfficheIcone('distance',12).' : '.$result['objet_distance'].'</td></tr>';
+					$txtAttaque =	'<tr>'
+									.'<td>'.AfficheIcone(objArmement::TYPE_ATTAQUE, 12).' : '.$result['objet_attaque'].'</td>'
+									.'<td>'.AfficheIcone(objArmement::TYPE_DEFENSE, 12).' : '.$result['objet_defense'].'</td>'
+									.'<td>'.AfficheIcone(objArmement::TYPE_DISTANCE, 12).' : '.$result['objet_distance'].'</td>'
+									.'</tr>';
 				}
 					
 				$InfoBulle = '<table class="InfoBulle">'

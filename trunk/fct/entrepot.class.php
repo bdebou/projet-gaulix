@@ -114,9 +114,9 @@ class entrepot extends batiment{
 					$InfoBulle .= '<table class="equipement">'
 						.'<tr><th colspan="3">'.$arObjet[1].'x '.$result['objet_nom'].'</th></tr>'
 						.'<tr>'
-							.'<td>'.AfficheIcone('attaque').' : '.$result['objet_attaque'].'</td>'
-							.'<td>'.AfficheIcone('defense').' : '.$result['objet_defense'].'</td>'
-							.'<td>'.AfficheIcone('distance').' : '.$result['objet_distance'].'</td>'
+							.'<td>'.AfficheIcone(objArmement::TYPE_ATTAQUE).' : '.$result['objet_attaque'].'</td>'
+							.'<td>'.AfficheIcone(objArmement::TYPE_DEFENSE).' : '.$result['objet_defense'].'</td>'
+							.'<td>'.AfficheIcone(objArmement::TYPE_DISTANCE).' : '.$result['objet_distance'].'</td>'
 						.'</tr>'
 						.'</table>';
 				}elseif(in_array($result['objet_type'], array('sort'))){	//Mais si c'est un sort, on affiche la description

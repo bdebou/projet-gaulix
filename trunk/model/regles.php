@@ -19,19 +19,19 @@ function ReglesAfficheTableauBatiment(){
 		<th colspan="4">Prix</th>
 	</tr>
 	<tr>
-		<td style="background-color:#'.$arCouleurs['Or'].';">'.AfficheIcone('or').' : '.$row['prix_or'].'</td>
+		<td style="background-color:#'.$arCouleurs[personnage::TYPE_RES_MONNAIE].';">'.AfficheIcone(personnage::TYPE_RES_MONNAIE).' : '.$row['prix_or'].'</td>
 		<td style="background-color:#'.$arCouleurs['Bois'].';">'.AfficheIcone('bois').' : '.$row['prix_bois'].'</td>
 		<td style="background-color:#'.$arCouleurs['Pierre'].';">'.AfficheIcone('pierre').' : '.$row['prix_pierre'].'</td>
-		<td style="background-color:#'.$arCouleurs['Nourriture'].';">'.AfficheIcone('nourriture').' : '.$row['prix_nourriture'].'</td>
+		<td style="background-color:#'.$arCouleurs[maison::TYPE_RES_NOURRITURE].';">'.AfficheIcone(maison::TYPE_RES_NOURRITURE).' : '.$row['prix_nourriture'].'</td>
 	</tr>
 	<tr>
 		<th colspan="4">Combat</th>
 	</tr>
 	<tr>
-		<td style="background-color:#'.$arCouleurs['Attaque'].';">'.AfficheIcone('attaque').': '.(is_null($row['batiment_attaque'])?'0':$row['batiment_attaque']).'</td>
-		<td style="background-color:#'.$arCouleurs['Attaque'].';">'.AfficheIcone('distance').': '.(is_null($row['batiment_distance'])?'0':$row['batiment_distance']).'</td>
-		<td style="background-color:#'.$arCouleurs['Defense'].';">'.AfficheIcone('defense').': '.(is_null($row['batiment_defense'])?'0':$row['batiment_defense']).'</td>
-		<td style="background-color:#'.$arCouleurs['Vie'].';">'.AfficheIcone('vie').': '.$row['batiment_vie'].'</td>
+		<td style="background-color:#'.$arCouleurs[objArmement::TYPE_ATTAQUE].';">'.AfficheIcone(objArmement::TYPE_ATTAQUE).': '.(is_null($row['batiment_attaque'])?'0':$row['batiment_attaque']).'</td>
+		<td style="background-color:#'.$arCouleurs[objArmement::TYPE_DISTANCE].';">'.AfficheIcone(objArmement::TYPE_DISTANCE).': '.(is_null($row['batiment_distance'])?'0':$row['batiment_distance']).'</td>
+		<td style="background-color:#'.$arCouleurs[objArmement::TYPE_DEFENSE].';">'.AfficheIcone(objArmement::TYPE_DEFENSE).': '.(is_null($row['batiment_defense'])?'0':$row['batiment_defense']).'</td>
+		<td style="background-color:#'.$arCouleurs[personnage::TYPE_VIE].';">'.AfficheIcone(personnage::TYPE_VIE).': '.$row['batiment_vie'].'</td>
 	</tr>
 	<tr>
 		<td colspan="6" style="text-align:left;">'.$row['batiment_description'].'</td>
@@ -65,11 +65,11 @@ function ReglesAfficheTableauEquipements($equipement){
 			
 			$InfoBulle = '<table class="equipement">'
 			.'<tr>'
-			.'<td>'.AfficheIcone('attaque').' : '.$row['objet_attaque'].'</td>'
-			.($equipement=='arme'?'<td>'.AfficheIcone('distance').' : '.($row['objet_distance']!=0?$row['objet_distance']:'0'):'').'</td>'
+			.'<td>'.AfficheIcone(objArmement::TYPE_ATTAQUE).' : '.$row['objet_attaque'].'</td>'
+			.($equipement=='arme'?'<td>'.AfficheIcone(objArmement::TYPE_DISTANCE).' : '.($row['objet_distance']!=0?$row['objet_distance']:'0'):'').'</td>'
 			.'</tr>'
-			.'<tr><td'.($equipement=='arme'?' colspan="2"':'').'>'.AfficheIcone('defense').' : '.$row['objet_defense'].'</td></tr>'
-			.'<tr><td'.($equipement=='arme'?' colspan="2"':'').'>'.AfficheIcone('or').' : '.$row['objet_prix'].'</td></tr>'
+			.'<tr><td'.($equipement=='arme'?' colspan="2"':'').'>'.AfficheIcone(objArmement::TYPE_DEFENSE).' : '.$row['objet_defense'].'</td></tr>'
+			.'<tr><td'.($equipement=='arme'?' colspan="2"':'').'>'.AfficheIcone(personnage::TYPE_RES_MONNAIE).' : '.$row['objet_prix'].'</td></tr>'
 			.'<tr><td'.($equipement=='arme'?' colspan="2"':'').'>Niveau requis : '.$row['objet_niveau'].'</td></tr>'
 			.'</table>';
 		}else{
