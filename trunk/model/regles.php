@@ -50,47 +50,41 @@ function ReglesAfficheTableauEquipements($equipement){
 	$bckColor='#c8c8c8';
 	$txt=null;
 
-	$sql="SELECT *
+	$sql="SELECT objet_code
 			FROM table_objets 
-			WHERE objet_type='".$equipement."'"
-	.($equipement != 'ressource'?' AND objet_quete IS NULL':'').";";
+			WHERE objet_type='".($equipement==objRessource::TYPE_RESSOURCE?$equipement:"Armement")."'
+			AND objet_quete IS NULL;";
 
 	$requete = mysql_query($sql) or die (mysql_error());
 	while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
-		if($bckColor=='#c8c8c8'){
+		if($bckColor=='#c8c8c8')
+		{
 			$bckColor='white';
-		}else{$bckColor='#c8c8c8';
-		}
-		if($equipement != 'ressource'){
-			
-			$InfoBulle = '<table class="equipement">'
-			.'<tr>'
-			.'<td>'.AfficheIcone(objArmement::TYPE_ATTAQUE).' : '.$row['objet_attaque'].'</td>'
-			.($equipement=='arme'?'<td>'.AfficheIcone(objArmement::TYPE_DISTANCE).' : '.($row['objet_distance']!=0?$row['objet_distance']:'0'):'').'</td>'
-			.'</tr>'
-			.'<tr><td'.($equipement=='arme'?' colspan="2"':'').'>'.AfficheIcone(objArmement::TYPE_DEFENSE).' : '.$row['objet_defense'].'</td></tr>'
-			.'<tr><td'.($equipement=='arme'?' colspan="2"':'').'>'.AfficheIcone(personnage::TYPE_RES_MONNAIE).' : '.$row['objet_prix'].'</td></tr>'
-			.'<tr><td'.($equipement=='arme'?' colspan="2"':'').'>Niveau requis : '.$row['objet_niveau'].'</td></tr>'
-			.'</table>';
 		}else{
-			$InfoBulle = null;
+			$bckColor='#c8c8c8';
 		}
-
-		$txt .= '
-<table class="equipements">
-	<tr style="background:'.$bckColor.';">
-		<td >
-			<img src="./img/objets/'.$row['objet_code'].'.png" 
-				height="100px" '
-		.'alt="'.$row['objet_nom'].'" '
-		.(!is_null($InfoBulle)?'onmouseover="montre(\''.CorrectDataInfoBulle($InfoBulle).'\');" onmouseout="cache();" ':'')
-		.'/>
-		</td>
-	</tr>
-	<tr style="background:'.$bckColor.';">
-		<th style="text-align:left;">'.$row['objet_nom'].'</th>
-	</tr>
-</table>';
+		
+		$oEquipement = FoundObjet($row['objet_code']);
+		
+		if(	$equipement == objRessource::TYPE_RESSOURCE
+			OR (	$equipement != objRessource::TYPE_RESSOURCE
+					AND $oEquipement->GetType() == $equipement
+				)
+			)
+		{
+			$txt .= '
+			<table class="equipements">
+				<tr style="background:'.$bckColor.';">
+					<td >'
+						.$oEquipement->AfficheInfoObjet(100)
+					.'</td>
+				</tr>
+				<tr style="background:'.$bckColor.';">
+					<th style="text-align:left;">'.$oEquipement->GetNom().'</th>
+				</tr>
+			</table>';
+		}
+		
 	}
 
 	return $txt;
