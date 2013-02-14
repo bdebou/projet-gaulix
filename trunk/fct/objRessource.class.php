@@ -1,6 +1,8 @@
 <?php
 class objRessource extends objMain{
 
+	Const TYPE_RESSOURCE		= 'Ressource';
+	
 	public function __construct(array $data, $nb){
 		date_default_timezone_set('Europe/Brussels');
 	
