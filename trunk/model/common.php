@@ -45,7 +45,7 @@ function FoundObjet($CodeObject, $nbObjet = 1){
 	
 		global $lstTypeObjets;
 	
-		if(in_array($arInfoObject['objet_type'], $lstTypeObjets))
+		if(	in_array($arInfoObject['objet_type'], array_merge($lstTypeObjets, array(qteCombat::TYPE_QUETE_ENNEMI, qteCombat::TYPE_QUETE_MONSTRE))))
 		{
 			$ObjetNom = 'obj'.$arInfoObject['objet_type'];
 				
@@ -576,6 +576,11 @@ function QuelTypeRessource(&$Code) {
 	}
 	return NULL;
 }
+/**
+ * Retourne la liste des cases libres d'une carte X ($carte = X) ou toutes les cartes ($carte = NULL)
+ * @param string $carte <p>Default value : NULL</p>
+ * @return array
+ */
 function FreeCaseCarte($carte = NULL) {
 	$sql = "SELECT coordonnee FROM table_carte WHERE detruit IS NULL AND id_type_batiment NOT IN (11);";
 	$requete = mysql_query($sql) or die(mysql_error() . $sql);
@@ -587,7 +592,7 @@ function FreeCaseCarte($carte = NULL) {
 	}
 
 	global $nbLigneCarte, $nbColonneCarte;
-	//ATTENTION la carte M est retirée car c'est la carte du camp romain
+	
 	$arCartes = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y');
 
 	if (is_null($carte)) {
@@ -630,6 +635,36 @@ function ListeMembreClan($Clan){
 		$lstMembre[] = $_SESSION['joueur'];
 	}
 	return $lstMembre;
+}
+/**
+ * Retourne NULL ou la liste des membres du $Village
+ * @param string $Village
+ * @return array|NULL
+ */
+function ListMembreVillage($Village){
+	//$lstMembre = null;
+	if (!is_null($Village))
+	{
+		$sql = "SELECT * FROM table_villages WHERE villages_nom='".htmlspecialchars($Village, ENT_QUOTES)."';";
+		$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
+
+		if(mysql_num_rows($requete) > 0)
+		{
+			while ($row = mysql_fetch_array($requete, MYSQL_ASSOC))
+			{
+				$lstMembre[] = $row['villages_citoyen'];
+			}
+		}
+		
+	}else{
+		$lstMembre[] = $_SESSION['joueur'];
+	}
+	if(isset($lstMembre))
+	{
+		return $lstMembre;
+	}
+	
+	return NULL;
 }
 function AddHistory($Login, $Carte, $Position, $Type, $Adversaire, $Date, $Info) {
 	if(is_null($Date)){
