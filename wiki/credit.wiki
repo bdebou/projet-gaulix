@@ -2,4 +2,5 @@
 Ce petit jeu est complètement gratuit.
 Un tout grand merci aux personnes ayant participées à ce projet et toujours gratuitement.
  * Programmation : [https://plus.google.com/u/0/107937906218732922871 http://www.google.com/images/icons/ui/gprofile_button-16.png] [https://plus.google.com/u/0/107937906218732922871 +Bruno Deboubers]
- * Illustrations : Raphael Lopez Perez
+ * Illustrations : Ralph [http://www.tidou.com www.tidou.com]
+ * Conception: [https://plus.google.com/u/0/107653956365795984909 http://www.google.com/images/icons/ui/gprofile_button-16.png] [https://plus.google.com/u/0/107653956365795984909 +Yves Vassart]
