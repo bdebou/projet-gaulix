@@ -23,7 +23,8 @@ abstract class batiment{
 	private $IDType;
 	
 	Const PRIX_REPARATION			= 'Sesterce=5,BC=10';		// Prix des réparation par point de vie
-	Const NIVEAU_MAX				= 4;		// Niveau Maximum pour chaque batiment.
+	Const NIVEAU_MAX				= 4;						// Niveau Maximum pour chaque batiment.
+	Const TAUX_ATTAQUANT			= 1.15;						// Taux utiliser pour calculer l'effet de surprise
 	
 	const CODE_ESCLAVE				= 'Esclave';
 	
@@ -41,45 +42,45 @@ abstract class batiment{
 	//--- L'attaque du batiment de $persoCible par $persoAttaquant ---
 	public function AttaquerBatiment(personnage $persoCible, personnage $persoAttaquant){
 			//on initialise la valeur de retour attaque pour persoAttaquant
-		$txt['0'] = null;
+		$txt[0] = null;
 			//on initialise la valeur de retour attaque pour persoCible
-		$txt['1'] = null;
+		$txt[1] = null;
 		
 			//On recupère les valeur d'attaque et de défense de persoAttaquant
 		$arAttAttaquant = $persoAttaquant->GetAttPerso();	
 		$arDefAttaquant = $persoAttaquant->GetDefPerso();
 		
 			//on calcule la valeur de défense de persoAttaquant
-		$DefAttaquant = $arDefAttaquant['0'] + $arDefAttaquant['1'];
+		$DefAttaquant = $arDefAttaquant[0] + $arDefAttaquant[1];
 			
 			//on calcule la valeur d'attaque de persoAttaquant
-		$ValeurAttaquant = intval( ( $arAttAttaquant['0'] + $arAttAttaquant['1'] ) * 1.15 ) + $DefAttaquant ;
+		$ValeurAttaquant = intval( ( $arAttAttaquant[0] + $arAttAttaquant[1] ) * self::TAUX_ATTAQUANT ) + $DefAttaquant ;
 		
 			//on calcule la valeur d'attaque du batiment
-		$Valeur = intval( $this->GetAttaque() * 1.15 ) + $this->GetDefense();
+		$Valeur = intval( $this->GetAttaque() * self::TAUX_ATTAQUANT ) + $this->GetDefense();
 		
 			//on calcule les pts de dégat au batiment
 		$ptsDegats = $ValeurAttaquant - $this->GetDefense();
 			
 		if($ptsDegats > 0){		//si le batiment perd des points
 				//on crée les messages de retour
-			$txt['0'] = 'Vous avez fait '.$ptsDegats.'pts de dégats au batiment ('.$this->Nom.').';
-			$txt['1'] = 'Vous avez eu '.$ptsDegats.'pts de dégats au batiment ('.$this->Nom.').';
+			$txt[0] = 'Vous avez fait '.$ptsDegats.'pts de dégats au batiment ('.$this->Nom.').';
+			$txt[1] = 'Vous avez eu '.$ptsDegats.'pts de dégats au batiment ('.$this->Nom.').';
 				//on abime le batiment
 			$this->BatimentAbime($persoCible, $ptsDegats, $persoAttaquant);
 		}else{
-			$txt['0'] = 'Vous avez fait aucun dégat au batiment ('.$this->Nom.') car il est bien solide.';
-			$txt['1'] = 'Votre batiment ('.$this->Nom.') a été attaqué mais a bien résister.';
+			$txt[0] = 'Vous avez fait aucun dégat au batiment ('.$this->Nom.') car il est bien solide.';
+			$txt[1] = 'Votre batiment ('.$this->Nom.') a été attaqué mais a bien résister.';
 		}
 		
 			//on calcule les points de vie perdus par l'attaquant
-		$ptsVie = intval($this->GetAttaque() * 1.15) - $DefAttaquant;
+		$ptsVie = intval($this->GetAttaque() * self::TAUX_ATTAQUANT) - $DefAttaquant;
 		
 		if($ptsVie > 0){		//Si l'attaquant perd des points de vie
 				//on lui retire des points de vie
 			$persoAttaquant->PerdreVie($ptsVie,'combat');
 				//on lui signale qu'il a perdu des points de vie
-			$txt['0'] .= ' Mais vous avez perdu '.$ptsVie.'pts '.AfficheIcone('vie');
+			$txt[0] .= ' Mais vous avez perdu '.$ptsVie.'pts '.AfficheIcone(personnage::TYPE_VIE);
 		}
 		
 			//attaquant gagane de l'espérience
@@ -88,10 +89,10 @@ abstract class batiment{
 			//On protege le batiment d'une autre attaque
 		$this->DateLastAction = strtotime('now');
 		//on envoie un mail
-		if($persoCible->GetNotifAttaque()){NotificationMail($persoCible->GetMail(), 'attaque', $this->Nom, $txt['1']);}
+		if($persoCible->GetNotifAttaque()){NotificationMail($persoCible->GetMail(), 'attaque', $this->Nom, $txt[1]);}
 		//on ajoute un historique
-		AddHistory($persoAttaquant->GetLogin(), $this->GetCarte(), $this->GetPosition(), 'attaque', $this->Login, NULL, $txt['0']);
-		AddHistory($this->Login, $this->GetCarte(), $this->GetPosition(), 'attaque', $persoAttaquant->GetLogin(), NULL, $txt['1']);
+		AddHistory($persoAttaquant->GetLogin(), $this->GetCarte(), $this->GetPosition(), 'attaque', $this->Login, NULL, $txt[0]);
+		AddHistory($this->Login, $this->GetCarte(), $this->GetPosition(), 'attaque', $persoAttaquant->GetLogin(), NULL, $txt[1]);
 		return $txt;
 	}
 		
