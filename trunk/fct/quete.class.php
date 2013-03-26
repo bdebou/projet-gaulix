@@ -26,6 +26,8 @@ abstract class quete{
 	private $Civilisation;
 	Private $Defense;
 	private $Status;
+	private $Visibilite;
+	private $chkCartes;
 	
 	const NB_QUETE_MAX			= 3;					// Nombre maximum de quete autorisée en  meme temp
 	Const MAX_DEPLACEMENT		= 20;					// Nombre maximum de déplacement pour les quetes ROMAIN
@@ -35,6 +37,8 @@ abstract class quete{
 	Const TYPE_GAIN_CMP			= 'Competence';
 	
 	Const TYPE_QUETE			= 'QUEST';
+	
+	Const IMG_QUETE				= 'romains';
 	
 	public function __construct(array $Quete, array $InfoQuete){
 		date_default_timezone_set('Europe/Brussels');
@@ -215,7 +219,11 @@ abstract class quete{
 		}
 		return false;
 	}
-	private function CreateListCout(){
+	/**
+	 * Retourne la liste des objet pour son achat ou validation
+	 * @return array|NULL
+	 */
+	Protected function CreateListCout(){
 		if(!is_null($this->Cout))
 		{
 			foreach($this->Cout as $Cout)
@@ -226,6 +234,8 @@ abstract class quete{
 					case personnage::TYPE_RES_MONNAIE:	
 					case personnage::TYPE_COMPETENCE:
 					case quete::TYPE_QUETE:
+					case qteCombat::TYPE_QUETE_ENNEMI:
+					case qteCombat::TYPE_QUETE_MONSTRE:
 						$lstCout[] = implode('=', $tmpCout);
 						break;
 				}
@@ -240,31 +250,6 @@ abstract class quete{
 		return NULL;
 	}
 	public function CreateListObjectNeed(){
-		if(!is_null($this->Cout))
-		{
-			foreach($this->Cout as $Cout)
-			{
-				$tmpCout = explode('=', $Cout);
-					
-				switch(QuelTypeObjet($tmpCout[0])){
-					case personnage::TYPE_RES_MONNAIE:
-					case personnage::TYPE_COMPETENCE:
-					case quete::TYPE_QUETE:
-					case qteCombat::TYPE_QUETE_MONSTRE:
-					case qteBatiment::TYPE_QUETE_BATIMENT:
-						break;
-					default:
-						$lstObjects[] = implode('=', $tmpCout);
-					break;
-				}
-					
-			}
-	
-			if(isset($lstObjects))
-			{
-				return $lstObjects;
-			}
-		}
 		return NULL;
 	}
 	//Création de l'objet
@@ -275,7 +260,7 @@ abstract class quete{
 				case 'id_quete_en_cours':	$this->ID_quete		= intval($value);									break;
 				case 'quete_login':			$this->Login		= strval($value);									break;
 				case 'quete_position':		$this->Position		= explode(',', $value);								break;
-				case 'quete_vie':			$this->Vie			= intval($value);									break;
+				//case 'quete_vie':			$this->Vie			= intval($value);									break;
 				case 'quete_reussi':		$this->Reussi		= (is_null($value)?false:true);						break;
 				case 'date_start':			$this->$key			= (is_null($value)?NULL:strtotime($value));			break;
 				case 'date_end':			$this->$key			= (is_null($value)?NULL:strtotime($value));			break;
@@ -294,7 +279,7 @@ abstract class quete{
 				case 'quete_txt_finish':	$this->TxtFinish		= (is_null($value)?NULL:strval($value));		break;
 				case 'quete_niveau':		$this->Niveau			= intval($value);								break;
 				case 'quete_gain':			$this->Gain				= (is_null($value)?NULL:explode(',', $value));	break;
-				//case 'gain_experience':		$this->GainExperience	= (is_null($value)?NULL:intval($value));		break;
+				case 'quete_cartes':		$this->chkCartes		= (is_null($value)?false:true);					break;
 				case 'quete_cout':			$this->Cout				= (is_null($value)?NULL:explode(',', $value));	break;
 				case 'quete_visible':		$this->Visibilite		= (is_null($value)?false:true);					break;
 				case 'quete_vie':			$this->VieMax			= intval($value);								break;
@@ -379,7 +364,6 @@ abstract class quete{
 	}
 	
 	//--- Les checks ---
-	
 	/**
 	 * Vérifie si $Login a bien terminé la quête
 	 * @param string $Login
@@ -409,6 +393,23 @@ abstract class quete{
 		}
 		return false;
 	}
+	/**
+	 * Vérifie si la quete est de type monstre ou pas.
+	 * @return boolean
+	 */
+	public function CheckQueteMonstre(){
+		return false;
+	}
+	/**
+	 * Vérifie si la quête est de type Ennemi ou pas
+	 * @return boolean
+	 */
+	public function CheckQueteEnnemi(){
+		return false;
+	}
+	//--- Les Sets ---
+	public function SetVie($value){			$this->Vie = $value;}
+	public function SetPosition($value){	$this->Position = $value;}
 	
 	//--- Renvoie de valeur ---
 	/**
@@ -422,6 +423,11 @@ abstract class quete{
 	 * </ul> 
 	 */
 	public function GetGain($type = NULL){
+		if(is_null($this->Gain))
+		{
+			return NULL;
+		}
+		
 		if(is_null($type))
 		{
 			foreach($this->Gain as $Gain)
@@ -451,7 +457,7 @@ abstract class quete{
 	}
 	public function GetLogin(){				return $this->Login;}
 	public function GetCout(){
-		return $this->Cout;
+		return $this->CreateListCout();
 	}
 	public function GetIDQuete(){			return $this->ID_quete;}
 	public function GetIDTypeQuete(){		return $this->IDTypeQuete;}
@@ -481,6 +487,8 @@ abstract class quete{
 	public function GetTextFinish(){		return $this->TxtFinish;}
 	public function GetStatus(){			return $this->Status;}
 	Public function GetCodeCmpQuete(){		return $this->GetGain(self::TYPE_GAIN_CMP);}
-	
+	public function GetVisibilite(){		return $this->Visibilite;}
+	public function GetImgNom(){			return $this::IMG_QUETE;}
+	public function GetCheckCartes(){		return $this->chkCartes;}
 }
 ?>
