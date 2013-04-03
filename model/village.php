@@ -18,87 +18,119 @@ function CreateListBatiment(personnage &$oJoueur){
 
 	return $lstBatiment;
 }
-function AfficheBatiment(batiment &$batiment, personnage &$oJoueur){
+function AfficheBatiment(batiment &$batiment, personnage &$oJoueur = NULL){
 	$ImgSize = 'height';
 	$txt = NULL;
 
 	$contenu = 'Ne peut rien contenir';
-	$PositionBatiment	= $batiment->GetCoordonnee();
-	$PositionJoueur		= $oJoueur->GetCoordonnee();
-	$chkOptions = false;
+	
+	$chkPositionJoueur = false;
+	$nbLigne = 2;
+	
+	if(!is_null($oJoueur)){	
+		$chkPositionJoueur		= $oJoueur->GetCoordonnee() == $batiment->GetCoordonnee();
+	}
+	
 	$chkMarche = false;
 	
-	$nbLigne = 5;
-	
-	$lstBatimentAvecEsclaves = array(ferme::ID_BATIMENT, potager::ID_BATIMENT, mine::ID_BATIMENT, carriere::ID_BATIMENT);
+	$lstBatimentAvecEsclaves = array(ferme::ID_BATIMENT, potager::ID_BATIMENT, mine::ID_BATIMENT, carriere::ID_BATIMENT, scierie::ID_BATIMENT);
 
-	if(in_array($batiment->GetIDType(), $lstBatimentAvecEsclaves))
-	{
-		$nbLigne++;
-	}
 	switch($batiment->GetIDType()){
 		case maison::ID_BATIMENT:
 			$ImgSize = 'width';
-			if($PositionBatiment == $PositionJoueur){
+			if($chkPositionJoueur){
 				$contenu = '<p>Ne peut rien contenir.</p>';
 				$chkOptions = false;
 			}else{
-				$contenu = '<p>Vous devez vous placez sur son emplacement pour afficher les options.</p>';
+				$contenu = '<p>Si ici que vous devez vous placer pour vous inscrire ou valider une quête.</p>';
 			}
 			break;
-		case 'bank':
+		/* case 'bank':
 			$contenu = $batiment->AfficheContenu($oJoueur);
-			break;
-		case entrepot::ID_BATIMENT:
-			$nbLigne--;
+			break; */
+		case scierie::ID_BATIMENT:
 		case ferme::ID_BATIMENT:
 		case mine::ID_BATIMENT :
 		case potager::ID_BATIMENT:
 		case carriere::ID_BATIMENT:
 			$ImgSize = 'width';
-			$contenu = $batiment->AfficheContenu($oJoueur);
+			if(!is_null($oJoueur)){	$contenu = $batiment->AfficheContenu($oJoueur);}
 			break;
-		case 'marche':
-			if($PositionBatiment == $PositionJoueur){
+		case marche::ID_BATIMENT:
+			if($chkPositionJoueur){
 				$chkMarche = true;
 			}else{
 				$contenu = '<p>Vous devez vous placez sur son emplacement pour afficher les transactions disponibles.</p>';
 			}
 			break;
 	}
+	if(in_array($batiment->GetIDType(), $lstBatimentAvecEsclaves))
+	{
+		$arLignes[3] = '
+			<tr>
+				<td>'
+		.(!is_null($oJoueur)?
+		$batiment->AfficheAchatEsclave($oJoueur)
+		:'Possibilité d\'acheter des esclaves pour augmenter sa production')
+		.'</td>
+			</tr>';
+		$nbLigne++;
+	}
 	
-	$txt .= '
-		<tr>
-			<td rowspan="'.$nbLigne.'" style="width:400px;">
-				<img alt="'.$batiment->GetType().'" src="./img/batiments/'.$batiment->GetType().'.png" width="400px"  onmouseover="montre(\''.CorrectDataInfoBulle($batiment->GetDescription()).'\');" onmouseout="cache();"/>
-			</td>
-			<th colspan="4">
-				<a name="'.str_replace(',', '_', $PositionBatiment).'">'.$batiment->GetNom($oJoueur->GetCivilisation()).' ('.$batiment->GetNiveau().' / '.$batiment->GetNiveauMax().')</a>
-			</th>
-		</tr>
-		<tr><td colspan="4">'.$batiment->AfficheOptionAmeliorer($oJoueur).'</td></tr>'
-		.(in_array($batiment->GetIDType(), $lstBatimentAvecEsclaves)?'<tr><td colspan="4">'.$batiment->AfficheAchatEsclave($oJoueur).'</td></tr>':NULL)
-		.'<tr>
-			<td colspan="4">'
-				.'<img alt="Barre status" src="./fct/fct_image.php?type=statusetat&amp;value='.$batiment->GetEtat().'&amp;max='.$batiment->GetEtatMax().'" />'
-				.'<br />'
-				.$batiment->AfficheOptionReparer($oJoueur)
-			.'</td>
-		</tr>
-		<tr>
-			<td colspan="4">
-				<ul style="list-style-type:none; padding:0px; text-align:center; margin:0px;">
-					<li style="display:inline;">'.AfficheIcone(objArmement::TYPE_ATTAQUE).' : '.(is_null($batiment->GetAttaque())?'0':$batiment->GetAttaque()).'</li>
-					<li style="display:inline; margin-left:40px;">'.AfficheIcone(objArmement::TYPE_DISTANCE).' : '.(is_null($batiment->GetDistance())?'0':$batiment->GetDistance())	.'</li>
-					<li style="display:inline; margin-left:40px;">'.AfficheIcone(objArmement::TYPE_DEFENSE).' : '.(is_null($batiment->GetDefense())?'0':$batiment->GetDefense()).'</li>
-				</ul>
-			</td>
-		</tr>
-		<tr><td colspan="'.($batiment->GetIDType() == entrepot::ID_BATIMENT?'5':'4').'">'.$contenu.'</td></tr>'
-		.($chkOptions?$batiment->AfficheOptions($oJoueur):'')
-		.($chkMarche?$batiment->AfficheTransactions($oJoueur):'');
+	if(!is_null($oJoueur))
+	{
+		$arLignes[2] = '
+			<tr><td>'.$batiment->AfficheOptionAmeliorer($oJoueur).'</td></tr>';
+		$arLignes[4] = '
+			<tr>
+				<td>'
+					.'<img alt="Barre status" src="./fct/fct_image.php?type=statusetat&amp;value='.$batiment->GetEtat().'&amp;max='.$batiment->GetEtatMax().'" />'
+					.'<br />'
+					.$batiment->AfficheOptionReparer($oJoueur)
+				.'</td>
+			</tr>';
+		$arLignes[6] = '
+			<tr><td>'.$contenu.'</td></tr>';
 	
-	return $txt;
+		$nbLigne+=3;
+		
+		if($batiment->GetIDType() == marche::ID_BATIMENT)
+		{
+			$arLignes[7] = $batiment->AfficheTransactions($oJoueur);
+			$nbLigne++;
+		}
+	}
+	
+	$arLignes[5] = '
+			<tr>
+				<td>
+					<ul style="list-style-type:none; padding:0px; text-align:center; margin:0px;">
+						<li style="display:inline;">'.AfficheIcone(objArmement::TYPE_ATTAQUE).' : '.(is_null($batiment->GetAttaque())?'0':$batiment->GetAttaque()).'</li>
+						<li style="display:inline; margin-left:40px;">'.AfficheIcone(objArmement::TYPE_DISTANCE).' : '.(is_null($batiment->GetDistance())?'0':$batiment->GetDistance())	.'</li>
+						<li style="display:inline; margin-left:40px;">'.AfficheIcone(objArmement::TYPE_DEFENSE).' : '.(is_null($batiment->GetDefense())?'0':$batiment->GetDefense()).'</li>
+					</ul>
+				</td>
+			</tr>';
+	$arLignes[1] = '
+			<tr>
+				<td rowspan="'.$nbLigne.'" style="width:400px;">
+					<img alt="'.$batiment->GetType().'" src="./img/batiments/'.$batiment->GetType().'.png" width="400px"  onmouseover="montre(\''.CorrectDataInfoBulle($batiment->GetDescription()).'\');" onmouseout="cache();"/>
+				</td>
+				<th>'
+					.(!is_null($oJoueur)?
+						'<a name="'.str_replace(',', '_', $batiment->GetCoordonnee()).'">'
+						:NULL)
+					.$batiment->GetNom((!is_null($oJoueur)?$oJoueur->GetCivilisation():personnage::CIVILISATION_GAULOIS)).(!is_null($oJoueur)?' ('.$batiment->GetNiveau().' / '.$batiment->GetNiveauMax().')':NULL)
+					.(!is_null($oJoueur)?
+						'</a>'
+						:NULL)
+				.'</th>
+			</tr>';
+	
+	//on trie par keys
+	ksort($arLignes);
+	
+	return implode('', $arLignes);
 }
 function AddTransaction($vendeur, $achat=array('nourriture'=>'NULL', 'pierre'=>'NULL', 'bois'=>'NULL', 'or'=>'NULL'), $vente=array('nourriture'=>'NULL', 'pierre'=>'NULL', 'bois'=>'NULL', 'or'=>'NULL')){
 	$sql="INSERT INTO `table_marche` (
