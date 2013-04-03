@@ -10,7 +10,7 @@ $DB_utilisateur		= 'gaulix_be'; 			// Nom de l'utilisateur de la base
 $DB_motdepasse		= 'A3hwDpwdVTPpC3B9'; 	// Mot de passe pour accèder à la base
 $DB_base			= 'gaulix_be'; 			// Nom de la base
 
-$NumVersion			= '4.0.1';				// Num Version
+$NumVersion			= '4.1';				// Num Version
 $MAX_essai			= 3;					// Nombre maximum d'essai de connection
 $nbLigneCarte		= 13;					// Nombre de ligne de la carte
 $nbColonneCarte		= 13;					// Nombre de colonne de la carte
@@ -32,8 +32,8 @@ $arCouleurs			= array(objArmement::TYPE_ATTAQUE			=> '#FF0000',		// Red
 
 //Listes des batiments que l'on ne peut construire que 1 seule fois
 $lstBatimentConstructionUnique	= array(maison::ID_BATIMENT,
-										entrepot::ID_BATIMENT,
 										potager::ID_BATIMENT,
+										scierie::ID_BATIMENT,
 										ferme::ID_BATIMENT,
 										marche::ID_BATIMENT,
 										mine::ID_BATIMENT,
