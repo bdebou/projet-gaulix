@@ -38,7 +38,7 @@ class ressource extends batiment{
 	const NIVEAU_NORMAL				= 1;
 	
 	// Initialisation de l'objet
-	public function __construct(array $dataCarte, array $dataBatiment){
+	public function __construct(array $dataCarte = NULL, array $dataBatiment){
 		
 		parent::Hydrate($dataCarte, $dataBatiment);
 		
@@ -129,7 +129,7 @@ class ressource extends batiment{
 	}
 	
 	//Remplir l'objet Ressource
-	public function hydrate(array $dataCarte, array $dataBatiment){
+	public function hydrate(array $dataCarte = NULL, array $dataBatiment){
 		
 		
 		foreach ($dataBatiment as $key => $value){
@@ -138,19 +138,22 @@ class ressource extends batiment{
 				case 'batiment_description':	$this->strDescription = strval($value); break;
 			}
 		}
-		foreach ($dataCarte as $key => $value){
-			switch ($key){
-				//case 'coordonnee':				$this->strCoordonnee = strval($value); break;
-				case 'login':					$this->strCollecteur = (is_null($value)?NULL:strval($value)); break;
-				case 'res_pierre':				if($this->strNom == self::NOM_RESSOURCE_PIERRE){$this->intStock = (is_null($value)?NULL:intval($value));} break;
-				case 'res_bois':				if($this->strNom == self::NOM_RESSOURCE_BOIS){$this->intStock = (is_null($value)?NULL:intval($value));} break;
-				case 'res_eau':					if($this->strNom == self::NOM_RESSOURCE_EAU){$this->intStock = (is_null($value)?NULL:intval($value));} break;
-				case 'date_action_batiment':	$this->dteDateAction = strtotime($value); break;
-				case 'detruit':					$this->bolVide = (is_null($value)?false:true); break;
-				case 'contenu_batiment':		$this->intTypeContenu = (is_null($value)?NULL:intval($value)); break;
+		
+		if(!is_null($dataCarte))
+		{
+			foreach ($dataCarte as $key => $value){
+				switch ($key){
+					//case 'coordonnee':				$this->strCoordonnee = strval($value); break;
+					case 'login':					$this->strCollecteur = (is_null($value)?NULL:strval($value)); break;
+					case 'res_pierre':				if($this->strNom == self::NOM_RESSOURCE_PIERRE){$this->intStock = (is_null($value)?NULL:intval($value));} break;
+					case 'res_bois':				if($this->strNom == self::NOM_RESSOURCE_BOIS){$this->intStock = (is_null($value)?NULL:intval($value));} break;
+					case 'res_eau':					if($this->strNom == self::NOM_RESSOURCE_EAU){$this->intStock = (is_null($value)?NULL:intval($value));} break;
+					case 'date_action_batiment':	$this->dteDateAction = strtotime($value); break;
+					case 'detruit':					$this->bolVide = (is_null($value)?false:true); break;
+					case 'contenu_batiment':		$this->intTypeContenu = (is_null($value)?NULL:intval($value)); break;
+				}
 			}
 		}
-		
 	}
 	
 	// -------------------- GET Affichage ----------------------

@@ -18,20 +18,23 @@ class maison extends batiment{
 	const NOM_GAULOIS					= 'Oppidum';
 		
 	//--- fonction qui est lancer lors de la création de l'objet. ---
-	public function __construct(array $carte, array $batiment){
+	public function __construct(array $carte = NULL, array $batiment){
 		$this->Hydrate($carte, $batiment);
 	}
-	public function Hydrate(array $carte, array $batiment){
+	public function Hydrate(array $carte = NULL, array $batiment){
 		date_default_timezone_set('Europe/Brussels');
 		
 		parent::Hydrate($carte, $batiment);
 		
-		foreach ($carte as $key => $value){
-			switch ($key)
-			{
-				case 'res_nourriture':		$this->ResNourriture = (is_null($value)?0:intval($value)); break;
-				case 'res_eau':				$this->ResEau = (is_null($value)?0:intval($value)); break;
-				case 'contenu_batiment':	$this->Contenu = (is_null($value)?NULL:$value); break;
+		if(!is_null($carte))
+		{
+			foreach ($carte as $key => $value){
+				switch ($key)
+				{
+					case 'res_nourriture':		$this->ResNourriture = (is_null($value)?0:intval($value)); break;
+					case 'res_eau':				$this->ResEau = (is_null($value)?0:intval($value)); break;
+					case 'contenu_batiment':	$this->Contenu = (is_null($value)?NULL:$value); break;
+				}
 			}
 		}
 	}
