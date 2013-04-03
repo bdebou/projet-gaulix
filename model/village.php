@@ -25,7 +25,7 @@ function AfficheBatiment(batiment &$batiment, personnage &$oJoueur = NULL){
 	$contenu = 'Ne peut rien contenir';
 	
 	$chkPositionJoueur = false;
-	$nbLigne = 2;
+	$nbLigne = 3;
 	
 	if(!is_null($oJoueur)){	
 		$chkPositionJoueur		= $oJoueur->GetCoordonnee() == $batiment->GetCoordonnee();
@@ -89,14 +89,16 @@ function AfficheBatiment(batiment &$batiment, personnage &$oJoueur = NULL){
 					.$batiment->AfficheOptionReparer($oJoueur)
 				.'</td>
 			</tr>';
-		$arLignes[6] = '
+		$arLignes[7] = '
 			<tr><td>'.$contenu.'</td></tr>';
 	
 		$nbLigne+=3;
 		
 		if($batiment->GetIDType() == marche::ID_BATIMENT)
 		{
-			$arLignes[7] = $batiment->AfficheTransactions($oJoueur);
+			$arLignes[8] = '
+			<tr><td>'.$batiment->AfficheTransactions($oJoueur).'</td></tr>';
+			
 			$nbLigne++;
 		}
 	}
@@ -111,6 +113,8 @@ function AfficheBatiment(batiment &$batiment, personnage &$oJoueur = NULL){
 					</ul>
 				</td>
 			</tr>';
+	$arLignes[6] = '
+			<tr><td>'.$batiment->GetDescription().'</td></tr>';
 	$arLignes[1] = '
 			<tr>
 				<td rowspan="'.$nbLigne.'" style="width:400px;">
