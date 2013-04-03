@@ -1,4 +1,11 @@
 <?php
+/**
+ * Retourne l'objet Batiment si trouvé.
+ * @param integer $idType <p>Numéro ID du type de bâtiment (Ex: 1 = Maison, ...). Default = False</p>
+ * @param string $login <p>Le Login du propriétaire du bâtiment. Default = False</p>
+ * @param string $Coordonnees <p>Les coordonnées du bâtiment structuré comme "A_1_1". Default = False</p>
+ * @return NULL|batiment <p>Retourne NULL si bâtiment non trouvé, sinon retourne l'objet bâtiment</p>
+ */
 function FoundBatiment($idType = false, $login = false, $Coordonnees = false) {
 	global $lstNonBatiment, $objManager;
 	$sql = "SELECT * FROM table_carte WHERE
