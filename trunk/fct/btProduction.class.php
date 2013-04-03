@@ -6,52 +6,55 @@ abstract class btProduction extends batiment{
 	
 	
 	//--- fonction qui est lancer lors de la création de l'objet. ---
-	public function __construct(array $carte, array $batiment){
+	public function __construct(array $carte = NULL, array $batiment){
 		
 		
 		$this->Hydrate($carte, $batiment);
 	}
 	
-	Public function Hydrate(array $carte, array $batiment){
+	Public function Hydrate(array $carte = NULL, array $batiment){
 		date_default_timezone_set('Europe/Brussels');
 		
 		parent::Hydrate($carte, $batiment);
 		
-		foreach ($carte as $key => $value){
-			switch ($key){
-				case 'date_action_batiment':	$this->DateAction = (is_null($value)?NULL:strtotime($value)); break;
-				case 'contenu_batiment':		$this->Contenu = (is_null($value)?array('a1', 0):explode(',', $value));	break;
-			}
-		}
-		
-		//on stock ce qui a été produit
-		if($this->GetStockContenu() >= $this->GetStockMax())
+		if(!is_null($carte))
 		{
-			$this->DateAction = strtotime('now');
-			
-		}elseif((strtotime('now') - $this->GetDateAction()) > $this->GetTempProduction($this->GetTypeContenu()))
-		{
-				
-			global $objManager;
-			$Producteur = $objManager->GetPersoLogin(parent::GetLogin());
-				
-			$this->AddStock($Producteur->GetNiveauCompetence($this::TYPE_COMPETENCE));
-			
-			unset($Producteur);
-			
-		}
-		
-		for($i = 2; $i <= $this->GetNbMaxEsclave(); $i++)
-		{
-			if(isset($this->Contenu[$i]))
-			{
-				$arEsclave = explode('=', $this->Contenu[$i]);
-				if($arEsclave[0] == parent::CODE_ESCLAVE AND (strtotime('now') - $arEsclave[1]) >= $this::DUREE_ESCLAVE)
-				{
-					unset($this->Contenu[$i]);
+			foreach ($carte as $key => $value){
+				switch ($key){
+					case 'date_action_batiment':	$this->DateAction = (is_null($value)?NULL:strtotime($value)); break;
+					case 'contenu_batiment':		$this->Contenu = (is_null($value)?array('a1', 0):explode(',', $value));	break;
 				}
-			}else{
-				break;
+			}
+		
+			//on stock ce qui a été produit
+			if($this->GetStockContenu() >= $this->GetStockMax())
+			{
+				$this->DateAction = strtotime('now');
+				
+			}elseif((strtotime('now') - $this->GetDateAction()) > $this->GetTempProduction($this->GetTypeContenu()))
+			{
+					
+				global $objManager;
+				$Producteur = $objManager->GetPersoLogin(parent::GetLogin());
+					
+				$this->AddStock($Producteur->GetNiveauCompetence($this::TYPE_COMPETENCE));
+				
+				unset($Producteur);
+				
+			}
+			
+			for($i = 2; $i <= $this->GetNbMaxEsclave(); $i++)
+			{
+				if(isset($this->Contenu[$i]))
+				{
+					$arEsclave = explode('=', $this->Contenu[$i]);
+					if($arEsclave[0] == parent::CODE_ESCLAVE AND (strtotime('now') - $arEsclave[1]) >= $this::DUREE_ESCLAVE)
+					{
+						unset($this->Contenu[$i]);
+					}
+				}else{
+					break;
+				}
 			}
 		}
 	}

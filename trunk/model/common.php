@@ -6,16 +6,23 @@
  * @param string $Coordonnees <p>Les coordonnées du bâtiment structuré comme "A_1_1". Default = False</p>
  * @return NULL|batiment <p>Retourne NULL si bâtiment non trouvé, sinon retourne l'objet bâtiment</p>
  */
-function FoundBatiment($idType = false, $login = false, $Coordonnees = false) {
+function FoundBatiment($idType = NULL, $login = NULL, $Coordonnees = NULL) {
 	global $lstNonBatiment, $objManager;
 	$sql = "SELECT * FROM table_carte WHERE
 			detruit IS NULL"
-			.($login ? " AND login = '".$login."'" : '')
-	. ($idType ? " AND id_type_batiment=$idType" : "")
-	. ($Coordonnees ? " AND coordonnee='$Coordonnees'" : "")
-	. ";";
+			. (!is_null($login)?
+				" AND login = '".$login."'"
+				:NULL)
+			. (!is_null($idType)?
+				" AND id_type_batiment=$idType"
+				:NULL)
+			. (!is_null($Coordonnees)?
+				" AND coordonnee='$Coordonnees'"
+				:NULL)
+			. ";";
 
 	$requete = mysql_query($sql) or die(mysql_error() . '<br />Function FoundBatiment SQL = ' . $sql);
+	
 	if (mysql_num_rows($requete) > 0) {
 		$carte = mysql_fetch_array($requete, MYSQL_ASSOC);
 		if(!in_array($carte['id_type_batiment'], $lstNonBatiment))
@@ -31,6 +38,20 @@ function FoundBatiment($idType = false, $login = false, $Coordonnees = false) {
 			
 			return $objBatiment;
 		}
+	}elseif(is_null($login) AND is_null($Coordonnees) AND !is_null($idType)){
+		$sql2 = "SELECT * FROM table_batiment 
+					WHERE id_type=" . $idType . "
+						 AND batiment_niveau=1;";
+		
+		$requete2 = mysql_query($sql2) or die(mysql_error() . '<br />' . $sql2);
+			
+		$batiment = mysql_fetch_array($requete2, MYSQL_ASSOC);
+			
+		$objBatiment =  new $batiment['batiment_type'](NULL, $batiment);
+			
+		//$objManager->UpdateBatiment($objBatiment);
+			
+		return $objBatiment;
 	}
 	
 	return null;

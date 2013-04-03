@@ -5,7 +5,7 @@ class entrepot extends batiment{
 	const ID_BATIMENT			= 4;
 	
 	//--- fonction qui est lancer lors de la création de l'objet. ---
-	public function __construct(array $carte, array $batiment){
+	public function __construct(array $carte = NULL, array $batiment){
 		$this->Hydrate($carte, $batiment);
 	}
 	
@@ -50,14 +50,17 @@ class entrepot extends batiment{
 		$this->Contenu=$temp;
 	}
 	
-	public function Hydrate(array $carte, array $batiment){
+	public function Hydrate(array $carte = NULL, array $batiment){
 		date_default_timezone_set('Europe/Brussels');
 		
 		parent::Hydrate($carte, $batiment);
 		
-		foreach ($carte as $key => $value){
-			switch ($key){
-				case 'contenu_batiment':	$this->Contenu = (is_null($value)?NULL:explode(',', $value)); break;
+		if(!is_null($carte))
+		{
+			foreach ($carte as $key => $value){
+				switch ($key){
+					case 'contenu_batiment':	$this->Contenu = (is_null($value)?NULL:explode(',', $value)); break;
+				}
 			}
 		}
 	}

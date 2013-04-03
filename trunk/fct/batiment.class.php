@@ -35,7 +35,7 @@ abstract class batiment{
 	
 	
 	//--- fonction qui est lancer lors de la création de l'objet. ---
-	public function __construct(array $carte, array $batiment){
+	public function __construct(array $carte = NULL, array $batiment){
 		$this->Hydrate($carte, $batiment);
 	}
 	
@@ -176,7 +176,7 @@ abstract class batiment{
 	}
 	
 	//--- on rempli l'objet avec les valeurs correspondant. ---
-	public function Hydrate(array $carte, array $batiment){
+	public function Hydrate(array $carte = NULL, array $batiment){
 		date_default_timezone_set('Europe/Brussels');
 		
 		foreach ($batiment as $key => $value){
@@ -194,19 +194,22 @@ abstract class batiment{
 			}
 		}
 		
-		foreach ($carte as $key => $value){
-			switch ($key){
-				case 'coordonnee':			$this->Coordonnee = explode(',', $value); break;
-				case 'login':				$this->Login = strval($value); break;
-				case 'id_case_carte':		$this->IDCaseCarte = intval($value); break;
-				case 'etat_batiment':		$this->Etat = (is_null($value)?NULL:intval($value)); break;
-				case 'date_last_attaque':	$this->DateLastAction = (is_null($value)?NULL:strtotime($value)); break;
-				case 'date_action_batiment':$this->DateAction = (is_null($value)?NULL:strtotime($value)); break;
-				case 'detruit':				$this->Detruit = (is_null($value)?false:true); break;
-				case 'contenu_batiment':	$this->Contenu = (is_null($value)?NULL:$value); break;
-				case 'niveau_batiment':		$this->Niveau = (is_null($value)?NULL:intval($value)); break;
-				case 'date_amelioration':	$this->DateAmelioration = (is_null($value)?NULL:strtotime($value)); break;
-				case 'tmp_amelioration':	$this->TmpAmelioration = (is_null($value)?NULL:intval($value)); break;
+		if(!is_null($carte))
+		{
+			foreach ($carte as $key => $value){
+				switch ($key){
+					case 'coordonnee':			$this->Coordonnee = explode(',', $value); break;
+					case 'login':				$this->Login = strval($value); break;
+					case 'id_case_carte':		$this->IDCaseCarte = intval($value); break;
+					case 'etat_batiment':		$this->Etat = (is_null($value)?NULL:intval($value)); break;
+					case 'date_last_attaque':	$this->DateLastAction = (is_null($value)?NULL:strtotime($value)); break;
+					case 'date_action_batiment':$this->DateAction = (is_null($value)?NULL:strtotime($value)); break;
+					case 'detruit':				$this->Detruit = (is_null($value)?false:true); break;
+					case 'contenu_batiment':	$this->Contenu = (is_null($value)?NULL:$value); break;
+					case 'niveau_batiment':		$this->Niveau = (is_null($value)?NULL:intval($value)); break;
+					case 'date_amelioration':	$this->DateAmelioration = (is_null($value)?NULL:strtotime($value)); break;
+					case 'tmp_amelioration':	$this->TmpAmelioration = (is_null($value)?NULL:intval($value)); break;
+				}
 			}
 		}
 		

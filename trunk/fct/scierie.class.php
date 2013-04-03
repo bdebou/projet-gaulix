@@ -1,13 +1,13 @@
 <?php
-class carriere extends btProduction{
+class scierie extends btProduction{
 	
-	const TYPE_COMPETENCE				= 'Travail de la pierre';
+	const TYPE_COMPETENCE				= 'Bucheron';
 	
-	const COUT_AMELIORATION_NIVEAU_2	= 'ResBois=5,Sesterce=10,ResMinF=150';
-	const COUT_AMELIORATION_NIVEAU_3	= 'Sesterce=1000,ResBois=1500,ResPierre=2';
-	const COUT_AMELIORATION_NIVEAU_4	= 'Sesterce=150000';
+	const COUT_AMELIORATION_NIVEAU_1	= 'ResBois=5,Sesterce=10,ResMinF=150';
+	const COUT_AMELIORATION_NIVEAU_2	= 'Sesterce=1000,ResBois=1500,ResPierre=2';
+	const COUT_AMELIORATION_NIVEAU_3	= 'Sesterce=150000';
 	
-	const ID_BATIMENT					= 16;
+	const ID_BATIMENT					= 4;
 	const STOCK_MAX_DEPART				= 500;
 	
 	const GAIN_TEMP_PAR_ESCLAVE			= 7;
@@ -18,54 +18,54 @@ class carriere extends btProduction{
 	const NB_ESCLAVES_NIV_3				= 8;
 	const NB_ESCLAVES_NIV_4				= 12;
 	
-	//Les valeurs communes de production avec la mine sont :
-	const A1_CODE						= mine::A1_CODE;
-	const A1_NOM						= mine::A1_NOM;
-	const A1_NIVEAU_COMPETENCE			= mine::A1_NIVEAU_COMPETENCE;
-	const A1_CODE_OBJET					= mine::A1_CODE_OBJET;
-	const A1_TEMP						= mine::A1_TEMP;
+	//Les valeurs communes de production avec la carrière sont :
+	const A1_CODE						= 'a1';
+	const A1_NOM						= 'du sable';
+	const A1_NIVEAU_COMPETENCE			= 1;
+	const A1_CODE_OBJET					= 'SA';
+	const A1_TEMP						= 3600;
 	
-	const A2_CODE						= mine::A2_CODE;
-	const A2_NOM						= mine::A2_NOM;
-	const A2_NIVEAU_COMPETENCE			= mine::A2_NIVEAU_COMPETENCE;
-	const A2_CODE_OBJET					= mine::A2_CODE_OBJET;
-	const A2_TEMP						= mine::A2_TEMP;
+	const A2_CODE						= 'a2';
+	const A2_NOM						= 'de la chaux';
+	const A2_NIVEAU_COMPETENCE			= 2;
+	const A2_CODE_OBJET					= 'CH';
+	const A2_TEMP						= 3600;
 	
-	const A3_CODE						= mine::A3_CODE;
-	const A3_NOM						= mine::A3_NOM;
-	const A3_NIVEAU_COMPETENCE			= mine::A3_NIVEAU_COMPETENCE;
-	const A3_CODE_OBJET					= mine::A3_CODE_OBJET;
-	const A3_TEMP						= mine::A3_TEMP;
+	const A3_CODE						= 'a3';
+	const A3_NOM						= 'du gravier';
+	const A3_NIVEAU_COMPETENCE			= 3;
+	const A3_CODE_OBJET					= 'GRA';
+	const A3_TEMP						= 3600;
 	
-	const A4_CODE						= mine::A4_CODE;
-	const A4_NOM						= mine::A4_NOM;
-	const A4_NIVEAU_COMPETENCE			= mine::A4_NIVEAU_COMPETENCE;
-	const A4_CODE_OBJET					= mine::A4_CODE_OBJET;
-	const A4_TEMP						= mine::A4_TEMP;
+	const A4_CODE						= 'a4';
+	const A4_NOM						= 'du ciment';
+	const A4_NIVEAU_COMPETENCE			= 4;
+	const A4_CODE_OBJET					= 'CIM';
+	const A4_TEMP						= 3600;
 		
-	//Les valeurs de production spécifique à la carrière sont :
+	//Les valeurs de production spécifique à la mine
 	const B1_CODE						= 'b1';
-	const B1_NOM						= 'de la Pierre';
+	const B1_NOM						= 'de l\'étain';
 	const B1_NIVEAU_COMPETENCE			= 1;
-	const B1_CODE_OBJET					= 'PIE';
-	const B1_TEMP						= 2400;
+	const B1_CODE_OBJET					= 'E';
+	const B1_TEMP						= 3600;
 	
 	const B2_CODE						= 'b2';
-	const B2_NOM						= 'du Granit';
+	const B2_NOM						= 'du minerai de cuivre';
 	const B2_NIVEAU_COMPETENCE			= 2;
-	const B2_CODE_OBJET					= 'GR';
-	const B2_TEMP						= 3000;
+	const B2_CODE_OBJET					= 'CUI';
+	const B2_TEMP						= 3600;
 	
 	const B3_CODE						= 'b3';
-	const B3_NOM						= 'du Marbre';
+	const B3_NOM						= 'du minerai d\'argent';
 	const B3_NIVEAU_COMPETENCE			= 3;
-	const B3_CODE_OBJET					= 'MA';
-	const B3_TEMP						= 3000;
+	const B3_CODE_OBJET					= 'AG';
+	const B3_TEMP						= 3600;
 	
 	const B4_CODE						= 'b4';
-	const B4_NOM						= 'du Diamant';
+	const B4_NOM						= 'du minerai d\'or';
 	const B4_NIVEAU_COMPETENCE			= 4;
-	const B4_CODE_OBJET					= 'DIA';
+	const B4_CODE_OBJET					= 'OR';
 	const B4_TEMP						= 3600;
 	
 		
@@ -74,7 +74,6 @@ class carriere extends btProduction{
 		date_default_timezone_set('Europe/Brussels');
 		
 		parent::Hydrate($carte, $batiment);
-		
 		
 	}
 	
@@ -87,7 +86,7 @@ class carriere extends btProduction{
 			case self::B1_CODE:
 				switch($this->GetNiveau())
 				{
-					case 1: return 2;
+					case 1:	return 2;
 					case 2: return 4;
 					case 3: return 6;
 					case 4: return 8;
@@ -137,9 +136,8 @@ class carriere extends btProduction{
 				break;
 		}
 		
-		return 1;
+		return 0;
 	}
-	
 	
 	
 	//Les Affichages
@@ -158,8 +156,7 @@ class carriere extends btProduction{
 		.($this->GetNiveau() >= self::A4_NIVEAU_COMPETENCE?'<option value="'.self::A4_CODE.'"'.($this->GetTypeContenu() == self::A4_CODE?' disabled="disabled"':'').'>'.self::A4_NOM.'</option>':'')
 		.($this->GetNiveau() >= self::B4_NIVEAU_COMPETENCE?'<option value="'.self::B4_CODE.'"'.($this->GetTypeContenu() == self::B4_CODE?' disabled="disabled"':'').'>'.self::B4_NOM.'</option>':'');
 	}
-	
-	Public function GetCodeRessource($CodeType){
+	public function GetCodeRessource($CodeType){
 		switch($CodeType){
 			case self::A1_CODE:	return self::A1_CODE_OBJET;		break;
 			case self::B1_CODE:	return self::B1_CODE_OBJET;		break;
@@ -170,14 +167,11 @@ class carriere extends btProduction{
 			case self::A4_CODE:	return self::A4_CODE_OBJET;		break;
 			case self::B4_CODE:	return self::B4_CODE_OBJET;		break;
 		}
-		
-		return NULL;
 	}
-	
 	public function GetTempProduction($code){
 		$Duree = 0;
 		
-	switch($code){
+		switch($code){
 			case self::A1_CODE:	$Duree = self::A1_TEMP;	break;
 			case self::B1_CODE:	$Duree = self::B1_TEMP;	break;
 			case self::A2_CODE:	$Duree = self::A2_TEMP;	break;
@@ -192,6 +186,5 @@ class carriere extends btProduction{
 		
 		return $Duree;
 	}
-	
 }
 ?>
