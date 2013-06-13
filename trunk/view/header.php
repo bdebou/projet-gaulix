@@ -4,7 +4,11 @@
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+	
 	<!--[if IE]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<link href="https://plus.google.com/u/0/b/116898576928846446900/116898576928846446900/posts" rel="publisher" />
+	<link href="http://fonts.googleapis.com/css?family=MedievalSharp&key=AIzaSyCvuVdTFkYGeKuHA5xljD_fGU5khD6lejM" rel="stylesheet" type="text/css">
+	
 	<meta name="keywords" content="gaulix" />
 	<meta name="description" content="Gaulix est un Web Game totalement gratuit. Vous incarnez un personnage gaulois. Il doit construire sa maison et peut construire aussi d\'autre batiment. Mais pour cela il lui faut des ressources que vous devrez collecter, apprendre des compétences pour fabriquer des armes, ... Bonne Chance!!!" />
 	
@@ -18,9 +22,6 @@
 	<link rel="shortcut icon" href="./img/icone.png" type="image/x-icon" />
 	
 	<link rel="stylesheet" href="./css/styles.css" type="text/css" />
-	
-	<link href="https://plus.google.com/u/0/b/116898576928846446900/116898576928846446900/posts" rel="publisher" />
-	<link href="http://fonts.googleapis.com/css?family=MedievalSharp" rel="stylesheet" type="text/css">
 	
 	<meta property="og:title" content="Gaulix" />
 	<meta property="og:type" content="game" />
