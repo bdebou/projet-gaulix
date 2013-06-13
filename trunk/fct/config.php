@@ -1,5 +1,5 @@
 <?php 
-global 	$NumVersion, $nbLigneCarte, $nbColonneCarte, $db, $temp_combat, $arCouleurs, $lstBatimentConstructionUnique, $MAX_essai, $lstPoints,
+global 	$NumVersion, $nbLigneCarte, $nbColonneCarte, $db, $temp_combat, $lstBatimentConstructionUnique, $MAX_essai, $lstPoints,
 		$objManager, $CodeCouleurQuete, $lstNonBatiment, $chkDebug, $lstBatimentsNonConstructible, $lstTypeObjets, $lstRessources, $LstBatimentMultiConstruction,
 		$lstBatimentConstructible;
 
@@ -20,15 +20,7 @@ $temp_combat		= 3600 * 1;				// Temp entre chaque combat
 
 $chkDebug			= false;
 
-//les couleurs
-$arCouleurs			= array(objArmement::TYPE_ATTAQUE			=> '#FF0000',		// Red 
-							objArmement::TYPE_DEFENSE			=> '#32CD32',		// LimeGreen
-							objArmement::TYPE_DISTANCE			=> '#c0c0c0',
-							maison::TYPE_RES_EAU_POTABLE		=> '#92ccff',		// bleu clair
-							maison::TYPE_RES_NOURRITURE			=> '#808000',		// Olive
-							personnage::TYPE_VIE				=> '#FFA07A',		// LightSalmon
-							personnage::TYPE_EXPERIENCE			=> '#6495ED',		// CornflowerBlue
-							personnage::TYPE_RES_MONNAIE		=> '#FFD700');		// Gold
+require_once 'arColor.php';
 
 //Listes des batiments que l'on ne peut construire que 1 seule fois
 $lstBatimentConstructionUnique	= array(maison::ID_BATIMENT,
