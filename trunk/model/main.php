@@ -225,13 +225,13 @@ function AfficheActions(personnage &$oJoueur) {
 
 		//=== On affiche le choix des ennemis attaquables
 		$sql = "SELECT * FROM table_joueurs WHERE 
-		login NOT IN ('".implode("', '", ListeMembreClan($oJoueur->GetClan()))."') 
+		login NOT IN ('".implode("', '", array_merge(ListeMembreClan($oJoueur->GetClan()), ListMembreVillage($oJoueur->GetVillage())))."') 
 		AND position IN('".implode("', '", $arSQLPosition)."');";
 		echo AfficheListeEnnemisAFrapper($oJoueur, $sql);
 
 		//=== On affiche la liste des batiment attaquables
 		$SQLCarte = "SELECT * FROM table_carte WHERE detruit IS NULL 
-		AND login NOT IN ('".implode("', '", ListeMembreClan($oJoueur->GetClan()))."') 
+		AND login NOT IN ('".implode("', '", array_merge(ListeMembreClan($oJoueur->GetClan()), ListMembreVillage($oJoueur->GetVillage())))."') 
 		AND coordonnee IN ('".implode("', '", $arSQLPosition)."');";
 		echo AfficheListeBatimentAttaquable($SQLCarte, $chkConstruction = true);
 
@@ -248,7 +248,7 @@ function AfficheActions(personnage &$oJoueur) {
 	echo AfficheQueteAPorteeDeTire($LstQueteAccessible);
 }
 function AfficheRedirectionBatiment(personnage &$oJoueur){
-	$batiment = FoundBatiment(false, $oJoueur->GetLogin(), $oJoueur->GetCoordonnee());
+	$batiment = FoundBatiment(NULL, $oJoueur->GetLogin(), $oJoueur->GetCoordonnee());
 	if(!is_null($batiment) and get_class($batiment) != 'ressource'){
 		return '<p>Allez à votre '
 					.'<a href="index.php?page=village&amp;anchor='.str_replace(',', '_', $batiment->GetCoordonnee()).'">'
@@ -261,7 +261,7 @@ function AfficheRedirectionBatiment(personnage &$oJoueur){
 	}
 }
 function AfficheActionViderStock(personnage &$oJoueur){
-	$batiment = FoundBatiment(false, $oJoueur->GetLogin(), $oJoueur->GetCoordonnee());
+	$batiment = FoundBatiment(NULL, $oJoueur->GetLogin(), $oJoueur->GetCoordonnee());
 	if(	!is_null($batiment)
 		AND in_array($batiment->GetIDType(), array(mine::ID_BATIMENT, ferme::ID_BATIMENT, carriere::ID_BATIMENT, potager::ID_BATIMENT/* , scierie::ID_BATIMENT */))
 		AND $batiment->GetStockContenu() == $batiment->GetStockMax()){
@@ -993,14 +993,20 @@ function NotificationMail($To, $type, $nom, $info) {
 function CheckQueteAccessible(&$lstMonster, $Position) {
 	global $temp_combat;
 	$arTmp = null;
-	foreach ($_SESSION['QueteEnCours'] as $Quete) {
+	foreach ($_SESSION['QueteEnCours'] as $Quete)
+	{
 		$arPositionJoueur = explode(',', $Position);
-		if (in_array($Quete->GetTypeQuete(), array('monstre', 'romains')) AND $arPositionJoueur[0] == $Quete->GetCarte()) {
+		
+		if(	($Quete->CheckQueteMonstre() OR $Quete->CheckQueteEnnemi())
+			AND $arPositionJoueur[0] == $Quete->GetCarte())
+		{
 			$arPositionQuete = $Quete->GetPosition();
-			if ($arPositionQuete[0] == $arPositionJoueur[1]
-			AND $arPositionQuete[1] == $arPositionJoueur[2]
-			AND (strtotime('now') - $Quete->GetDateCombat()) > $temp_combat) {
-				$lstMonster[] = array('id' => $Quete->GetIDQuete(), 'nom' => $Quete->GetNom());
+
+			if(	$arPositionQuete[0] == $arPositionJoueur[1]
+				AND $arPositionQuete[1] == $arPositionJoueur[2]
+				AND (strtotime('now') - $Quete->GetDateCombat()) > $temp_combat)
+			{
+				$lstMonster[] = array('id' => $Quete->GetIDQuete(), 'nom' => $Quete->GetNomEnnemi());
 			}
 		}
 	}
@@ -1099,7 +1105,7 @@ function ActionMove(&$check, personnage &$oJoueur, &$objManager){
 		$tmp = AttaqueTour($oJoueur);
 		if(!is_null($tmp)){
 			$_SESSION['message'][] = '<p>Vous avez été attaqué par une ou des tours. Vous êtes blessé de '.$tmp.'pts de vie.</p>';
-		}
+ 		}
 	}
 
 	if(isset($_SESSION['QueteEnCours'])){
