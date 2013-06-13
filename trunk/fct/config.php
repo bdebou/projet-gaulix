@@ -20,7 +20,7 @@ $temp_combat		= 3600 * 1;				// Temp entre chaque combat
 
 $chkDebug			= false;
 
-require_once 'arColor.php';
+require_once 'arColor.config.php';
 
 //Listes des batiments que l'on ne peut construire que 1 seule fois
 $lstBatimentConstructionUnique	= array(maison::ID_BATIMENT,
