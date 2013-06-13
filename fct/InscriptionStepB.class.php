@@ -98,7 +98,7 @@ class InscriptionStepB{
 					'".$_SESSION['inscription']['login']."');";
 		mysql_query($sql) or die ( mysql_error().'<br />'.$sql);
 		
-		unset($_SESSION['inscription']);
+		
 	}
 	
 	public function loadForm($data){
@@ -152,6 +152,8 @@ class InscriptionStepB{
 			</ul>
 		</div>
 		<button type="button" style="width:160px;" onclick="window.location=\'./\'">Retour</button>';
+		
+		unset($_SESSION['inscription']);
 	}
 	private function PositionAleatoire($civilisation){
 		global $nbLigneCarte, $nbColonneCarte;
