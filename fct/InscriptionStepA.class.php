@@ -14,9 +14,6 @@ class InscriptionStepA{
 	const SIZE_PASS_MIN		= 6;
 	const SIZE_PASS_MAX		= 20;
 	
-	const CIVI_GAULOIS		= 'gaulois';
-	const CIVI_ROMAINS		= 'romains';
-	
 	const STYLE_BLANC		= ' style = "background-color: #ffffff" ';
 	const STYLE_ROUGE		= ' style = "background-color: #ff0000" ';
 		
@@ -138,28 +135,6 @@ class InscriptionStepA{
 		}
 	}
 		
-	private function envoi_sql(){ //fonction qui envoie la requete SQL
-		require('./fct/config.php'); // On réclame le fichier
-		$sql = 	"INSERT INTO table_joueurs (
-				`id`, 
-				`login`, 
-				`password`, 
-				`mail`, 
-				`dates`, 
-				`civilisation`,
-				`last_action`, 
-				`date_last_combat`) 
-			VALUES (
-				NULL, 
-				'".$this->Login."', 
-				'".sha1($this->PasswordA)."', 
-				'".$this->Mail."', 
-				'".date('Y-m-d H:i:s')."', 
-				'".$this->Civilisation."', 
-				'".date('Y-m-d H:i:s')."', 
-				'".date('Y-m-d H:i:s')."');";
-		mysql_query($sql) or die ( mysql_error().'<br />'.$sql);
-	}
 	
 	public function loadForm($data){
 		extract($data);
@@ -168,7 +143,7 @@ class InscriptionStepA{
 		$this->PasswordB		= $PasswordB;
 		$this->Mail				= strtolower($mail);
 		$this->CaptchaResult	= strtoupper($captchaResult);
-		$this->Civilisation		= strtolower($Civilisation);
+		$this->Civilisation		= $Civilisation;
 		
 		if($this->testForm()){
 			//$this->envoi_sql();
@@ -246,21 +221,21 @@ class InscriptionStepA{
 		return self::STYLE_BLANC;
 	}
 	public function GetSelectCivilisation($civilisation){
-		$sqlG = "SELECT id FROM table_joueurs WHERE civilisation='".self::CIVI_GAULOIS."';";
+		$sqlG = "SELECT id FROM table_joueurs WHERE civilisation='".personnage::CIVILISATION_GAULOIS."';";
 		$rqtG = mysql_query($sqlG) or die ( mysql_error() );
 		
-		$sqlR = "SELECT id FROM table_joueurs WHERE civilisation='".self::CIVI_ROMAINS."';";
+		$sqlR = "SELECT id FROM table_joueurs WHERE civilisation='".personnage::CIVILISATION_ROMAIN."';";
 		$rqtR = mysql_query($sqlR) or die ( mysql_error() );
 		
 		if(mysql_num_rows($rqtG) >= mysql_num_rows($rqtR)){
 			switch($civilisation){
-				case self::CIVI_GAULOIS:	return NULL;
-				case self::CIVI_ROMAINS:	return ' selected="selected"';
+				case personnage::CIVILISATION_GAULOIS:	return NULL;
+				case personnage::CIVILISATION_ROMAIN:	return ' selected="selected"';
 			}
 		}else{
 			switch($civilisation){
-				case self::CIVI_GAULOIS:	return ' selected="selected"';
-				case self::CIVI_ROMAINS:	return NULL;
+				case personnage::CIVILISATION_GAULOIS:	return ' selected="selected"';
+				case personnage::CIVILISATION_ROMAIN:	return NULL;
 			}
 		}
 	}

@@ -77,7 +77,7 @@ class InscriptionStepB{
 				VALUES (
 					NULL, 
 					'".$_SESSION['inscription']['login']."', 
-					'".$_SESSION['inscription']['password']."', 
+					'".sha1($_SESSION['inscription']['password'])."', 
 					'".$_SESSION['inscription']['mail']."', 
 					'".date('Y-m-d H:i:s')."', 
 					'".$_SESSION['inscription']['civilisation']."', 
@@ -159,10 +159,10 @@ class InscriptionStepB{
 		global $nbLigneCarte, $nbColonneCarte;
 		if(is_null($this->CarteVillage)){
 			switch($civilisation){
-				case InscriptionStepA::CIVI_GAULOIS:
+				case personnage::CIVILISATION_GAULOIS:
 					$Cartes = array('a','b','c','d','e','f','g','h','i','j','m','n','o');
 					break;
-				case InscriptionStepA::CIVI_ROMAINS:
+				case personnage::CIVILISATION_ROMAIN:
 					$Cartes = array('k','l','p','q','r','s','t','u','v','w','x','y');
 					break;
 			}
