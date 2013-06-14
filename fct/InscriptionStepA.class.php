@@ -47,7 +47,7 @@ class InscriptionStepA{
 				return true;
 			}else{
 				$this->CaptchaResult = NULL;
-    			$this->Message .= '<li>Code de vérification invalide</li>';
+    			$this->Message .= '<li>Code de vÃ©rification invalide</li>';
 				return false;
 			}
 		}else{
@@ -73,14 +73,14 @@ class InscriptionStepA{
 	
 				$this->PasswordA = NULL;
 				$this->PasswordB = NULL;
-    			$this->Message .= '<li>Password trop court (min '.self::SIZE_PASS_MIN.' caractères)</li>';
+    			$this->Message .= '<li>Password trop court (min '.self::SIZE_PASS_MIN.' caractÃ¨res)</li>';
 				return false;
 	
 			}elseif(strlen($this->PasswordA) > self::SIZE_PASS_MAX){
 	
 				$this->PasswordA = NULL;
 				$this->PasswordB = NULL;
-    			$this->Message .= '<li>Password trop long (max '.self::SIZE_PASS_MAX.' caractères)</li>';
+    			$this->Message .= '<li>Password trop long (max '.self::SIZE_PASS_MAX.' caractÃ¨res)</li>';
 				return false;
 	
 			}else{
@@ -92,7 +92,7 @@ class InscriptionStepA{
 		}
 	}
 	private function CheckLogin(){
-			// On réclame le fichier
+			// On rÃ©clame le fichier
 		require_once('./fct/config.php');
 		
 		if(isset($_POST['next'])){
@@ -110,19 +110,19 @@ class InscriptionStepA{
 			}elseif(strlen($this->Login) < self::SIZE_LOGIN_MIN){
 				
 				$this->Login = NULL;
-    			$this->Message .= '<li>Login trop court (min '.self::SIZE_LOGIN_MIN.' caractères)</li>';
+    			$this->Message .= '<li>Login trop court (min '.self::SIZE_LOGIN_MIN.' caractÃ¨res)</li>';
 				return false;
 				
 			}elseif(strlen($this->Login) > self::SIZE_LOGIN_MAX){
 				
 				$this->Login = NULL;
-    			$this->Message .= '<li>Login trop long (max '.self::SIZE_LOGIN_MAX.' caractères)</li>';
+    			$this->Message .= '<li>Login trop long (max '.self::SIZE_LOGIN_MAX.' caractÃ¨res)</li>';
 				return false;
 				
 			}else{
 				
 				$sql = "SELECT id FROM table_joueurs WHERE login='".$this->Login."'";
-				// On vérifie si ce login existe
+				// On vÃ©rifie si ce login existe
 				$requete = mysql_query($sql) or die ( mysql_error() );
 				
 				if(mysql_num_rows($requete) == 0){
@@ -139,7 +139,7 @@ class InscriptionStepA{
 	}
 		
 	private function envoi_sql(){ //fonction qui envoie la requete SQL
-		require('./fct/config.php'); // On réclame le fichier
+		require('./fct/config.php'); // On rÃ©clame le fichier
 		$sql = 	"INSERT INTO table_joueurs (
 				`id`, 
 				`login`, 
@@ -152,7 +152,7 @@ class InscriptionStepA{
 			VALUES (
 				NULL, 
 				'".$this->Login."', 
-				'".$this->PasswordA."', 
+				'".sha1($this->PasswordA)."', 
 				'".$this->Mail."', 
 				'".date('Y-m-d H:i:s')."', 
 				'".$this->Civilisation."', 
