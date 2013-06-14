@@ -77,8 +77,8 @@
 			<td align="right"><strong>*</strong> Civilisation :</td>
 			<td>
 				<select style="width:150px;" name="Civilisation" onselect="CacherAutreVillage(this);">
-					<option value="<?php echo InscriptionStepA::CIVI_GAULOIS;?>"<?php echo $contact->GetSelectCivilisation(InscriptionStepA::CIVI_GAULOIS);?>>Gaulois</option>
-					<option value="<?php echo InscriptionStepA::CIVI_ROMAINS;?>"<?php echo $contact->GetSelectCivilisation(InscriptionStepA::CIVI_ROMAINS);?>>Romains</option>
+					<option value="<?php echo personnage::CIVILISATION_GAULOIS;?>"<?php echo $contact->GetSelectCivilisation(personnage::CIVILISATION_GAULOIS);?>>Gaulois</option>
+					<option value="<?php echo personnage::CIVILISATION_ROMAIN;?>"<?php echo $contact->GetSelectCivilisation(personnage::CIVILISATION_ROMAIN);?>>Romains</option>
 				</select>
 			</td>
 		</tr>
