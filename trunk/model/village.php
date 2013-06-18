@@ -18,6 +18,12 @@ function CreateListBatiment(personnage &$oJoueur){
 
 	return $lstBatiment;
 }
+/**
+ * Retourne une <TR> pour un tableau contenant toutes les informations du batiment.
+ * @param batiment $batiment
+ * @param <i>personnage $oJoueur </i>
+ * @return string
+ */
 function AfficheBatiment(batiment &$batiment, personnage &$oJoueur = NULL){
 	$ImgSize = 'height';
 	$txt = NULL;

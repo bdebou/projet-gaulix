@@ -667,7 +667,7 @@ function ListeMembreClan($Clan){
 /**
  * Retourne NULL ou la liste des membres du $Village
  * @param string $Village
- * @return array|NULL
+ * @return array
  */
 function ListMembreVillage($Village){
 	//$lstMembre = null;
@@ -692,7 +692,7 @@ function ListMembreVillage($Village){
 		return $lstMembre;
 	}
 	
-	return NULL;
+	return array();
 }
 function AddHistory($Login, $Carte, $Position, $Type, $Adversaire, $Date, $Info) {
 	if(is_null($Date)){
