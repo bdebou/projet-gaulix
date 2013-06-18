@@ -1,6 +1,6 @@
 <h1>Compétences</h1>
-<p>Dans cette partie, vous pourrez améliorer votre attaque et votre défense pour un prix modeste et un temps de travail correct.</p>
-<p>Mais aussi apprendre des compétences diverses et variées qui vous permettront de fabriquer des armes, objets, boucliers, ...</p>
+<p>Mise à part de l'amélioration de votre attaque et de votre défense, vous pourrez apprendre ou amélioraer vos connaissance dans certain domaines tel que la Métallurgie, la cuisine, la médecine, la magie, ...</p> 
+<p>Voici un apperçu des quelques compétences disponible:</p>
 <?php
 echo AfficheListeCompetences();
 ?>

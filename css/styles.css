@@ -27,7 +27,9 @@ div.pub,
 div.carte,
 div.login,
 div.perfectionnement,
-div.fiche_quete{
+div.fiche_quete,
+div.equipements,
+div.regles_competences{
 	float: left;
 }
 div.module_social,
@@ -48,7 +50,8 @@ div.statistiques{
 div.main,
 div.loginstatus,
 div.module_social,
-div.statistiques{
+div.statistiques,
+div.equipements{
 	padding: 3px;
 }
 div.loginstatus,
@@ -60,7 +63,9 @@ div.main,
 div.module_social,
 div.carte,
 div.statistiques,
-div.fiche_quete{
+div.fiche_quete,
+div.equipements,
+div.regles_competences{
 	margin: 2px;
 }
 div.history,
@@ -92,9 +97,13 @@ div.main{
 div.loginstatus{
 	background: red;
 }
+div.carte,
+div.pub,
+div.equipements{
+	text-align: center;
+}
 div.carte{
 	width: 465px;
-	text-align: center;
 }
 div.pion{
 	margin: auto;
@@ -109,7 +118,6 @@ div.actions{
 div.pub{
 	width: 310px;
 	height: 250px;
-	text-align: center;
 	overflow: hidden;
 }
 div.menu{
@@ -123,6 +131,12 @@ div.equipement{
 div.statistiques{
 	height: 100px;
 	width : 200px;
+}
+div.equipements{
+	border-collapse: collapse;
+	border: 1px solid black;
+	height: 180px;
+	width: 117px;
 }
 div.loginstatus span.login{
 	 font-weight: bold;
@@ -150,15 +164,21 @@ div.perfectionnement{
 	width: 393px;
 	height: 300px;
 }
+div.regles_competences,
 div.Ressource,
 div.Divers,
 div.Armement,
 div.Construction{
 	width: 378px;
-	height: 250px;
+	height: 150px;
 	overflow-y: auto; 
 }
-
+div.Ressource,
+div.Divers,
+div.Armement,
+div.Construction{
+	height: 250px;
+}
 /*  Les Onglets */
 .onglet{
 	display:inline-block;
@@ -196,9 +216,6 @@ table.quetes, table.quetes td{
 }
 table.InfoBulle{
 	width: 190px;
-}
-table.regles_competences td.regles_competences_niveau{
-	width: 100px;
 }
 table.mouvements{
 	width: 220px;

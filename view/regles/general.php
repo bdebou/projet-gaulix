@@ -14,9 +14,9 @@
 	<table class="experience">
 		<tr style="background:grey;"><th>Niveau</th><th>Expérience</th></tr>
 		<tr><td>0</td><td>100</td></tr>
-		<tr><td>1</td><td>200</td></tr>
-		<tr><td>2</td><td>300</td></tr>
-		<tr><td>3</td><td>400</td></tr>
+		<tr><td>1</td><td>300</td></tr>
+		<tr><td>2</td><td>600</td></tr>
+		<tr><td>3</td><td>1000</td></tr>
 		<tr><td>...</td><td>...</td></tr>
 	</table>
 </div>
@@ -37,5 +37,5 @@
 	<h3>Attaques de bâtiment</h3>
 	<p>C'est le même principe que pour le combat entre joueur mais la différence se situe au niveau des conséquences.</p>
 	<p>Le bâtiment perdra des pts de vie selon la formule suivante : <i>ValeurCombatJoueur - DefenseBatiment</i>. Si la différence est négative, le bâtiment ne perdra pas de points.</p>
-	<p>Et le joueur perdra des pts de vies selon la formule suivante : <i>(AttaqueBatiment * 1.15) - DefenseJoueur</i>. Si la différence est négative, le joueur ne perdra pas de points.</p>
+	<p>Et le joueur perdra des pts de vies selon la formule suivante : <i>(AttaqueBatiment * <?php echo batiment::TAUX_ATTAQUANT;?>) - DefenseJoueur</i>. Si la différence est négative, le joueur ne perdra pas de points.</p>
 	<p>Dans tous les cas, le joueur augmentera son expérience de 5pts.</p>
