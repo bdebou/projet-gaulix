@@ -409,6 +409,10 @@ abstract class quete{
 	}
 	//--- Les Sets ---
 	public function SetVie($value){			$this->Vie = $value;}
+	/**
+	 * Pour changer les coordonnées de la quête.
+	 * @param array $value
+	 */
 	public function SetPosition($value){	$this->Position = $value;}
 	
 	//--- Renvoie de valeur ---
