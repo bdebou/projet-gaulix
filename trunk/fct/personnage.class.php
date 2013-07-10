@@ -54,6 +54,7 @@ class personnage{
 	const TYPE_RES_MONNAIE			= 'Sesterce';
 	const TYPE_COMPETENCE			= 'Compétence';
 	
+	Const TYPE_COMBAT				= 'Combat';
 	Const TYPE_PERFECT_ATTAQUE		= objArmement::TYPE_ATTAQUE;
 	Const TYPE_PERFECT_DEFENSE		= objArmement::TYPE_DEFENSE;
 	
@@ -167,7 +168,7 @@ class personnage{
 				//La cible à perdu
 			$montant = $persoCible->GetArgent();
 			
-			if($persoCible->PerdreVie($Valeur-$ValeurCible,'combat')){
+			if($persoCible->PerdreVie($Valeur-$ValeurCible, self::TYPE_COMBAT)){
 				$this->AddOr($montant);
 			}else{
 				$montant = intval($this->GetTauxVolArgent() * $persoCible->GetArgent());
@@ -195,7 +196,7 @@ class personnage{
 		}else{
 				//La Cible a gagné
 			$montant = $this->GetArgent();
-			if($this->PerdreVie($ValeurCible-$Valeur,'combat')){
+			if($this->PerdreVie($ValeurCible-$Valeur, self::TYPE_COMBAT)){
 				$persoCible->AddOr($montant);
 			}else{
 				$montant = intval($this->GetArgent() / 10);
@@ -228,7 +229,12 @@ class personnage{
 			}
 		}
 	}
-	//On met à jour les scores après le combat
+
+	/**
+	 * On met à jour les scores après le combat
+	 * @param integer $Gagner
+	 * @param integer $Perdu
+	 */
 	public function UpdateScores($Gagner, $Perdu){
 		$this->nb_victoire+=$Gagner;
 		$this->nb_vaincu+=$Perdu;
@@ -264,9 +270,16 @@ class personnage{
 		$this->niveau++;
 		$this->UpdatePoints(abs(self::POINT_NIVEAU_TERMINE));
 	}
+	/**
+	 * On diminue la valeur de la vie du joueur de $nb. Et selon le $type, on affect certains autres paramètres comme la date du dernier combat.
+	 * Si la vie du joueur est égale à 0 ou moins, on return <b>True</b> pour signaler qu'il est mort.
+	 * @param integer $nb
+	 * @param string $type
+	 * @return boolean
+	 */
 	public function PerdreVie($nb, $type){
 		switch($type){
-			case 'combat':
+			case self::TYPE_COMBAT:
 				$this->vie -= $nb;
 				$this->last_combat=strtotime('now');
 				break;
@@ -274,18 +287,22 @@ class personnage{
 			case 'chasse':
 			case 'druide':
 			case 'legionnaire':
-			case 'quete':
+			case quete::TYPE_QUETE:
 				$this->vie -= $nb;
 				break;
 		}
 		if($this->vie <= 0){
 			$this->Ressuscite();
 			return true;
-		}else{
-			return false;
 		}
+		
+		return false;
 	}
 	
+	/**
+	 * On augmente la valeur Vie de son joueur de $nb jusqu'au MAX pas plus.
+	 * @param integer $nb
+	 */
 	public function GagnerVie($nb){
 		$this->vie += $nb;
 		if($this->vie > self::VIE_MAX){$this->vie = self::VIE_MAX;}
@@ -348,9 +365,17 @@ class personnage{
 		$Code = NULL;
 	}
 	//La gestion de l'or
+	/**
+	 * On augmente son argent de $or
+	 * @param integer $or
+	 */
 	public function AddOr($or){
 		$this->argent += abs(intval($or));
 	}
+	/**
+	 * On diminue son argent de $or
+	 * @param integer $or
+	 */
 	public function MindOr($or){
 		$this->argent -= abs(intval($or));
 	}
@@ -501,7 +526,7 @@ class personnage{
 				foreach($this->arInventaire as $key=>$element)
 				{
 					$arTemp = explode('=', $element);
-					if(	$arTemp['0'] == $codeObjet/*  AND $this->CheckSiObjetPeutEtreGroupe($codeObjet, $typeObjet) */)
+					if(	$arTemp['0'] == $codeObjet)
 					{
 						$arTemp['1'] += $nbObjet;
 						$this->arInventaire[$key] = implode('=', $arTemp);
@@ -551,19 +576,10 @@ class personnage{
 		}
 		return false;
 	}
-	public function CheckSiObjetPeutEtreGroupe($code = null, $type = null) {
-		//les  ressource ne peuvent pas etre groupées
-		if (!is_null($code) AND in_array(substr($code, 0, 6), array('ResBoi', 'ResNou', 'ResPie', 'ResVie', 'ResDep'))) {
-			return false;
-		}
-	
-		//les objets de type armes et autre de combats ne peuvents pas etre grouppés
-		if (!is_null($type) AND in_array($type, array('sac', 'arme', 'bouclier', 'jambiere', 'casque', 'cuirasse', 'livre', 'sort', 'potion'))) {
-			return false;
-		}
-		//Autrement oui
-		return true;
-	}
+	/**
+	 * On vérifie si on a un plus grand bolga que celui par défaut de 20 objets.
+	 * @return integer
+	 */
 	public function QuelCapaciteMonBolga() {
 	    //Est ce que le joueur possède un sac?
 	    if (!is_null($this->code_sac)) {
@@ -574,10 +590,9 @@ class personnage{
 	        
 	        return $result['objet_attaque'];
 	        
-	    } else {
-	    	
-	        return self::TAILLE_MINIMUM_BOLGA;
 	    }
+	    
+	    return self::TAILLE_MINIMUM_BOLGA;	    
 	}
 
 	public function LaunchPerfectionnement($type, $tmp, $prix, $step){
@@ -984,6 +999,10 @@ class personnage{
 		if(!is_null($this->arInventaire)){return $this->arInventaire;}
 		else{return NULL;}
 	}
+	/**
+	 * Retourne une array avec les valeurs de combats grace à l'entrainement et les valeurs d'attaque grace aux équipements
+	 * @return array <li>Valeur de defense</li><li>Valeur des objets</li> 
+	 */
 	public function GetAttPerso(){
 			//on initialise la valeur d'attaque des équipements		
 		$val_attaque_objet = 0;
@@ -996,7 +1015,11 @@ class personnage{
 		
 		return array($this->val_attaque, $val_attaque_objet);
 	}
-	public function GetDefPerso(){
+	/**
+	 * Retourne une array avec les valeurs de défense grace à l'entrainement et les valeurs de défense grace aux équipements
+	 * @return array <li>Valeur de defense</li><li>Valeur des objets</li> 
+	 */
+	 public function GetDefPerso(){
 			//on initialise la valeur d'attaque des équipements
 		$val_defense_objet = 0;
 		
@@ -1008,7 +1031,11 @@ class personnage{
 		
 		return array($this->val_defense, $val_defense_objet);
 	}
-	public function GetDisPerso(){
+	/**
+	 * Retourne une array avec la distance utile
+	 * @return integer <p>Valeur de la distance</p>
+	 */
+	 public function GetDisPerso(){
 			//on initialise la valeur d'attaque des équipements		
 		$val_distance_objet = 0;
 		
@@ -1065,6 +1092,10 @@ class personnage{
 	public function GetCivilisation(){		return $this->civilisation;}
 	public function GetVillage(){			return $this->village;}
 	public function GetCodeCarriere(){		return $this->carriere;}
+	/**
+	 * Retourne les coordonnées de la maison si installée sinon retourn NULL
+	 * @return <b>Array</b>
+	 */
 	public function GetMaisonInstalle(){	return $this->maison_installe;}
 	public function GetAttaqueTour(){		return $this->attaque_tour;}
 	public function GetClan(){				return $this->clan;}
@@ -1090,7 +1121,7 @@ class personnage{
 	/**
 	 * Retourne le niveau maximum atteint dans un type de compétence donnée par $TypeCompetence
 	 * @param string $TypeCompetence <p>Nom du type de compétence</p>
-	 * @return number|NULL
+	 * @return <b><i>Integer</i></b> or NULL
 	 */
 	public function GetNiveauCompetence( $TypeCompetence){
 		
