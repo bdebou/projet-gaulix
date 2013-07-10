@@ -606,8 +606,8 @@ function QuelTypeRessource(&$Code) {
 }
 /**
  * Retourne la liste des cases libres d'une carte X ($carte = X) ou toutes les cartes ($carte = NULL)
- * @param string $carte <p>Default value : NULL</p>
- * @return array
+ * @param string $carte Default value : NULL
+ * @return array(string) Liste de coordonnées (c,x,y)
  */
 function FreeCaseCarte($carte = NULL) {
 	$sql = "SELECT coordonnee FROM table_carte WHERE detruit IS NULL AND id_type_batiment NOT IN (11);";
