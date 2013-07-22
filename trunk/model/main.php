@@ -75,7 +75,7 @@ function AfficheMouvements(personnage &$oJoueur) {
 	</table>';
 	return $txt;
 }
-function AfficheActions(personnage &$oJoueur, maison &$oMaison) {
+function AfficheActions(personnage &$oJoueur, maison &$oMaison = NULL) {
 	global $retour_combat, $nbLigneCarte, $nbColonneCarte;
 
 	$LstQueteAccessible = null;
@@ -309,7 +309,7 @@ function AfficheObjetTrouveDansMenuAction(personnage &$oJoueur) {
 	}
 	return (is_null($txt) ? $txt : $txt . '<hr />');
 }
-function AfficheCollecteRessource(personnage &$oJoueur, maison &$oMaison) {
+function AfficheCollecteRessource(personnage &$oJoueur, maison &$oMaison = NULL) {
 	//on vérifie si on a déja installé sa maison
 	if (is_null($oJoueur->GetMaisonInstalle())) {
 		return null;
@@ -403,7 +403,7 @@ function ChkIfFree($position) {
 
 	return true;
 }
-function AfficheGibierAChasser(personnage &$oJoueur, maison &$oMaison) {
+function AfficheGibierAChasser(personnage &$oJoueur, maison &$oMaison = NULL) {
 	$txt = null;
 	if(!$oJoueur->GetChkChasse())
 	{
@@ -585,7 +585,7 @@ Function AfficheAttaqueBrigand(personnage &$oJoueur) {
 			<hr />';
 	}
 } */
-function AfficheMenuConstruction(personnage &$oJoueur, &$chkConstruction, maison &$maison) {
+function AfficheMenuConstruction(personnage &$oJoueur, &$chkConstruction, maison &$maison = NULL) {
 	if (is_null($oJoueur->GetMaisonInstalle())) {
 		//La Maison n'est pas encore installée
 		
@@ -1187,7 +1187,7 @@ function ActionLegionnaire(&$check, personnage &$oJoueur){
 		echo 'Erreur GLX0002: Fonction ActionLegionnaire';
 	}
 }
-function ActionConstruire(&$check, $id, personnage &$oJoueur, maison &$maison){
+function ActionConstruire(&$check, $id, personnage &$oJoueur, maison &$maison = NULL){
 	if(ChkIfBatimentDejaConstruit($_SESSION['main'][$id]['construire']))
 	{
 		$check = false;
