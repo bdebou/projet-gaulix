@@ -2,15 +2,14 @@
 	<h1>La Carte</h1>
 	<table class="all_cartes">
 <?php 
-$arCarteNum = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y');
 $numCol = 0;
 
-for($i=0; $i <= (count($arCarteNum) - 1); $i++){
+for($i=0; $i <= (count($arCartes) - 1); $i++){
 	if($numCol == 0){
 		echo '
 	<tr>';
 	}
-	echo '<td>'.AfficheCarte($arCarteNum[$i], true).'</td>';
+	echo '<td>'.AfficheCarte($arCartes[$i], true, array($nbLigneCarte, $nbColonneCarte)).'</td>';
 	
 	$numCol++;
 	
