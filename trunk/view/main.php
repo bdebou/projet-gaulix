@@ -1,10 +1,5 @@
-<?php 
-global $objManager;
-$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
-
-?>
 <div class="main">
-	<div class="carte"><?php echo AfficheCarte($oJoueur->GetCarte());?></div>
+	<div class="carte"><?php echo AfficheCarte($oJoueur->GetCarte(), false, array($nbLigneCarte, $nbColonneCarte));?></div>
 	<div class="mouvements"><?php echo AfficheMouvements($oJoueur);?></div>
 	<div class="module_social">
 		<table class="module_social">
@@ -33,13 +28,9 @@ $oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 	<div class="pub">
 		<iframe class="pub" src="./pub.html"></iframe>
 	</div>
-	<div class="actions"><?php AfficheActions($oJoueur);?></div>
+	<div class="actions"><?php AfficheActions($oJoueur, $oMaison);?></div>
 	<div class="history">
 		<h1>Historique</h1>
 		<?php echo AfficheHistory($oJoueur);?>
 	</div>
 </div>
-<?php 
-$objManager->update($oJoueur);
-unset($oJoueur);
-?>

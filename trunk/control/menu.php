@@ -1,9 +1,6 @@
 <?php
 include_once('model/menu.php');
 
-global $objManager, $chkDebug;
-$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
-
 $arBtMenu[0] = array('link' => './',							'name' => 'Principal');
 $arBtMenu[1] = array('link' => './index.php?page=inventaire',	'name' => 'Bolga');
 $arBtMenu[2] = array('link' => './index.php?page=equipement',	'name' => 'Equipements');
@@ -24,9 +21,4 @@ $arBtMenu[10] = array('link' => './index.php?page=regles',		'name' => 'Règles');
 $arBtMenu[11] = array('link' => './index.php?page=options',		'name' => AfficheIcone('options', 15) . ' Options');
 
 include('view/menu.php');
-
-$objManager->update($oJoueur);
-unset($oJoueur);
-
-
 ?>

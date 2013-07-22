@@ -1,5 +1,5 @@
 <?php
-function CreateListBatiment(personnage &$oJoueur){
+function CreateListBatiment(personnage &$oJoueur, maison &$oMaison = NULL){
 	global $lstNonBatiment, $lstBatimentsNonConstructible;
 	
 	$lstBatiment = null;
@@ -11,7 +11,7 @@ function CreateListBatiment(personnage &$oJoueur){
 	
 		while($carte = mysql_fetch_array($requete, MYSQL_ASSOC)){
 			if(!in_array($carte['id_type_batiment'], array_merge($lstNonBatiment, $lstBatimentsNonConstructible))){
-				$lstBatiment[] = AfficheBatiment(FoundBatiment(NULL, $oJoueur->GetLogin(), $carte['coordonnee']), $oJoueur);
+				$lstBatiment[] = AfficheBatiment(FoundBatiment(NULL, $oJoueur->GetLogin(), $carte['coordonnee']), $oJoueur, $oMaison);
 			}
 		}
 	}
@@ -24,7 +24,7 @@ function CreateListBatiment(personnage &$oJoueur){
  * @param <i>personnage $oJoueur </i>
  * @return string
  */
-function AfficheBatiment(batiment &$batiment, personnage &$oJoueur = NULL){
+function AfficheBatiment(batiment &$batiment, personnage &$oJoueur = NULL, maison &$oMaison = NULL){
 	$ImgSize = 'height';
 	$txt = NULL;
 
@@ -86,7 +86,7 @@ function AfficheBatiment(batiment &$batiment, personnage &$oJoueur = NULL){
 	if(!is_null($oJoueur))
 	{
 		$arLignes[2] = '
-			<tr><td>'.$batiment->AfficheOptionAmeliorer($oJoueur).'</td></tr>';
+			<tr><td>'.$batiment->AfficheOptionAmeliorer($oJoueur, $oMaison).'</td></tr>';
 		$arLignes[4] = '
 			<tr>
 				<td>'
@@ -171,10 +171,8 @@ function UpdateTransaction($id, $type='vendu') {
 //+---------------------------------+
 //|				ACTIONS				|
 //+---------------------------------+
-function ActionAmeliorerBatiment(&$check, personnage &$oJoueur, &$objManager, $coordonnee){
+function ActionAmeliorerBatiment(&$check, personnage &$oJoueur, &$objManager, $coordonnee, maison &$maison){
 	if(isset($_SESSION['main'][$coordonnee])){
-
-		$maison = $oJoueur->GetObjSaMaison();
 
 		if(!is_null($maison)){
 				
@@ -204,7 +202,12 @@ function ActionAmeliorerBatiment(&$check, personnage &$oJoueur, &$objManager, $c
 							echo 'Erreur GLX0006: Fonction ActionAmeliorerBatiment - Pas de prix.';
 						}
 					case 'Finish':
-						$batiment->Amelioration($batiment->GetStatusAmelioration());
+						if($batiment->GetIDType() == maison::ID_BATIMENT){
+							$maison->Amelioration($maison->GetStatusAmelioration());
+						}else{
+							$batiment->Amelioration($batiment->GetStatusAmelioration());
+							$objManager->UpdateBatiment($batiment);
+						}
 						break;
 					default:
 						$check = false;
@@ -212,17 +215,12 @@ function ActionAmeliorerBatiment(&$check, personnage &$oJoueur, &$objManager, $c
 						break;
 				}
 				
-				$objManager->UpdateBatiment($batiment);
-				
 				unset($batiment);
 			}else{
 				$check = false;
 				echo 'Erreur GLX0004: Fonction ActionAmeliorerBatiment - Batiment Introuvable';
 			}
-			if($chk){
-				$objManager->UpdateBatiment($maison);
-			}
-			unset($maison);
+			
 		}else{
 			$check = false;
 			echo 'Erreur GLX0003: Fonction ActionAmeliorerBatiment - Maison Introuvable';
@@ -233,33 +231,24 @@ function ActionAmeliorerBatiment(&$check, personnage &$oJoueur, &$objManager, $c
 		echo 'Erreur GLX0002: Fonction ActionAmeliorerBatiment';
 	}
 }
-function ActionReparer(&$check, $qtePoint, personnage &$oJoueur, &$objManager){
+function ActionReparer(&$check, $qtePoint, personnage &$oJoueur, &$objManager, maison &$objMaison){
 	//if(isset($_SESSION['main']['Reparer'])){
 		$batiment = FoundBatiment(null, $oJoueur->GetLogin(), $oJoueur->GetCoordonnee());
 		
 		if(!is_null($batiment)){
-			$objMaison = $oJoueur->GetObjSaMaison();
 			
 			if(CheckCout($batiment->GetCoutReparation($qtePoint), $oJoueur, $objMaison))
 			{
 				$batiment->Reparer($qtePoint, $oJoueur);
-				
-				if($batiment->GetIDType() == maison::ID_BATIMENT)
-				{
-					foreach($batiment->GetCoutReparation($qtePoint) as $Prix)
-					{
-						UtilisationRessource(explode('=', $Prix), $oJoueur, $batiment);
-					}
-				}else{
 				foreach($batiment->GetCoutReparation($qtePoint) as $Prix)
-					{
-						UtilisationRessource(explode('=', $Prix), $oJoueur, $objMaison);
-					}
-					$objManager->UpdateBatiment($objMaison);
+				{
+					UtilisationRessource(explode('=', $Prix), $oJoueur, $objMaison);
 				}
-				//$oJoueur->MindOr(batiment::PRIX_REPARATION * $qtePoint);
-				$objManager->UpdateBatiment($batiment);
 				
+				if($batiment->GetIDType() != maison::ID_BATIMENT)
+				{
+					$objManager->UpdateBatiment($batiment);
+				}
 			}
 		}else{
 			$check = false;
@@ -377,9 +366,8 @@ function ActionProduction(&$check, $id, $NomBatiment, $type, personnage &$oJoueu
 	}
 	
 }
-function ActionDruide(&$chkErr, $id, personnage &$oJoueur, &$objManager){
+function ActionDruide(&$chkErr, $id, personnage &$oJoueur, maison &$maison){
 	if(isset($_SESSION['main']['druide'])){
-		$maison = $oJoueur->GetObjSaMaison();
 		foreach($_SESSION['main']['druide'][$id] as $key=>$value){
 			switch($key){
 				case 'N' :
@@ -443,8 +431,6 @@ function ActionDruide(&$chkErr, $id, personnage &$oJoueur, &$objManager){
 			$oJoueur->AddInventaire($_SESSION['main']['druide'][$id]['type'], 1, false);
 		}
 
-		$objManager->UpdateBatiment($maison);
-		unset($maison);
 		unset($_SESSION['main']['druide']);
 	}else{
 		$check = false;
@@ -477,7 +463,7 @@ function ActionVenteMarche(&$check, $id, &$oJoueur, &$objManager){
 		echo 'Erreur GLX0002: Fonction ActionVenteMarché';
 	}
 }
-function ActionAnnulerTransaction(&$chkErr, $id, personnage &$oJoueur, &$objManager){
+function ActionAnnulerTransaction(&$chkErr, $id, personnage &$oJoueur, maison &$maison){
 	if(isset($_GET['action']) and $_GET['action'] == 'annulertransaction'){
 		UpdateTransaction($_SESSION['main']['transaction'][$id]['annuler'], 'annule');
 
@@ -485,29 +471,23 @@ function ActionAnnulerTransaction(&$chkErr, $id, personnage &$oJoueur, &$objMana
 		$requete = mysql_query($sql) or die (mysql_error());
 		$row = mysql_fetch_array($requete, MYSQL_ASSOC);
 
-		$maison = $oJoueur->GetObjSaMaison();
-
 		$maison->AddRessource(maison::TYPE_RES_NOURRITURE, $row['vente_nourriture']);
 		$maison->AddRessource(maison::TYPE_RES_PIERRE, $row['vente_pierre']);
 		$maison->AddRessource(maison::TYPE_RES_BOIS, $row['vente_bois']);
 		$oJoueur->AddOr($row['vente_or']);
 
-		$objManager->UpdateBatiment($maison);
-
-		unset($maison);
 		unset($_GET['action']);
 	}else{
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionAnnulerTransaction';
 	}
 }
-function ActionAccepterTransaction(&$chkErr, $id, personnage &$oJoueur, &$objManager){
+function ActionAccepterTransaction(&$chkErr, $id, personnage &$oJoueur, &$objManager, maison &$maisonA){
 	if(isset($_GET['action']) and $_GET['action'] == 'acceptertransaction'){
 		$sql = "SELECT * FROM table_marche WHERE ID_troc=".$_SESSION['main']['transaction'][$id]['accepter'].";";
 		$requete = mysql_query($sql) or die (mysql_error());
 		$row = mysql_fetch_array($requete, MYSQL_ASSOC);
 
-		$maisonA = $oJoueur->GetObjSaMaison();
 		$maisonV = FoundBatiment(1, $row['vendeur']);
 		$vendeur = $objManager->GetPersoLogin($row['vendeur']);
 
@@ -547,22 +527,18 @@ function ActionAccepterTransaction(&$chkErr, $id, personnage &$oJoueur, &$objMan
 			$vendeur->AddOr($row['achat_or']);
 				
 			$objManager->update($vendeur);
-			$objManager->UpdateBatiment($maisonA);
 			$objManager->UpdateBatiment($maisonV);
 		}
 
-		unset($maison);
 		unset($_GET['action']);
 	}else{
 		$check = false;
 		echo 'Erreur GLX0002: Fonction ActionAccepterTransaction';
 	}
 }
-function ActionTransactionMarche(&$chkErr, personnage &$oJoueur, &$objManager){
+function ActionTransactionMarche(&$chkErr, personnage &$oJoueur, maison &$maison){
 	if(isset($_POST['transaction'])){
 		$_SESSION['transaction']['acceptation'] = null;
-
-		$maison = $oJoueur->GetObjSaMaison();
 
 		if($_POST['VOr']			> $oJoueur->GetArgent()){
 			$_SESSION['transaction']['acceptation'] .= 'Transaction annulée : Pas assez d\'or<br />';
@@ -586,10 +562,9 @@ function ActionTransactionMarche(&$chkErr, personnage &$oJoueur, &$objManager){
 			$maison->MindRessource(maison::TYPE_RES_PIERRE, $_POST['VPierre']);
 			$maison->MindRessource(maison::TYPE_RES_BOIS, $_POST['VBois']);
 			$oJoueur->MindOr($_POST['VOr']);
-			$objManager->UpdateBatiment($maison);
+			
 		}
 
-		unset($maison);
 		unset($_POST['transaction']);
 	}else{
 		$check = false;

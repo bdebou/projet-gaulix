@@ -1,10 +1,6 @@
 <?php
 include_once('model/inventaire.php');
 
-global $objManager, $chkDebug;
-
-$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
-
 $ChkDebugVar = false;
 
 if($chkDebug AND $ChkDebugVar){
@@ -26,10 +22,10 @@ if(isset($_GET['action'])){
 }elseif(isset($_POST['action'])){
 	switch($_POST['action'])
 	{
-		case 'Vendre':				ActionVendre($chkErr, $_POST['id'], $oJoueur, $objManager, abs($_POST['qte'])); break;
+		case 'Vendre':				ActionVendre($chkErr, $_POST['id'], $oJoueur, $oMaison, abs($_POST['qte'])); break;
 		case 'Entreposer':			ActionEntreposer($chkErr, $objManager, $_GET['id'], $oJoueur); break;
-		case 'Convertir':			ActionConvertir($chkErr, $_POST['id'], $oJoueur, $objManager, abs($_POST['qte'])); break;
-		case 'Utiliser':			ActionUtiliser($chkErr, $_SESSION['inventaire'][$_POST['id']]['code'], $oJoueur, $objManager, abs($_POST['qte'])); break;
+		case 'Convertir':			ActionConvertir($chkErr, $_POST['id'], $oJoueur, $oMaison, abs($_POST['qte'])); break;
+		case 'Utiliser':			ActionUtiliser($chkErr, $_SESSION['inventaire'][$_POST['id']]['code'], $oJoueur, abs($_POST['qte'])); break;
 		case 'Abandonner':			ActionAbandonner($chkErr, $oJoueur, $_POST['id'], abs($_POST['qte'])); break;
 		case 'Equiper':				ActionEquiper($chkErr, $_POST['id'], $oJoueur); break;
 		case 'Sort':				ActionSorts($chkErr, $oJoueur); break;
@@ -42,9 +38,6 @@ if(isset($_GET['action'])){
 if($chkDebug AND $ChkDebugVar){
 	var_dump($_SESSION['inventaire']);
 }
-
-$objManager->update($oJoueur);
-unset($oJoueur);
 
 if($chkDebug OR !$chkErr){
 	echo '<br /><a href="index.php?page=inventaire">Retour</a>';

@@ -75,7 +75,7 @@ function AfficheMouvements(personnage &$oJoueur) {
 	</table>';
 	return $txt;
 }
-function AfficheActions(personnage &$oJoueur) {
+function AfficheActions(personnage &$oJoueur, maison &$oMaison) {
 	global $retour_combat, $nbLigneCarte, $nbColonneCarte;
 
 	$LstQueteAccessible = null;
@@ -92,10 +92,10 @@ function AfficheActions(personnage &$oJoueur) {
 	echo AfficheObjetTrouveDansMenuAction($oJoueur);
 
 	//===  Affichage de collecte de ressource
-	echo AfficheCollecteRessource($oJoueur);
+	echo AfficheCollecteRessource($oJoueur, $oMaison);
 
 	//===  Affichage du gibier apportée de tir  ===
-	echo AfficheGibierAChasser($oJoueur);
+	echo AfficheGibierAChasser($oJoueur, $oMaison);
 	
 	//=== Affichage de l'action "Vider stock" si plein et sur la case
 	echo AfficheActionViderStock($oJoueur);
@@ -243,7 +243,7 @@ function AfficheActions(personnage &$oJoueur) {
 		<hr />';
 	}
 	//===  Partie pour afficher La possibilité de construction  ===
-	echo AfficheMenuConstruction($oJoueur, $chkConstruction);
+	echo AfficheMenuConstruction($oJoueur, $chkConstruction, $oMaison);
 	//===  Partie pour afficher les monstres des quetes  ===
 	echo AfficheQueteAPorteeDeTire($LstQueteAccessible);
 }
@@ -309,7 +309,7 @@ function AfficheObjetTrouveDansMenuAction(personnage &$oJoueur) {
 	}
 	return (is_null($txt) ? $txt : $txt . '<hr />');
 }
-function AfficheCollecteRessource(personnage &$oJoueur) {
+function AfficheCollecteRessource(personnage &$oJoueur, maison &$oMaison) {
 	//on vérifie si on a déja installé sa maison
 	if (is_null($oJoueur->GetMaisonInstalle())) {
 		return null;
@@ -336,7 +336,7 @@ function AfficheCollecteRessource(personnage &$oJoueur) {
 		{
 			$txt = '<p>Vous devez avoir une compétence <u>'. GetInfoCompetence($objRessource->GetCompetenceRequise(), 'cmp_lst_nom').'</u> pour ramasser ' . $objRessource->GetTextRessource() . '</p><hr />';
 		} else {
-			if(	CheckIfAssezRessource(array($objRessource->GetCodeRessource(ressource::TYPE_NORMAL), 1), $oJoueur, $oJoueur->GetObjSaMaison())
+			if(	CheckIfAssezRessource(array($objRessource->GetCodeRessource(ressource::TYPE_NORMAL), 1), $oJoueur, $oMaison)
 				OR count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga())
 			{
 				$txt = '<p style="text-align:center;">'
@@ -351,7 +351,7 @@ function AfficheCollecteRessource(personnage &$oJoueur) {
 				if ($objRessource->GetNomType() == ressource::NOM_RESSOURCE_PIERRE
 				AND $oJoueur->CheckCompetence(ressource::COMPETENCE_POUR_OR))
 				{
-					if(	CheckIfAssezRessource(array($objRessource->GetCodeRessource(ressource::TYPE_NORMAL), 1), $oJoueur, $oJoueur->GetObjSaMaison())
+					if(	CheckIfAssezRessource(array($objRessource->GetCodeRessource(ressource::TYPE_NORMAL), 1), $oJoueur, $oMaison)
 						OR count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga())
 					{
 						$txt .= '<p style="text-align:center;">'
@@ -403,7 +403,7 @@ function ChkIfFree($position) {
 
 	return true;
 }
-function AfficheGibierAChasser(personnage &$oJoueur) {
+function AfficheGibierAChasser(personnage &$oJoueur, maison &$oMaison) {
 	$txt = null;
 	if(!$oJoueur->GetChkChasse())
 	{
@@ -425,7 +425,7 @@ function AfficheGibierAChasser(personnage &$oJoueur) {
 				
 				return '<p>Voulez-vous chasser du ' . $oGibier->GetNom() . '? Gain de ' . AfficheListePrix($oGibier->GetRessource()).(!is_null($oGibier->GetAttaque())?' mais '.$oGibier->GetAttaque().' de force':NULL).'.'
 						. '<ul style="display:inline; list-style-type:none; padding:0px; text-align:center;">'
-						. ((CheckIfAssezRessource(array($oGibier->GetCode(), 1), $oJoueur, $oJoueur->GetObjSaMaison())
+						. ((CheckIfAssezRessource(array($oGibier->GetCode(), 1), $oJoueur, $oMaison)
 							OR count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga())?
 								'<li style="display:inline; margin-left:20px;"><a href="index.php?page=main&amp;action=chasser">Chasser</a></li>'
 								:'<li style="display:inline; margin-left:20px;">Votre Bolga est plein.</li>')
@@ -585,7 +585,7 @@ Function AfficheAttaqueBrigand(personnage &$oJoueur) {
 			<hr />';
 	}
 } */
-function AfficheMenuConstruction(personnage &$oJoueur, &$chkConstruction) {
+function AfficheMenuConstruction(personnage &$oJoueur, &$chkConstruction, maison &$maison) {
 	if (is_null($oJoueur->GetMaisonInstalle())) {
 		//La Maison n'est pas encore installée
 		
@@ -618,9 +618,6 @@ function AfficheMenuConstruction(personnage &$oJoueur, &$chkConstruction) {
 			$txt = null;
 			$chkStart = true;
 			$nbBatiment = 0;
-
-			//on trouve la maison
-			$maison = $oJoueur->GetObjSaMaison();
 
 			while ($row = mysql_fetch_array($rqtBatiment, MYSQL_ASSOC))
 			{
@@ -1116,26 +1113,17 @@ function ActionMove(&$check, personnage &$oJoueur, &$objManager){
 	unset($_SESSION['retour_attaque']);
 	unset($_GET['move']);
 }
-function ActionChasser(&$check, personnage &$oJoueur, &$objManager){
+function ActionChasser(&$check, personnage &$oJoueur){
 	if(isset($_SESSION['chasser'])){
 		
-		//$maison = $oJoueur->GetObjSaMaison();
 		$oGibier = FoundGibier($_SESSION['chasser']);
 		
 		$oJoueur->AddInventaire($oGibier->GetCode(), 1, false);
 		
-		//$maison->AddRessource(maison::TYPE_RES_NOURRITURE, $_SESSION['chasser']['nourriture']);
-		
-		/* if(!is_null($_SESSION['chasser']['cuir'])){
-			$oJoueur->AddInventaire('ResCuir', $_SESSION['chasser']['cuir'], false);
-		} */
 		if(!is_null($oGibier->GetAttaque()))
 		{
 			$oJoueur->PerdreVie($oGibier->GetAttaque(), 'chasse');
 		}
-
-		//$objManager->UpdateBatiment($maison);
-		//unset($maison);
 
 		unset($_SESSION['chasser']);
 	}else{
@@ -1199,7 +1187,7 @@ function ActionLegionnaire(&$check, personnage &$oJoueur){
 		echo 'Erreur GLX0002: Fonction ActionLegionnaire';
 	}
 }
-function ActionConstruire(&$check, $id, personnage &$oJoueur, &$objManager){
+function ActionConstruire(&$check, $id, personnage &$oJoueur, maison &$maison){
 	if(ChkIfBatimentDejaConstruit($_SESSION['main'][$id]['construire']))
 	{
 		$check = false;
@@ -1220,13 +1208,10 @@ function ActionConstruire(&$check, $id, personnage &$oJoueur, &$objManager){
 		AddCaseCarte($oJoueur->GetCoordonnee(), $oJoueur->GetLogin(), maison::ID_BATIMENT, $batiment['batiment_vie'], $batiment['batiment_niveau']);
 		
 	}else{
-		//On trouve la maison
-		$maison = $oJoueur->GetObjSaMaison();
-		
+				
 		if(!is_null($maison))
 		{
-		
-		
+			
 			//on paie le batiment
 			$chkPaye = true;
 		
@@ -1237,9 +1222,7 @@ function ActionConstruire(&$check, $id, personnage &$oJoueur, &$objManager){
 				{
 					UtilisationRessource(explode('=', $Prix), $oJoueur, $maison);
 				}
-				
-				$objManager->UpdateBatiment($maison);
-				
+								
 				// on recupère les info du batiment
 				$sql = "SELECT * FROM table_batiment WHERE id_type=".$_SESSION['main'][$id]['construire']." AND batiment_niveau=1;";
 				$requete = mysql_query($sql) or die ( mysql_error() );
@@ -1247,7 +1230,6 @@ function ActionConstruire(&$check, $id, personnage &$oJoueur, &$objManager){
 				
 				// on ajoute le batiment à la carte
 				AddCaseCarte($oJoueur->GetCoordonnee(), $oJoueur->GetLogin(), $_SESSION['main'][$id]['construire'], $batiment['batiment_vie'], $batiment['batiment_niveau']);
-				
 				
 				//on gagne des points
 				$oJoueur->UpdatePoints($batiment['batiment_points']);
@@ -1259,9 +1241,7 @@ function ActionConstruire(&$check, $id, personnage &$oJoueur, &$objManager){
 				echo 'Erreur GLX0003: Fonction ActionConstruire - Pas assez de ressource pour payer';
 				return NULL;
 			}
-			
-			unset($maison);
-			
+						
 		}else{
 			$check = false;
 			echo 'Erreur GLX0003: Fonction ActionConstruire - Maison introuvable';
@@ -1299,16 +1279,12 @@ function ActionRessource(&$check, personnage &$oJoueur, &$objManager, $id = NULL
 	}elseif((strtotime('now') - $objRessource->GetDateDebutAction()) >= $objRessource->GetTempRessource()){
 			//On vérifie si le joueur est bien le collecteur
 		if($oJoueur->GetLogin() == $objRessource->GetCollecteur()){
-				//on récupère la maison du joueur
-			//$oMaison = $oJoueur->GetObjSaMaison();
 				//on finit la collecte
 			$objRessource->FinishCollect($oJoueur/* , $oMaison */);
 
 		}else{
 				//Alors on récupère l'objet du collecteur
 			$oCollecteur = $objManager->GetPersoLogin($objRessource->GetCollecteur());
-				//on récupère la maison du collecteur
-			//$oMaison = $oCollecteur->GetObjSaMaison();
 				//on finit la collecte
 			$objRessource->FinishCollect($oCollecteur/* , $oMaison */);
 				//on enregistre les data du collecteur

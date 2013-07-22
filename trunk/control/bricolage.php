@@ -1,10 +1,6 @@
 <?php
 include_once('model/bricolage.php');
 
-global $objManager, $chkDebug;
-
-$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
-
 $ChkDebugVar = false;
 
 if($chkDebug AND $ChkDebugVar){	var_dump($_SESSION['Bricolage']);}
@@ -19,16 +15,13 @@ if(isset($_POST['action'])){
 	$RetourOnglet = $_SESSION['Bricolage'][$_POST['id']]['type'];
 	$strAnchor = $_SESSION['Bricolage'][$_POST['id']]['code'];
 	switch($_POST['action']){
-		case 'Fabriquer':				ActionFabriquer($chkErr, $_POST['id'], $oJoueur, $objManager); break;
+		case 'Fabriquer':				ActionFabriquer($chkErr, $_POST['id'], $oJoueur, $oMaison); break;
 	}
 	unset($_POST['action']);
 	$CheckRetour = true;
 }
 
 if($chkDebug AND ($ChkDebugVar OR !$chkErr)){var_dump($_SESSION['Bricolage']);}
-
-$objManager->update($oJoueur);
-unset($oJoueur);
 
 if($chkDebug OR !$chkErr){
 	echo '<br /><a href="index.php?page=bricolage'.(isset($strAnchor)?'&onglet='.$RetourOnglet.'#'.$strAnchor:'').'">Retour</a>';

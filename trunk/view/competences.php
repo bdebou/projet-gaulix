@@ -1,11 +1,5 @@
 <div class="main">
 <h1>Compétences</h1>
-<?php
-	global $objManager;
-	
-	$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
-	$oMaison = $oJoueur->GetObjSaMaison();
-?>
 <div class="perfectionnement">
 	<?php echo AfficheModulePerfectionnement(objArmement::TYPE_ATTAQUE, $oJoueur, $oMaison);?>
 </div>
@@ -20,14 +14,3 @@
 	</table>
 	<?php echo $temp[1];?>
 </div>
-<?php 
-	$objManager->update($oJoueur);
-	
-	if(!is_null($oMaison))
-	{
-		$objManager->UpdateBatiment($oMaison);
-		unset($oMaison);
-	}
-	
-	unset($oJoueur);
-?>

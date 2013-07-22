@@ -1,9 +1,6 @@
 <?php
 include_once('model/alliance.php');
 
-global $objManager;
-$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
-
 if (!is_null($oJoueur->GetClan()) AND $oJoueur->GetClan() != 1){
 	$oJoueur->SetLastMessageLu();
 }
@@ -30,9 +27,6 @@ if(isset($_POST['action'])){
 	unset($_GET['action']);
 	$CheckRetour = true;
 }
-
-$objManager->update($oJoueur);
-unset($oJoueur);
 
 if($CheckRetour){
 	//header('location: index.php?page=alliance');

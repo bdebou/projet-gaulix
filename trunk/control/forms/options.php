@@ -1,6 +1,4 @@
 <?php
-global $objManager;
-$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 
 include_once('model/options.php');
 
@@ -38,9 +36,6 @@ if(isset($_POST['ChgNot'])){
 	ChangeNotification($oJoueur);
 	$CheckRetour = true;
 }
-
-$objManager->update($oJoueur);
-unset($oJoueur);
 
 if($CheckRetour){
 	//header('location: index.php?page=options');

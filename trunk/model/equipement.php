@@ -105,7 +105,7 @@ function GetCodeEquipement($type, personnage &$oJoueur){
 	}
 	return NULL;
 }
-function AfficheDescriptifEquipement(personnage &$oJoueur){
+function AfficheDescriptifEquipement(personnage &$oJoueur, maison &$oMaison){
 	$txt = '
 	<table class="equipement">
 		<tr style="background:lightgrey;">
@@ -142,7 +142,7 @@ function AfficheDescriptifEquipement(personnage &$oJoueur){
 						<form class="equipement" action="index.php?page=equipement" formmethod="post" method="post">
 							<input type="hidden" name="id" value="'.$id.'" />
 							<input type="hidden" name="action" value="unUse" />
-							<input type="submit" name="submit" value="Remettre dans mon Bolga"'.((CheckIfAssezRessource(array($oObjet->GetCode(), 1), $oJoueur, $oJoueur->GetObjSaMaison()) OR count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga())?NULL:' disabled="disabled"').' />
+							<input type="submit" name="submit" value="Remettre dans mon Bolga"'.((CheckIfAssezRessource(array($oObjet->GetCode(), 1), $oJoueur, $oMaison) OR count($oJoueur->GetLstInventaire()) < $oJoueur->QuelCapaciteMonBolga())?NULL:' disabled="disabled"').' />
 						</form>
 					</td>
 				</tr>

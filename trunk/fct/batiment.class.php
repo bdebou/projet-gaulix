@@ -235,7 +235,7 @@ abstract class batiment{
 					.'</tr>'
 				.'</table>';
 	}
-	public function AfficheOptionAmeliorer(personnage &$oJoueur){
+	public function AfficheOptionAmeliorer(personnage &$oJoueur, maison &$maison){
 		
 		$id = str_replace(',', '_', $this->GetCoordonnee());
 		
@@ -259,7 +259,6 @@ abstract class batiment{
 		}else{
 			
 			$prixAmelioration = $this->GetCoutAmelioration();
-			$maison = $oJoueur->GetObjSaMaison();
 			
 			$chkPrix = true;
 			if(!is_null($prixAmelioration))
@@ -284,9 +283,9 @@ abstract class batiment{
 			return '<br /><a href="index.php?page=village&action=ameliorer&id='.$id.'&anchor='.$id.'" title="Or = '.$prixAmelioration['Or'].'&#13;Bois = '.$prixAmelioration['Bois'].'&#13;Pierre = '.$prixAmelioration['Pierre'].'&#13;Nourriture = '.$prixAmelioration['Nourriture'].'&#13;'.AfficheTempPhrase(DecoupeTemp(intval(3600*exp($this->Niveau)))).'">Améliorer</a> pour '.AfficheListePrix($prixAmelioration, $oJoueur, $maison);
 		}
 	}
-	public function AfficheOptionReparer(personnage &$oJoueur){
+	public function AfficheOptionReparer(personnage &$oJoueur, maison &$oMaison){
 		
-		$txt = 'Coût par point de réparation : </br>'.AfficheListePrix($this->GetCoutReparation(), $oJoueur, $oJoueur->GetObjSaMaison()).'</br>';
+		$txt = 'Coût par point de réparation : </br>'.AfficheListePrix($this->GetCoutReparation(), $oJoueur, $oMaison).'</br>';
 		$chkA = true;
 		$txt_Options = null;
 	
@@ -303,7 +302,7 @@ abstract class batiment{
 			for($i = 1; $i <= ($this->GetEtatMax() - $this->Etat); $i++)
 			{
 				
-				if(CheckCout($this->GetCoutReparation($i), $oJoueur, $oJoueur->GetObjSaMaison()))
+				if(CheckCout($this->GetCoutReparation($i), $oJoueur, $oMaison))
 				{
 					$nbMax = $i;
 				}else{

@@ -1,10 +1,6 @@
 <?php
 include('model/village.php');
 
-global $objManager, $chkDebug;
-
-$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
-
 $ChkDebugVar = false;
 
 if($chkDebug AND $ChkDebugVar){	echo '$_SESSION[\'main\']<br />';print_r($_SESSION['main']);echo '<br />';}
@@ -22,18 +18,18 @@ if(isset($_POST['depot'])){
 	ActionRetrait($chkErr, $oJoueur, $objManager);
 	$CheckRetour = true;
 }elseif(isset($_POST['transaction'])){
-	ActionTransactionMarche($chkErr, $oJoueur, $objManager);
+	ActionTransactionMarche($chkErr, $oJoueur, $oMaison);
 	$_GET['anchor'] = $_POST['anchor'];
 	$CheckRetour = true;
 }elseif(isset($_GET['action'])){
 	switch($_GET['action']){
-		case 'ameliorer':				ActionAmeliorerBatiment($chkErr, $oJoueur, $objManager, $_GET['id']); break;
+		case 'ameliorer':				ActionAmeliorerBatiment($chkErr, $oJoueur, $objManager, $_GET['id'], $oMaison); break;
 		
 		case 'reprendre':				ActionReprendre($chkErr, $_GET['id'], $oJoueur, $objManager); break;
-		case 'druide':					ActionDruide($chkErr, $_GET['id'], $oJoueur, $objManager); break;
+		case 'druide':					ActionDruide($chkErr, $_GET['id'], $oJoueur, $oMaison); break;
 		case 'VenteMarche':				ActionVenteMarche($chkErr, $_GET['id'], $oJoueur, $objManager); break;
-		case 'annulertransaction':		ActionAnnulerTransaction($chkErr, $_GET['id'], $oJoueur, $objManager); break;
-		case 'acceptertransaction':		ActionAccepterTransaction($chkErr, $_GET['id'], $oJoueur, $objManager); break;
+		case 'annulertransaction':		ActionAnnulerTransaction($chkErr, $_GET['id'], $oJoueur, $oMaison); break;
+		case 'acceptertransaction':		ActionAccepterTransaction($chkErr, $_GET['id'], $oJoueur, $objManager, $oMaison); break;
 	}
 	$CheckRetour = true;
 }elseif(isset($_POST['action']))
@@ -48,16 +44,13 @@ if(isset($_POST['depot'])){
 		case 'viderstockferme':			ActionViderStock($chkErr, ferme::ID_BATIMENT, 'ferme', $oJoueur, $objManager); break;
 		case 'viderstockpotager':		ActionViderStock($chkErr, potager::ID_BATIMENT, 'potager', $oJoueur, $objManager); break;
 		case 'viderstockmine':			ActionViderStock($chkErr, mine::ID_BATIMENT, 'mine', $oJoueur, $objManager); break;
-		case 'reparer':					ActionReparer($chkErr, $_POST['qte'], $oJoueur, $objManager); break;
+		case 'reparer':					ActionReparer($chkErr, $_POST['qte'], $oJoueur, $objManager, $oMaison); break;
 	}
 }
 
 if($chkDebug AND $ChkDebugVar){print_r($_SESSION['main']);}
 
-$lstBatiment = CreateListBatiment($oJoueur);
-
-$objManager->update($oJoueur);
-unset($oJoueur);
+$lstBatiment = CreateListBatiment($oJoueur, $oMaison);
 
 if($chkDebug OR !$chkErr){
 	echo '<br /><a href="index.php?page=village">Retour</a>';

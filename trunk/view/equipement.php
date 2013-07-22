@@ -1,12 +1,9 @@
 <div class="main">
 <h1>Equipement</h1>
 <p>Cliquez sur un objet pour le remettre dans votre inventaire.</p>
-<?php
-global $objManager;
-$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
-
-if($oJoueur->GetDisPerso() > 0){echo '<p>Grace à votre arme employée, vous pouvez combattre vos ennemis qui sont à une distance de '.$oJoueur->GetDisPerso().'. Vous verrez automatiquement les joueurs qui sont à portée de tire dans la partie "Action".</p>';}
-?>
+<?php if($oJoueur->GetDisPerso() > 0){?>
+<p>Grace à votre arme employée, vous pouvez combattre vos ennemis qui sont à une distance de <?php echo $oJoueur->GetDisPerso();?>. Vous verrez automatiquement les joueurs qui sont à portée de tire dans la partie "Action".</p>
+<?php }?>
 <div class="equipement">
 <table style="width:100%;">
 	<tr>
@@ -20,12 +17,7 @@ if($oJoueur->GetDisPerso() > 0){echo '<p>Grace à votre arme employée, vous pouve
 	</table>
 	</td>
 	<td style="border:1px solid black;">
-<?php
-	echo AfficheDescriptifEquipement($oJoueur);
-	
-$objManager->update($oJoueur);
-unset($oJoueur);
-?>
+<?php echo AfficheDescriptifEquipement($oJoueur, $oMaison);?>
 	</td>
 	</tr>
 </table>

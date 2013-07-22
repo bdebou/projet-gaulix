@@ -345,9 +345,8 @@ function ActionPerfectionnement(&$check, personnage &$oJoueur, $type){
 		echo 'Erreur GLX0002: Fonction ActionPerfectionnement - '.$type;
 	}
 }
-function ActionCompetence(&$check, personnage &$oJoueur, $cmp, &$objManager){
+function ActionCompetence(&$check, personnage &$oJoueur, $cmp, &$maison){
 	if(isset($_SESSION['competences'][$cmp])){
-		$maison = $oJoueur->GetObjSaMaison();
 
 		if(CheckCout($_SESSION['competences'][$cmp]['prix'], $oJoueur, $maison))
 		{
@@ -359,9 +358,6 @@ function ActionCompetence(&$check, personnage &$oJoueur, $cmp, &$objManager){
 			AddEnregistrementCompetence($cmp, $_SESSION['competences'][$cmp]['temp']);
 		}
 		
-		$objManager->UpdateBatiment($maison);
-		unset($maison);
-
 		unset($_SESSION['competences'][$cmp]);
 	}else{
 		$check = false;

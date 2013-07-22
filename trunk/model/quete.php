@@ -1,5 +1,5 @@
 <?php
-function SelectQuete(personnage &$oJoueur){
+function SelectQuete(personnage &$oJoueur, maison &$oMaison){
 	$txt = null;
 	$sql = "SELECT * 
 			FROM table_quete_lst 
@@ -31,7 +31,7 @@ function SelectQuete(personnage &$oJoueur){
 				}
 				
 				$txt .= '
-					<td>'.$oQuete->AfficheDescriptif($oJoueur, $oJoueur->GetObjSaMaison(), false).'</td>';
+					<td>'.$oQuete->AfficheDescriptif($oJoueur, $oMaison, false).'</td>';
 					
 				$nbCol++;
 				
