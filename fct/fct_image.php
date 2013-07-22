@@ -58,7 +58,6 @@ else{
 //---------------------------------------------------	FUNCTIONS	-----------------------------
 //
 function ImageProgression($type, $max, $value, $SizeX = 102, $SizeY = 12){
-	//global $arCouleurs;
 	require_once 'arColor.config.php';
 	
 	$image		= imagecreate($SizeX, $SizeY);
