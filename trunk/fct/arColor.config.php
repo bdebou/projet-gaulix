@@ -1,6 +1,4 @@
 <?php
-Global $arCouleurs;
-
 //les couleurs
 $arCouleurs	= array(objArmement::TYPE_ATTAQUE			=> '#FF0000',		// Red
 					objArmement::TYPE_DEFENSE			=> '#32CD32',		// LimeGreen
