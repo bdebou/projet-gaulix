@@ -1,5 +1,5 @@
 <?php
-function SelectQuete(personnage &$oJoueur, maison &$oMaison){
+function SelectQuete(personnage &$oJoueur, maison &$oMaison = NULL){
 	$txt = null;
 	$sql = "SELECT * 
 			FROM table_quete_lst 

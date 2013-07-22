@@ -127,7 +127,7 @@ class qteCombat extends quete{
 	
 	//Les Affichages
 	//==============
-	public function AfficheDescriptif(personnage &$oJoueur, maison &$oMaison, $Avancement = false){
+	public function AfficheDescriptif(personnage &$oJoueur, maison &$oMaison = NULL, $Avancement = false){
 		$_SESSION['quete'][$this->GetIDTypeQuete()] = $Avancement;
 		//On ajoute l'entete de la fiche
 		$txt = '

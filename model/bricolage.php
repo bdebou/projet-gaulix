@@ -7,7 +7,7 @@
  * @param array $lstTypeObjets <p>Liste des types d'objets à bricoler.</p>
  * @return string
  */
-function AfficheListeElementBricolage(personnage &$oJoueur, $Onglet = null, maison &$maison, $lstTypeObjets){
+function AfficheListeElementBricolage(personnage &$oJoueur, $Onglet = null, maison &$maison = NULL, $lstTypeObjets){
 	
 	$txt = '
 	<div class="systeme_onglets">';

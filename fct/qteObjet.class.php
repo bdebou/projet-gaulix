@@ -95,7 +95,7 @@ class qteObjet extends quete{
 	}
 	//Les Affichages
 	//==============
-	public function AfficheDescriptif(personnage &$oJoueur, maison &$oMaison, $bAvancement/* , $bSurMaison */){
+	public function AfficheDescriptif(personnage &$oJoueur, maison &$oMaison = NULL, $bAvancement){
 		$_SESSION['quete'][$this->GetIDTypeQuete()] = $bAvancement;
 		//On ajoute l'entete de la fiche
 		$txt = '
