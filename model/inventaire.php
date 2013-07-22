@@ -15,9 +15,8 @@ function CreateListObjet($Bolga){
 	
 	return $lst;
 }
-function AfficheRessource($type, personnage &$oJoueur){
-	$maison = $oJoueur->GetObjSaMaison();
-
+function AfficheRessource($type, personnage &$oJoueur, maison &$maison){
+	
 	$txtBt = NULL;
 	
 	if(!is_null($maison)){
@@ -78,11 +77,129 @@ function AfficheBtEquiper(personnage &$oJoueur, objArmement &$oObjet){
 	
 	return $txtBtEquiper;
 }
+
+function AfficheListObjets(personnage &$oJoueur, $lstTypeObjets){
+	if(!is_null($oJoueur->GetLstInventaire()))
+	{
+		$lstObjetParCategory = CreateListObjet($oJoueur->GetLstInventaire());
+	}else{
+		$lstObjetParCategory = NULL;
+	}
+	
+	$id = 0;
+	$txt = NULL;
+	
+	foreach($lstTypeObjets as $Category)
+	{
+		$txt .= '<div class="'.$Category.'">
+				<h2>'.$Category.'</h2>';
+		if(isset($lstObjetParCategory['obj'.$Category]))
+		{
+			//echo '<table class="objets">';
+	
+			foreach($lstObjetParCategory['obj'.$Category] as $objObjet)
+			{
+				$_SESSION['inventaire'][$id]['code'] = $objObjet->GetCode();
+					
+				$txtUtiliser		= NULL;
+				$txtVendre			= '<input type="submit" name="action" value="Vendre" />';
+				$txtEntreposer		= NULL;
+				$txtInfoArmement	= NULL;
+				$txtEquiper			= NULL;
+				$txtConvertir		= NULL;
+				$txtConvertion		= NULL;
+				$txtAbandonner		= '<input style="float:right; width:20px; height:20px;" type="image" src="./img/icones/ic_croix.png" name="action" value="Abandonner" alt="Abandonner" />';
+				$nbLigne			= 4;
+				$nbColonne			= 2;
+					
+				//On crée le boutton "entreposer" si on est bien sur un entrepot
+				if(CheckIfOnEstSurUnBatiment(entrepot::ID_BATIMENT, $oJoueur->GetCoordonnee()))
+				{
+					$txtEntreposer = '<input type="submit" name="action" value="Entreposer" />';
+					$nbLigne = 5;
+				}
+					
+				if(in_array(QuelTypeObjet($objObjet->GetCode()), array(objDivers::TYPE_RES_DEP, objDivers::TYPE_RES_VIE)))
+				{
+					$txtValideUtiliser = NULL;
+					if(	(QuelTypeObjet($objObjet->GetCode()) == objDivers::TYPE_RES_VIE AND ($oJoueur->GetVie() + $objObjet->GetNb(objDivers::TYPE_RES_VIE)) > personnage::VIE_MAX)
+					OR
+					(QuelTypeObjet($objObjet->GetCode()) == objDivers::TYPE_RES_DEP AND ($oJoueur->GetDepDispo() + $objObjet->GetNb(objDivers::TYPE_RES_DEP)) > personnage::DEPLACEMENT_MAX)
+					)
+					{
+						$txtValideUtiliser = ' disabled="disabled"';
+					}
+	
+					$txtUtiliser = '<input '.$txtValideUtiliser.'type="submit" name="action" value="Utiliser" />';
+					$nbLigne = 5;
+	
+				}else{
+					if(!is_null($objObjet->GetRessource()))
+					{
+						$txtConvertion = AfficheListePrix($objObjet->GetRessource());
+						$nbLigne++;
+	
+						$txtValideUtiliser = NULL;
+						if(!CheckIfOnEstSurUnBatiment(maison::ID_BATIMENT, $oJoueur->GetCoordonnee()))
+						{
+							$txtValideUtiliser = ' disabled="disabled"';
+						}
+						$txtConvertir = '<input '.$txtValideUtiliser.'type="submit" name="action" value="Convertir" />';
+					}
+				}
+					
+					
+				switch($Category)
+				{
+					case 'Construction':
+					case 'Divers':
+					case 'Ressource':
+						break;
+					case 'Armement':
+						$txtInfoArmement = $objObjet->AfficheInfoTd(NULL, true);
+						$nbColonne = 3;
+						$nbLigne = 5;
+						$nbLigne++;
+						$txtEquiper = AfficheBtEquiper($oJoueur, $objObjet);
+						break;
+				}
+					
+				$txt .= '<form class="inventaire" action="index.php?page=inventaire" formmethod="post" method="post">'
+				.'<table class="objet">
+			<tr><td rowspan="'.$nbLigne.'" style="width:105px; margin:auto;">'
+				//.'<img src="./img/objets/'.$objObjet->GetCode().'.png" alt="'.$objObjet->GetNom().'" width="100px" onmouseover="montre(\''.CorrectDataInfoBulle($objObjet->GetInfoBulle()).'\');" onmouseout="cache();" style="vertical-align:middle;" />'
+				.$objObjet->AfficheInfoObjet(100)
+				.'</td></tr>'
+				.'<tr><th colspan="'.$nbColonne.'">'.($objObjet->GetQuantite() > 1?'<b>'.$objObjet->GetQuantite().'x</b> ':'').$objObjet->GetNom().$txtAbandonner.'</th></tr>'
+				.$txtInfoArmement
+				.'<tr><td colspan="'.$nbColonne.'" style="text-align:center;">
+							<input style="width:150px;" id="Slider'.$objObjet->GetCode().'" type="range" min="1" max="'.$objObjet->GetQuantite().'" step="1" value="1" onchange="printValue(\'Slider'.$objObjet->GetCode().'\',\'RangeValue'.$objObjet->GetCode().'\');" />
+							<input style="width:50px;" name="qte" id="RangeValue'.$objObjet->GetCode().'" onchange="printValue(\'RangeValue'.$objObjet->GetCode().'\',\'Slider'.$objObjet->GetCode().'\');" type="number" min="1" max="'.$objObjet->GetQuantite().'" step="1" value ="1" size="15" />
+							<script>printValue(\'Slider'.$objObjet->GetCode().'\',\'RangeValue'.$objObjet->GetCode().'\');</script>
+						</td></tr>'
+				.'<tr><td class="action_inventaire">'.$txtVendre.'</td><td colspan="'.($nbColonne - 1).'" style="text-align:center;">'.AfficheListePrix(array(personnage::TYPE_RES_MONNAIE.'='.$objObjet->GetPrix())).' par unité</td></tr>'
+				.(!is_null($txtConvertion)?'<tr><td class="action_inventaire">'.$txtConvertir.'</td><td style="text-align:center;">'.$txtConvertion.' par unité</td>':'')
+				.'<input type="hidden" name="id" value="'.$id.'" />'
+				.((!is_null($txtEntreposer) OR !is_null($txtUtiliser) OR !is_null($txtEquiper))?'<tr><td colspan="'.$nbColonne.'" class="action_inventaire">'.$txtEntreposer.$txtUtiliser.$txtEquiper.'</td></tr>':NULL)
+				.'</table>'
+				.'</form>';
+				$id++;
+			}
+	
+			//echo '</table>';
+		}else{
+			$txt .= 'Aucun objet de cette catégorie.';
+		}
+		$txt .= '</div>';
+	}
+	
+	return $txt;
+}
 //+---------------------------------+
 //|				ACTIONS				|
 //+---------------------------------+
 
-function ActionVendre(&$check, $id, personnage &$oJoueur, &$objManager, $qte){
+function ActionVendre(&$check, $id, personnage &$oJoueur, maison &$maison, $qte){
 	if(isset($_SESSION['inventaire'][$id]['code'])){
 		
 		$objObjet = FoundObjet($_SESSION['inventaire'][$id]['code']);
@@ -110,13 +227,11 @@ function ActionVendre(&$check, $id, personnage &$oJoueur, &$objManager, $qte){
 		unset($_SESSION['inventaire']);
 	}elseif(in_array($id, array(maison::TYPE_RES_NOURRITURE, maison::TYPE_RES_EAU_POTABLE)))
 	{
-		$maison = $oJoueur->GetObjSaMaison();
-		
+				
 		$maison->MindRessource($id, $qte);
 		$oJoueur->AddOr($qte);
 		
-		$objManager->UpdateBatiment($maison);
-		unset($maison, $_SESSION['inventaire']);
+		unset($_SESSION['inventaire']);
 		
 	}else{
 		$check = false;
@@ -212,12 +327,9 @@ function ActionSorts(&$check, personnage &$oJoueur){
 			print_r($_SESSION['main']);
 	}
 }
-function ActionConvertir(&$check, $id, personnage &$oJoueur, &$objManager, $Qte){
+function ActionConvertir(&$check, $id, personnage &$oJoueur, maison &$maison, $Qte){
 	if(isset($_SESSION['inventaire'][$id]['code'])){
 
-		//on trouve sa maison
-		$maison = $oJoueur->GetObjSaMaison();
-		
 		//on crée l'objet Objet
 		$objObjet = FoundObjet($_SESSION['inventaire'][$id]['code']);
 		
@@ -243,13 +355,7 @@ function ActionConvertir(&$check, $id, personnage &$oJoueur, &$objManager, $Qte)
 			//on enlève un objet de l'inventaire
 			$oJoueur->CleanInventaire($objObjet->GetCode());
 		}
-		
-		if(!is_null($maison)){
-			$objManager->UpdateBatiment($maison);
-			unset($maison);
-		}
-
-		
+				
 		unset($_SESSION['inventaire'][$id]['code']);
 	}else{
 		$check = false;
