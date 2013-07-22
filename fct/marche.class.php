@@ -153,7 +153,7 @@ class marche extends batiment{
 					.$txtBt
 				.'</p>';
 	}
-	private function AffichePropositionsTrocs(personnage &$oJoueur){
+	private function AffichePropositionsTrocs(personnage &$oJoueur, maison &$oMaison){
 		$txt = null;
 		
 		$sql = "SELECT * FROM table_marche WHERE status_vente IS NULL AND vendeur IS NOT NULL AND vendeur IN ('".implode("', '", ListeMembreClan($oJoueur->GetClan()))."')";
@@ -165,8 +165,6 @@ class marche extends batiment{
 				<td colspan="4"><p>Aucune transaction en cours</p></td>
 			</tr>';
 		}else{
-			//on trouve la maison du joueur
-			$maison = $oJoueur->GetObjSaMaison();
 			
 			$txt .= '
 			<tr>
@@ -182,9 +180,9 @@ class marche extends batiment{
 				$_SESSION['main']['transaction'][$numTransaction]['accepter'] = $row['ID_troc'];
 					
 				if(	$row['achat_or']				<= $oJoueur->GetArgent()
-					AND $row['achat_nourriture']	<= $maison->GetRessource(maison::TYPE_RES_NOURRITURE)
-					AND $row['achat_bois']			<= $maison->GetRessource(maison::TYPE_RES_BOIS)
-					AND $row['achat_pierre']		<= $maison->GetRessource(maison::TYPE_RES_PIERRE)
+					AND $row['achat_nourriture']	<= $oMaison->GetRessource(maison::TYPE_RES_NOURRITURE)
+					AND $row['achat_bois']			<= $oMaison->GetRessource(maison::TYPE_RES_BOIS)
+					AND $row['achat_pierre']		<= $oMaison->GetRessource(maison::TYPE_RES_PIERRE)
 				){
 					$checkValid = true;
 				}else{

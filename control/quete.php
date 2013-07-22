@@ -1,11 +1,6 @@
 <?php
 include_once('model/quete.php');
 
-global $chkDebug, $objManager;
-$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
-
-$oMaison = $oJoueur->GetObjSaMaison();
-
 $ChkDebugVar = true;
 
 if($chkDebug AND $ChkDebugVar){
@@ -33,11 +28,6 @@ if(isset($_GET['action'])){
 if($chkDebug AND $ChkDebugVar){
 	var_dump($_SESSION['quete']);
 }
-
-$objManager->update($oJoueur);
-if(!is_null($oMaison)){$objManager->UpdateBatiment($oMaison);}
-
-unset($oJoueur, $oMaison);
 
 if($chkDebug OR !$chkErr){
 	echo '<br /><a href="index.php?page=quete">Retour</a>';

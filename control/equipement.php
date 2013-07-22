@@ -1,10 +1,6 @@
 <?php 
 include_once('model/equipement.php');
 
-global $objManager, $chkDebug;
-
-$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
-
 $ChkDebugVar = false;
 
 if($chkDebug AND $ChkDebugVar){	var_dump($_SESSION['Equipement']);}
@@ -26,9 +22,6 @@ if(isset($_POST['action'])){
 if($chkDebug AND ($ChkDebugVar OR !$chkErr)){
 	var_dump($_SESSION['Bricolage']);
 }
-
-$objManager->update($oJoueur);
-unset($oJoueur);
 
 if($chkDebug OR !$chkErr){
 	echo '<br /><a href="index.php?page=equipement">Retour</a>';

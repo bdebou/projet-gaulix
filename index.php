@@ -8,9 +8,7 @@ spl_autoload_register('chargerClasse');
 session_start();
 
 include('fct/config.php');
-
 include('model/common.php');
-
 include('view/header.php');
 
 if(!isset($_SESSION['joueur'])){
@@ -44,6 +42,10 @@ if(!isset($_SESSION['joueur'])){
 	}
 }else{
 	
+	$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
+	$oMaison = $oJoueur->GetObjSaMaison();
+	
+	
 	$_SESSION['main']['deplacement']	= 'new';
 
 		//On créé la liste des quêtes
@@ -65,6 +67,15 @@ if(!isset($_SESSION['joueur'])){
 	}else{
 		include('view/main.php');
 	}
+	
+	if(!is_null($oMaison))
+	{
+		$objManager->UpdateBatiment($oMaison);
+		unset($oMaison);
+	}
+	
+	$objManager->update($oJoueur);
+	unset($oJoueur);
 	
 }
 

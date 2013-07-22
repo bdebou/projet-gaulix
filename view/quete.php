@@ -1,9 +1,3 @@
-<?php 
-global $objManager;
-$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
-$oMaison = $oJoueur->GetObjSaMaison();
-?>
-
 <div class="main">
 	<h1>Les quêtes</h1>
 	<p>Voici la liste des quêtes qui vous sont proposées. Acceptez une ou plusieurs quêtes et bonne chance!</p>
@@ -30,18 +24,7 @@ $oMaison = $oJoueur->GetObjSaMaison();
 		<?php }?>
 		<h2>Et les quêtes disponibles</h2>
 		<?php
-		echo SelectQuete($oJoueur);
+		echo SelectQuete($oJoueur, $oMaison);
 		?>
 	
 </div>
-
-<?php 
-if(!is_null($oMaison))
-{
-	$objManager->UpdateBatiment($oMaison);
-	unset($oMaison);
-}
-
-$objManager->update($oJoueur);
-unset($oJoueur);
-?>

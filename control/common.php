@@ -1,16 +1,12 @@
 <?php
-global $objManager, $chkDebug;
-
-$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
-print_r($_SESSION);
 if($chkDebug){
 	if(isset($_SESSION['LoginStatus'])){
-		echo '$_SESSION[\'LoginStatus\']<br />';print_r($_SESSION['LoginStatus']);echo '<br />';
+		echo '$_SESSION[\'LoginStatus\']<br />';var_dump($_SESSION['LoginStatus']);
 	}else{
 		echo '$_SESSION[\'LoginStatus\']) not set<br />';
 	}
-	echo '$_GET<br />';print_r($_GET);echo '<br />';
-	echo '$_POST<br />';print_r($_POST);echo '<br />';
+	echo '$_GET<br />';var_dump($_GET);
+	echo '$_POST<br />';var_dump($_POST);
 	echo '<hr />';
 }
 
@@ -27,7 +23,7 @@ if(isset($_GET['action'])){
 
 if($chkDebug){
 	if(isset($_SESSION['LoginStatus'])){
-		print_r($_SESSION['LoginStatus']);
+		var_dump($_SESSION['LoginStatus']);
 	}else{
 		echo '$_SESSION[\'LoginStatus\']) not set<br />';
 	}

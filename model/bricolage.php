@@ -1,6 +1,13 @@
 <?php
-function AfficheListeElementBricolage(personnage &$oJoueur, $Onglet = null){
-	global $lstTypeObjets;
+/**
+ * Retourne un système d'onglet (1 par type d'objet) et la liste des objets pouvant être costruit selon sa carrière.
+ * @param personnage $oJoueur
+ * @param unknown_type $Onglet
+ * @param maison $maison
+ * @param array $lstTypeObjets
+ * @return string
+ */
+function AfficheListeElementBricolage(personnage &$oJoueur, $Onglet = null, maison &$maison, $lstTypeObjets){
 	
 	$txt = '
 	<div class="systeme_onglets">';
@@ -10,9 +17,7 @@ function AfficheListeElementBricolage(personnage &$oJoueur, $Onglet = null){
 	$arOnglets['Span'] = '
 		<div class="onglets">';
 	$nbBricolage = 0;
-	
-	$maison = $oJoueur->GetObjSaMaison();
-	
+		
 	$chkFirst = false;
 
 	//$CarriereClass = GetInfoCarriere($oJoueur->GetCodeCarriere(), 'carriere_class');
@@ -145,13 +150,11 @@ function AfficheInfoObjetBricolage(personnage &$oJoueur, &$oObjet, &$numObjet, m
  * @param personnage $oJoueur
  * @param PersonnageManager $objManager
  */
-function ActionFabriquer(&$check, $id, personnage &$oJoueur, &$objManager){
+function ActionFabriquer(&$check, $id, personnage &$oJoueur, &$oMaison){
 	global $lstPoints;
 	//var_dump($_SESSION);
 	if(isset($_SESSION['Bricolage'][$id])){
-		//on trouve la maison
-		$oMaison = $oJoueur->GetObjSaMaison();
-
+		
 		if(!is_null($oMaison)){
 			//$LstPrix = explode(',', $_SESSION['main']['bricolage'][$id]['prix']);
 				
@@ -169,10 +172,7 @@ function ActionFabriquer(&$check, $id, personnage &$oJoueur, &$objManager){
 					break;
 				}
 			}
-				
-			$objManager->UpdateBatiment($oMaison);
-			unset($oMaison);
-				
+			
 			if(!$check){
 				echo 'Erreur GLX0004: Fonction ActionFabriquer - Pas assez de ressource';
 			}else{

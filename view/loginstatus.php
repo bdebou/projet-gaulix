@@ -1,8 +1,4 @@
 <?php
-global $arCouleurs, $objManager;
-
-$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
-
 $arAtt = $oJoueur->GetAttPerso();
 $arDef = $oJoueur->GetDefPerso();
 $arDis = $oJoueur->GetDisPerso();
@@ -40,8 +36,3 @@ $arDis = $oJoueur->GetDisPerso();
 		</tr>
 	</table>
 </div>
-
-<?php 
-$objManager->update($oJoueur);
-unset($oJoueur);
-?>

@@ -1,10 +1,6 @@
 <?php
 include_once('model/competences.php');
 
-global $objManager, $chkDebug;
-
-$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
-
 FinishAllCompetenceEnCours($oJoueur);
 
 $ChkDebugVar = false;
@@ -25,21 +21,18 @@ if(isset($_GET['action'])){
 	switch($_GET['action']){
 		case 'PerfAtt':					ActionPerfectionnement($chkErr, $oJoueur, personnage::TYPE_PERFECT_ATTAQUE); break;
 		case 'PerfDef':					ActionPerfectionnement($chkErr, $oJoueur, personnage::TYPE_PERFECT_DEFENSE); break;
-		case 'competence':				ActionCompetence($chkErr, $oJoueur, $_GET['cmp'], $objManager); break;
+		case 'competence':				ActionCompetence($chkErr, $oJoueur, $_GET['cmp'], $oMaison); break;
 	}
 	unset($_GET['action']);
 	$CheckRetour = true;
 }elseif(isset($_POST['action'])){
 	switch($_POST['action'])
 	{
-		case 'competence':				ActionCompetence($chkErr, $oJoueur, $_POST['cmp'], $objManager); break;
+		case 'competence':				ActionCompetence($chkErr, $oJoueur, $_POST['cmp'], $oMaison); break;
 	}
 }
 
 if($chkDebug AND $ChkDebugVar){var_dump($_SESSION['main']);}
-
-$objManager->update($oJoueur);
-unset($oJoueur);
 
 if($chkDebug OR !$chkErr){
 	echo '<br /><a href="index.php?page=competences">Retour</a>';
