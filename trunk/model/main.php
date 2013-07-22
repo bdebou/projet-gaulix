@@ -231,7 +231,7 @@ function AfficheActions(personnage &$oJoueur, maison &$oMaison = NULL) {
 
 		//=== On affiche la liste des batiment attaquables
 		$SQLCarte = "SELECT * FROM table_carte WHERE detruit IS NULL 
-		AND login NOT IN ('".implode("', '", array_merge(ListeMembreClan($oJoueur->GetClan()), ListMembreVillage($oJoueur->GetVillage())))."') 
+		AND login IN ('".implode("', '", array_merge(ListeMembreClan($oJoueur->GetClan()), ListMembreVillage($oJoueur->GetVillage())))."') 
 		AND coordonnee IN ('".implode("', '", $arSQLPosition)."');";
 		echo AfficheListeBatimentAttaquable($SQLCarte, $chkConstruction = true);
 
