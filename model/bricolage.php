@@ -2,9 +2,9 @@
 /**
  * Retourne un système d'onglet (1 par type d'objet) et la liste des objets pouvant être costruit selon sa carrière.
  * @param personnage $oJoueur
- * @param unknown_type $Onglet
+ * @param string $Onglet [Optional]
  * @param maison $maison
- * @param array $lstTypeObjets
+ * @param array $lstTypeObjets <p>Liste des types d'objets à bricoler.</p>
  * @return string
  */
 function AfficheListeElementBricolage(personnage &$oJoueur, $Onglet = null, maison &$maison, $lstTypeObjets){
@@ -148,9 +148,9 @@ function AfficheInfoObjetBricolage(personnage &$oJoueur, &$oObjet, &$numObjet, m
  * @param boolean $check <p>Boolean si il y a une erreur</p>
  * @param int $id <p>Numéro de l'objet dans la liste</p>
  * @param personnage $oJoueur
- * @param PersonnageManager $objManager
+ * @param maison $oMaison
  */
-function ActionFabriquer(&$check, $id, personnage &$oJoueur, &$oMaison){
+function ActionFabriquer(&$check, $id, personnage &$oJoueur, maison &$oMaison){
 	global $lstPoints;
 	//var_dump($_SESSION);
 	if(isset($_SESSION['Bricolage'][$id])){
