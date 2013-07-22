@@ -1,7 +1,3 @@
-<?php
-global $objManager;
-$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
-?>
 <td>
 	<fieldset style="border:3px double; margin:3px;">
 		<legend style="font-weight:bold;text-decoration:underline;padding-left:5px;padding-right:5px;">Notifications :</legend>
