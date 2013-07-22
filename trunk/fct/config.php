@@ -1,6 +1,6 @@
 <?php 
-global 	$NumVersion, $nbLigneCarte, $nbColonneCarte, $db, $temp_combat, $lstBatimentConstructionUnique, $MAX_essai, $lstPoints,
-		$objManager, $CodeCouleurQuete, $lstNonBatiment, $chkDebug, $lstBatimentsNonConstructible, $lstTypeObjets, $lstRessources, $LstBatimentMultiConstruction,
+global 	$nbLigneCarte, $nbColonneCarte, $db, $temp_combat, $lstBatimentConstructionUnique, $MAX_essai, $lstPoints,
+		$objManager, $CodeCouleurQuete, $lstNonBatiment, $lstBatimentsNonConstructible, $lstTypeObjets, $lstRessources, $LstBatimentMultiConstruction,
 		$lstBatimentConstructible;
 
 date_default_timezone_set('Europe/Brussels');
@@ -72,13 +72,13 @@ $lstPoints	= array('CombatGagné'	=>	array(abs(personnage::POINT_COMBAT),				'Com
 		or die ('MySQL error '.mysql_errno().': '.mysql_error());
 
 // On se connecte à la BDD
-mysql_select_db($DB_base, $connection)
+	mysql_select_db($DB_base, $connection)
 		or die ('MySQL error '.mysql_errno().': '.mysql_error());
 
 		
 	$db = new PDO('mysql:host='.$DB_serveur.';dbname='.$DB_base, $DB_utilisateur, $DB_motdepasse);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING); // On émet une alerte à chaque fois qu'une requête a échoué
 	
-$objManager = new PersonnagesManager($db);
+	$objManager = new PersonnagesManager($db);
 ?>
 
