@@ -61,7 +61,7 @@ class qteObjet extends quete{
 		//.'" et gagné ';
 		//.$this->GainOr.' '.AfficheIcone('or').', '.$this->GainExperience.' d\'expérience et '.$this->GainPoints.' points.';
 		
-		AddHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'quete', $this->GetNom(), NULL, $txt);
+		$this->DB->InsertHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'quete', $this->GetNom(), NULL, $txt);
 		
 		$_SESSION['message']['quete'] = $txt;
 	}
