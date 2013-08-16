@@ -105,7 +105,7 @@ function GetCodeEquipement($type, personnage &$oJoueur){
 	}
 	return NULL;
 }
-function AfficheDescriptifEquipement(personnage &$oJoueur, maison &$oMaison){
+function AfficheDescriptifEquipement(personnage &$oJoueur, maison &$oMaison = NULL){
 	$txt = '
 	<table class="equipement">
 		<tr style="background:lightgrey;">

@@ -1,22 +1,22 @@
 <?php 
-global 	$nbLigneCarte, $nbColonneCarte, $db, $temp_combat, $lstBatimentConstructionUnique, $MAX_essai, $lstPoints,
+global 	$arTailleCarte, $db, $temp_combat, $lstBatimentConstructionUnique, $MAX_essai, $lstPoints,
 		$objManager, $CodeCouleurQuete, $lstNonBatiment, $lstBatimentsNonConstructible, $lstTypeObjets, $lstRessources, $LstBatimentMultiConstruction,
 		$lstBatimentConstructible, $arCartes;
 
 date_default_timezone_set('Europe/Brussels');
 
-$DB_serveur			= 'localhost'; 			// Nom du serveur
-$DB_utilisateur		= 'gaulix_be'; 			// Nom de l'utilisateur de la base
-$DB_motdepasse		= 'A3hwDpwdVTPpC3B9'; 	// Mot de passe pour accèder à la base
-$DB_base			= 'gaulix_be'; 			// Nom de la base
+$DB_serveur			= 'localhost'; 				// Nom du serveur
+$DB_utilisateur		= 'gaulix_be'; 				// Nom de l'utilisateur de la base
+$DB_motdepasse		= 'A3hwDpwdVTPpC3B9'; 		// Mot de passe pour accèder à la base
+$DB_base			= 'gaulix_be'; 				// Nom de la base
 
-$NumVersion			= '4.1';				// Num Version
-$MAX_essai			= 3;					// Nombre maximum d'essai de connection
-$nbLigneCarte		= 13;					// Nombre de ligne de la carte
-$nbColonneCarte		= 13;					// Nombre de colonne de la carte
-$nbCarteH			= 5;					// Nombre de carte horizontale
-$nbCarteV			= 5;					// Nombre de carte Verticale
-$temp_combat		= 3600 * 1;				// Temp entre chaque combat
+$NumVersion			= '4.1';					// Num Version
+$MAX_essai			= 3;						// Nombre maximum d'essai de connection
+$arTailleCarte		= array('NbLigne' => 13,	// Nombre de ligne sur chaque carte
+							'NbColonne' => 13);	// Nombre de colonne sur chaque carte
+$nbCarteH			= 5;						// Nombre de carte horizontale
+$nbCarteV			= 5;						// Nombre de carte Verticale
+$temp_combat		= 3600 * 1;					// Temp entre chaque combat
 
 $chkDebug			= false;
 

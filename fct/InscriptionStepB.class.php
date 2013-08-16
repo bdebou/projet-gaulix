@@ -156,7 +156,6 @@ class InscriptionStepB{
 		unset($_SESSION['inscription']);
 	}
 	private function PositionAleatoire($civilisation){
-		global $nbLigneCarte, $nbColonneCarte;
 		if(is_null($this->CarteVillage)){
 			switch($civilisation){
 				case personnage::CIVILISATION_GAULOIS:
@@ -173,13 +172,6 @@ class InscriptionStepB{
 		$arCaseLibre = FreeCaseCarte($Cartes[array_rand($Cartes)]);
 		
 		return $arCaseLibre[array_rand($arCaseLibre)];
-		/* //$Cartes = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y');
-
-		$numL = mt_rand(0,$nbLigneCarte);
-		$numC = mt_rand(0,$nbColonneCarte);
-		//$carteV = mt_rand(0, $nbCarteV);
-		//$carteH = mt_rand(0, $nbCarteH);
-		return implode(',', array($Cartes[array_rand($Cartes)], $numL, $numC)); */
 	}
 	
 	//Les GETS

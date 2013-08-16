@@ -671,29 +671,29 @@ class personnage{
 		$this->position = $NewPosition;
 	}
 	public function deplacer($direction){
-		global $nbLigneCarte, $nbColonneCarte;
+		Global $arTailleCarte;
 		$arCarteNum = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y');
 		switch($direction){
 			case 'up':
 				if($this->position['1'] == 0){
-					$this->position['1'] = $nbLigneCarte;
+					$this->position['1'] = $arTailleCarte['NbLigne'];
 					$this->position['0'] = $arCarteNum[(array_search($this->position['0'], $arCarteNum) - 5)];
 				}else{$this->position['1']--;}
 				break;
 			case 'left':
 				if($this->position['2'] == 0){
-					$this->position['2'] = $nbColonneCarte;
+					$this->position['2'] = $arTailleCarte['NbColonne'];
 					$this->position['0'] = $arCarteNum[(array_search($this->position['0'], $arCarteNum) - 1)];
 				}else{$this->position['2']--;}
 				break;
 			case 'down':
-				if($this->position['1'] == $nbLigneCarte){
+				if($this->position['1'] == $arTailleCarte['NbLigne']){
 					$this->position['1'] = 0;
 					$this->position['0'] = $arCarteNum[(array_search($this->position['0'], $arCarteNum) + 5)];
 				}else{$this->position['1']++;}
 				break;
 			case 'right':
-				if($this->position['2'] == $nbColonneCarte){
+				if($this->position['2'] == $arTailleCarte['NbColonne']){
 					$this->position['2'] = 0;
 					$this->position['0'] = $arCarteNum[(array_search($this->position['0'], $arCarteNum) + 1)];
 				}else{$this->position['2']++;}
@@ -708,7 +708,7 @@ class personnage{
 	}
 	
 	public function CheckMove($direction){
-		global $nbLigneCarte, $nbColonneCarte;
+		Global $arTailleCarte;
 		$arCoteCarte = array(	'up'	=>array('a','b','c','d','e'),
 								'down'	=>array('u','v','w','x','y'),
 								'left'	=>array('a','f','k','p','u'),
@@ -720,9 +720,9 @@ class personnage{
 								'right'	=>array('x'=>$this->position[1], 'y'=>($this->position[2]) + 1));
 		
 		if(		($direction == 'up'		AND $this->position[1] == 0)
-			OR	($direction == 'down'	AND $this->position[1] == $nbLigneCarte)
+			OR	($direction == 'down'	AND $this->position[1] == $arTailleCarte['NbLigne'])
 			OR	($direction == 'left'	AND $this->position[2] == 0)
-			OR	($direction == 'right'	AND $this->position[2] == $nbColonneCarte))
+			OR	($direction == 'right'	AND $this->position[2] == $arTailleCarte['NbColonne']))
 			{
 				if(in_array($this->GetCarte(), $arCoteCarte[$direction]))
 				{

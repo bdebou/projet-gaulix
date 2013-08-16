@@ -76,7 +76,7 @@ function AfficheMouvements(personnage &$oJoueur) {
 	return $txt;
 }
 function AfficheActions(personnage &$oJoueur, maison &$oMaison = NULL) {
-	global $retour_combat, $nbLigneCarte, $nbColonneCarte;
+	global $retour_combat, $arTailleCarte;
 
 	$LstQueteAccessible = null;
 	$position = $oJoueur->GetPosition();
@@ -133,7 +133,7 @@ function AfficheActions(personnage &$oJoueur, maison &$oMaison = NULL) {
 						}
 					}
 					//la direction verticale bas
-					if (($position['1'] + $i) > $nbLigneCarte) {
+					if (($position['1'] + $i) > $arTailleCarte['NbLigne']) {
 						$chkDirection['VB'] = false;
 					}
 					if ($chkDirection['VB']) {
@@ -155,7 +155,7 @@ function AfficheActions(personnage &$oJoueur, maison &$oMaison = NULL) {
 						}
 					}
 					//la direction horizontale droite
-					if (($position['0'] + $i) > $nbColonneCarte) {
+					if (($position['0'] + $i) > $arTailleCarte['NbColonne']) {
 						$chkDirection['HD'] = false;
 					}
 					if ($chkDirection['HD']) {
@@ -177,7 +177,7 @@ function AfficheActions(personnage &$oJoueur, maison &$oMaison = NULL) {
 						}
 					}
 					//la direction oblique HD
-					if (($position['0'] - $i) < 0 or ($position['1'] + $i) > $nbColonneCarte) {
+					if (($position['0'] - $i) < 0 or ($position['1'] + $i) > $arTailleCarte['NbColonne']) {
 						$chkDirection['OHD'] = false;
 					}
 					if ($chkDirection['OHD']) {
@@ -188,7 +188,7 @@ function AfficheActions(personnage &$oJoueur, maison &$oMaison = NULL) {
 						}
 					}
 					//la direction oblique BG
-					if (($position['0'] + $i) > $nbLigneCarte or ($position['1'] - $i) < 0) {
+					if (($position['0'] + $i) > $arTailleCarte['NbLigne'] or ($position['1'] - $i) < 0) {
 						$chkDirection['OBG'] = false;
 					}
 					if ($chkDirection['OBG']) {
@@ -199,7 +199,7 @@ function AfficheActions(personnage &$oJoueur, maison &$oMaison = NULL) {
 						}
 					}
 					//la direction oblique BD
-					if (($position['0'] + $i) > $nbLigneCarte or ($position['1'] + $i) > $nbColonneCarte) {
+					if (($position['0'] + $i) > $arTailleCarte['NbLigne'] or ($position['1'] + $i) > $arTailleCarte['NbColonne']) {
 						$chkDirection['OBD'] = false;
 					}
 					if ($chkDirection['OBD']) {
@@ -714,7 +714,7 @@ function AttaqueTour(personnage &$oJoueur){
 	return $ptsViePerduTour;
 }
 function ZoneAttaqueTour($position, $distance, $carte){
-	global $nbColonneCarte, $nbLigneCarte;
+	global $arTailleCarte;
 	$chkDirection = array('VH'=>true, 'VB'=>true, 'HG'=>true, 'HD'=>true, 'OHG'=>true, 'OHD'=>true, 'OBG'=>true, 'OBD'=>true);
 	$lstCoordonnee[] = implode(',', array_merge(array($carte),$position));
 	for($i=1;$i<=$distance;$i++){
@@ -722,25 +722,25 @@ function ZoneAttaqueTour($position, $distance, $carte){
 		if(($position['1']-$i)<0){$chkDirection['VH'] = false;}
 		if($chkDirection['VH']){$lstCoordonnee[] = implode(',', array($carte, $position['0'], ($position['1'] - $i)));}
 		//la direction verticale bas
-		if(($position['1']+$i)>$nbLigneCarte){$chkDirection['VB'] = false;}
+		if(($position['1']+$i)>$arTailleCarte['NbLigne']){$chkDirection['VB'] = false;}
 		if($chkDirection['VB']){$lstCoordonnee[] = implode(',', array($carte, $position['0'], ($position['1'] + $i)));}
 		//la direction horizontale gauche
 		if(($position['0']-$i)<0){$chkDirection['HG'] = false;}
 		if($chkDirection['HG']){$lstCoordonnee[] = implode(',', array($carte, ($position['0'] - $i), $position['1']));}
 		//la direction horizontale droite
-		if(($position['0']+$i)>$nbColonneCarte){$chkDirection['HD'] = false;}
+		if(($position['0']+$i)>$arTailleCarte['NbColonne']){$chkDirection['HD'] = false;}
 		if($chkDirection['HD']){$lstCoordonnee[] = implode(',', array($carte, ($position['0'] + $i), $position['1']));}
 		//la direction oblique HG
 		if(($position['0']-$i)<0 or ($position['1']-$i)<0){$chkDirection['OHG'] = false;}
 		if($chkDirection['OHG']){$lstCoordonnee[] = implode(',', array($carte, ($position['0'] - $i), ($position['1'] - $i)));}
 		//la direction oblique HD
-		if(($position['0']-$i)<0 or ($position['1']+$i)>$nbColonneCarte){$chkDirection['OHD'] = false;}
+		if(($position['0']-$i)<0 or ($position['1']+$i)>$arTailleCarte['NbColonne']){$chkDirection['OHD'] = false;}
 		if($chkDirection['OHD']){$lstCoordonnee[] = implode(',', array($carte, ($position['0'] - $i), ($position['1'] + $i)));}
 		//la direction oblique BG
-		if(($position['0']+$i)>$nbLigneCarte or ($position['1']-$i)<0){$chkDirection['OBG'] = false;}
+		if(($position['0']+$i)>$arTailleCarte['NbLigne'] or ($position['1']-$i)<0){$chkDirection['OBG'] = false;}
 		if($chkDirection['OBG']){$lstCoordonnee[] = implode(',', array($carte, ($position['0'] + $i), ($position['1'] - $i)));}
 		//la direction oblique BD
-		if(($position['0']+$i)>$nbLigneCarte or ($position['1']+$i)>$nbColonneCarte){$chkDirection['OBD'] = false;}
+		if(($position['0']+$i)>$arTailleCarte['NbLigne'] or ($position['1']+$i)>$arTailleCarte['NbColonne']){$chkDirection['OBD'] = false;}
 		if($chkDirection['OBD']){$lstCoordonnee[] = implode(',', array($carte, ($position['0'] + $i), ($position['1'] + $i)));}
 	}
 	return $lstCoordonnee;
@@ -871,7 +871,7 @@ Function GibierTrouve(personnage &$oJoueur) {
 	return null;
 }
 function MonVillageEstProche($carte, $position, $login) {
-	global $nbColonneCarte, $nbLigneCarte;
+	global $arTailleCarte;
 	$sql = "SELECT coordonnee, id_type_batiment FROM table_carte WHERE login='" . $login . "' AND detruit IS NULL;";
 	$requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
 	$lstCoordonnee[] = implode(',', array_merge(array($carte), $position));
@@ -880,7 +880,7 @@ function MonVillageEstProche($carte, $position, $login) {
 		$lstCoordonnee[] = implode(',', array($carte, $position['0'], ($position['1'] - 1)));
 	}
 	//la direction verticale bas
-	if (($position['1'] + 1) <= $nbLigneCarte) {
+	if (($position['1'] + 1) <= $arTailleCarte['NbLigne']) {
 		$lstCoordonnee[] = implode(',', array($carte, $position['0'], ($position['1'] + 1)));
 	}
 	//la direction horizontale gauche
@@ -888,7 +888,7 @@ function MonVillageEstProche($carte, $position, $login) {
 		$lstCoordonnee[] = implode(',', array($carte, ($position['0'] - 1), $position['1']));
 	}
 	//la direction horizontale droite
-	if (($position['0'] + 1) <= $nbColonneCarte) {
+	if (($position['0'] + 1) <= $arTailleCarte['NbColonne']) {
 		$lstCoordonnee[] = implode(',', array($carte, ($position['0'] + 1), $position['1']));
 	}
 	//la direction oblique HG
@@ -896,15 +896,15 @@ function MonVillageEstProche($carte, $position, $login) {
 		$lstCoordonnee[] = implode(',', array($carte, ($position['0'] - 1), ($position['1'] - 1)));
 	}
 	//la direction oblique HD
-	if (($position['0'] - 1) >= 0 or ($position['1'] + 1) <= $nbColonneCarte) {
+	if (($position['0'] - 1) >= 0 or ($position['1'] + 1) <= $arTailleCarte['NbColonne']) {
 		$lstCoordonnee[] = implode(',', array($carte, ($position['0'] - 1), ($position['1'] + 1)));
 	}
 	//la direction oblique BG
-	if (($position['0'] + 1) <= $nbLigneCarte or ($position['1'] - 1) >= 0) {
+	if (($position['0'] + 1) <= $arTailleCarte['NbLigne'] or ($position['1'] - 1) >= 0) {
 		$lstCoordonnee[] = implode(',', array($carte, ($position['0'] + 1), ($position['1'] - 1)));
 	}
 	//la direction oblique BD
-	if (($position['0'] + 1) <= $nbLigneCarte or ($position['1'] + 1) <= $nbColonneCarte) {
+	if (($position['0'] + 1) <= $arTailleCarte['NbLigne'] or ($position['1'] + 1) <= $arTailleCarte['NbColonne']) {
 		$lstCoordonnee[] = implode(',', array($carte, ($position['0'] + 1), ($position['1'] + 1)));
 	}
 
