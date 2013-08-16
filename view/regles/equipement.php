@@ -3,12 +3,12 @@
 	<p>Si vous cliquez sur un élément, il sera remis dans votre inventaire.</p>
 	<p>Voici la liste des équipements possibles avec leurs caractéristiques et valeurs.</p>
 <h2 style="clear:both;">Armes</h2>
-	<?php echo ReglesAfficheTableauEquipements(objArmement::TYPE_ARME);?>
+	<?php echo ReglesAfficheTableauEquipements($oDB, objArmement::TYPE_ARME);?>
 <h2 style="clear:both;">Boucliers</h2>
-	<?php echo ReglesAfficheTableauEquipements(objArmement::TYPE_BOUCLIER);?>
+	<?php echo ReglesAfficheTableauEquipements($oDB, objArmement::TYPE_BOUCLIER);?>
 <h2 style="clear:both;">Casques</h2>
-	<?php echo ReglesAfficheTableauEquipements(objArmement::TYPE_CASQUE);?>
+	<?php echo ReglesAfficheTableauEquipements($oDB, objArmement::TYPE_CASQUE);?>
 <h2 style="clear:both;">Jambières</h2>
-	<?php echo ReglesAfficheTableauEquipements(objArmement::TYPE_CUIRASSE);?>
+	<?php echo ReglesAfficheTableauEquipements($oDB, objArmement::TYPE_CUIRASSE);?>
 <h2 style="clear:both;">Cuirasses</h2>
-	<?php echo ReglesAfficheTableauEquipements(objArmement::TYPE_JAMBIERE);?>
+	<?php echo ReglesAfficheTableauEquipements($oDB, objArmement::TYPE_JAMBIERE);?>

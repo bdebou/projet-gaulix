@@ -2,7 +2,7 @@
 <p>Vous trouverez la liste des joueurs avec un apercçu de leur status, le nombre de combats gagnés et perdus.</p>
 <p>Pour info, les combats dont les résultats sont nuls ne sont pas comptabilisés.</p>
 <div style="clear:both;float:left;margin-right:15px;">
-	<?php echo AfficheTableauGainScores();?>
+	<?php echo AfficheTableauGainScores($lstPoints);?>
 </div>
 <div style="float:left; width:400px;">
 	<p>Pour certaines actions, un nombre X de points vous sera attribué et un tableau des scores sera créé.</p>

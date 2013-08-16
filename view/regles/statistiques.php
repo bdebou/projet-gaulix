@@ -4,10 +4,10 @@
 			<th>Statistiques</th>
 		</tr>
 		<tr>
-			<td><?php echo NombreDeJoueurs(personnage::CIVILISATION_GAULOIS);?> Gaulois inscrits</td>
+			<td><?php echo NombreDeJoueurs($oDB, personnage::CIVILISATION_GAULOIS);?> Gaulois inscrits</td>
 		</tr>
 		<tr>
-			<td><?php echo NombreDeJoueurs(personnage::CIVILISATION_ROMAIN);?> Romains inscrits</td>
+			<td><?php echo NombreDeJoueurs($oDB, personnage::CIVILISATION_ROMAIN);?> Romains inscrits</td>
 		</tr>
 		<tr>
 			<td>
