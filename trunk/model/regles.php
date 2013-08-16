@@ -1,10 +1,11 @@
 <?php
 /**
  * Retourne une liste de DIV de tous les objets sélectionnés
+ * @param DBManage <p>Instance de la Class de gestion de DB</p>
  * @param string <p>String du type d'élément</p>
  * @return <NULL, string>
  */
-function ReglesAfficheTableauEquipements($equipement){
+function ReglesAfficheTableauEquipements(DBManage $db, $equipement){
 	$bckColor='#c8c8c8';
 	$txt=null;
 
@@ -13,7 +14,8 @@ function ReglesAfficheTableauEquipements($equipement){
 			WHERE objet_type='".($equipement==objRessource::TYPE_RESSOURCE?$equipement:"Armement")."'
 			AND objet_quete IS NULL;";
 
-	$requete = mysql_query($sql) or die (mysql_error());
+	$requete = $db->Query($sql);
+	
 	while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
 		if($bckColor=='#c8c8c8')
 		{
@@ -48,8 +50,7 @@ function ReglesAfficheTableauEquipements($equipement){
  * Retourne un tableau (class = points)avec la liste des points. 
  * @return string
  */
-function AfficheTableauGainScores(){
-	global $lstPoints;
+function AfficheTableauGainScores($lstPoints){
 
 	$txt = '<table class="points">
 		<tr style="background:grey;"><th style="width:40px;">Pts</th><th style="width:300px;">Action</th></tr>';
@@ -62,23 +63,18 @@ function AfficheTableauGainScores(){
 }
 /**
  * Crée une liste de DIV pour chaque compétence de niveau 1. La class de ces DIV est <strong>regles_competences</strong>
+ * @param DBManage <p>Instance de la Class de gestion de DB</p>
  * @return string  <i>Liste des DIV</i> 
  */
-function AfficheListeCompetences(){
+function AfficheListeCompetences(DBManage &$db){
 	$txtDIV = NULL;
 	
-	/* $NomPrecedent = null;
-	$nbComp = 0;
-	$NumCol = 0;
-	$CheckA = false;
-	$CheckB = false; */
+	$sql = "SELECT cmp_lst_type, cmp_lst_nom, cmp_lst_description, cmp_lst_acces 
+				FROM table_competence_lst 
+				WHERE cmp_lst_niveau=1 
+				ORDER BY cmp_lst_type ASC;";
 	
-	//$sqlLstCmp = "SELECT * FROM table_competence_lst WHERE cmp_lst_niveau =1 ORDER BY cmp_lst_nom ASC;";
-	$sqlLstCmp = "SELECT cmp_lst_type, cmp_lst_nom, cmp_lst_description, cmp_lst_acces 
-					FROM table_competence_lst 
-					WHERE cmp_lst_niveau =1 
-					ORDER BY cmp_lst_type ASC;";
-	$rqtLstCmp = mysql_query($sqlLstCmp) or die (mysql_error().'<br />'.$sqlLstCmp);
+	$rqtLstCmp = $db->Query($sql);
 	
 	while($cmp = mysql_fetch_array($rqtLstCmp, MYSQL_ASSOC)){
 		
@@ -107,11 +103,16 @@ function ListCarriere($strAcces){
 	
 	return 'les '.strtolower(implode('s et les ', $arAcces)).'s';
 }
-function NombreDeJoueurs($civilisation){
-	$sql = "SELECT id FROM table_joueurs WHERE civilisation='".$civilisation."';";
-	$rqt = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
+/**
+ * Retourne le nombre de joueur faisant partie d'une civilisation donnée
+ * @param DBManage $db
+ * @param string $civilisation
+ * @return number
+ */
+function NombreDeJoueurs(DBManage &$db, $civilisation){
 	
-	return mysql_num_rows($rqt);
+	//On exécute sa query
+	return $db->NbLigne("SELECT id FROM table_joueurs WHERE civilisation='".$civilisation."';");
 }
 
 ?>

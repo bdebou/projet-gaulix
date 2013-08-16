@@ -42,7 +42,7 @@ foreach($lignes as $ligne){
 			<p>Chaque <span class="underline">Quête</span> vous apporte un nombre spécifique de points.</p>
 		</td>
 		<td>
-			<?php include_once('model/regles.php'); echo AfficheTableauGainScores();?>
+			<?php include_once('model/regles.php'); echo AfficheTableauGainScores($lstPoints);?>
 		</td>
 		</tr>
 	</table>
