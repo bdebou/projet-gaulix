@@ -36,7 +36,7 @@ class qtePerso extends quete{
 			$txt = "Bravo, vous l\'avez retrouvé. Il va beaucoup mieux. Merci";
 		}
 		
-		AddHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'quete', $this->GetNom(), NULL, $txt);
+		$this->DB->InsertHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'quete', $this->GetNom(), NULL, $txt);
 		
 		$_SESSION['message']['quete'] = $txt;
 	}
