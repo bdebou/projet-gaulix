@@ -11,6 +11,8 @@ include('fct/config.php');
 include('model/common.php');
 include('view/header.php');
 
+$oDB = new DBManage();
+
 if(!isset($_SESSION['joueur'])){
 
 	if (isset($_GET['page']) && in_array($_GET['page'], array('inscription_a', 'inscription_b', 'mp_oublie', 'unconnect'))){
@@ -45,7 +47,6 @@ if(!isset($_SESSION['joueur'])){
 	$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
 	$oMaison = $oJoueur->GetObjSaMaison();
 	
-	
 	$_SESSION['main']['deplacement']	= 'new';
 
 		//On créé la liste des quêtes
@@ -78,6 +79,8 @@ if(!isset($_SESSION['joueur'])){
 	unset($oJoueur);
 	
 }
+
+unset($oDB);
 
 include('view/footer.php');
 ?>
