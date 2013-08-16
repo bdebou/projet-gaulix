@@ -45,6 +45,8 @@ class qteObjet extends quete{
 	}
 	
 	Private function QueteAccomplie(personnage &$oJoueur){
+		Global $oDB;
+		
 		$this->RecupereGains($oJoueur);
 		
 		$this->FinishQuete();
@@ -61,7 +63,7 @@ class qteObjet extends quete{
 		//.'" et gagné ';
 		//.$this->GainOr.' '.AfficheIcone('or').', '.$this->GainExperience.' d\'expérience et '.$this->GainPoints.' points.';
 		
-		$this->DB->InsertHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'quete', $this->GetNom(), NULL, $txt);
+		$oDB->InsertHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'quete', $this->GetNom(), NULL, $txt);
 		
 		$_SESSION['message']['quete'] = $txt;
 	}

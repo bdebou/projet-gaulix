@@ -41,8 +41,6 @@ class personnage{
 	private $nb_points;
 	Private $ListQuetesTerminees;
 	Private $ListQuetesEnCours;
-	
-	Protected $DB;
 			
 	Const TAILLE_MINIMUM_BOLGA		= 20;			//La taille minimum du bolga
 	Const DUREE_SORT				= 432000;		// Limite de temp pour l'utilisation d'un sort (3600 * 24 *5).
@@ -81,8 +79,6 @@ class personnage{
 	public function __construct(array $donnees){
 		$this->hydrate($donnees);
 		
-		$this->DB = new DBManage();
-		
 		//on vérifie si il a droit à des déplacements
 		if(	intval((strtotime('now') - $this->last_action) / self::TEMP_DEPLACEMENT_SUP) >= 1
 			AND $this->deplacement < self::DEPLACEMENT_MAX){
@@ -110,7 +106,7 @@ class personnage{
 		//on vérifie si on passee à la carrière suivante
 		if($this->CheckCarriere())
 		{
-			$this->DB->InsertHistory($this->GetLogin(), $this->GetCarte(), $this->GetPosition(), 'Carrière', NULL, NULL, 'Vous êtes passé à la carrière: '.GetInfoCarriere($this->carriere, 'carriere_nom'));
+			$oDB->InsertHistory($this->GetLogin(), $this->GetCarte(), $this->GetPosition(), 'Carrière', NULL, NULL, 'Vous êtes passé à la carrière: '.GetInfoCarriere($this->carriere, 'carriere_nom'));
 		}
 	}
 	
@@ -118,11 +114,12 @@ class personnage{
 	 * Crée la liste des quêtes terminées
 	 */
 	Private function CreateListQuete(){
+		Global $oDB;
 		$sqlLst = "SELECT quete_id
 						FROM `table_quetes`
 						WHERE quete_login='".$this->GetLogin()."'
 							AND quete_reussi IS NOT NULL;";
-		$rqtLst = $this->DB->Query($sqlLst);
+		$rqtLst = $oDB->Query($sqlLst);
 		
 		if(mysql_num_rows($rqtLst) > 0){
 			while($arQuete = mysql_fetch_array($rqtLst, MYSQL_ASSOC)){
@@ -389,6 +386,8 @@ class personnage{
 	
 	//les Compétences
 	private function CreateListCompetence(){
+		Global $oDB;
+		
 		//on crée la liste des compétences possible
 		$CarriereClass = GetInfoCarriere($this->GetCodeCarriere(), 'carriere_class');
 		
@@ -397,7 +396,7 @@ class personnage{
 										WHERE (cmp_lst_acces IN ('".$CarriereClass."', 'Tous') 
 												OR cmp_lst_acces LIKE '%".$CarriereClass."%')  
 										ORDER BY cmp_lst_type, cmp_lst_code ASC;";
-		$rqtLstCmp = $this->DB->Query($sqlLstCmp);
+		$rqtLstCmp = $oDB->Query($sqlLstCmp);
 		
 		if(mysql_num_rows($rqtLstCmp) > 0){
 			while($item = mysql_fetch_array($rqtLstCmp, MYSQL_ASSOC)){
@@ -409,7 +408,7 @@ class personnage{
 		$sqlCmp = "SELECT cmp_code
 									FROM table_competence 
 									WHERE cmp_login='".$this->login."' AND cmp_finish=1;";
-		$rqtCmp = $this->DB->Query($sqlCmp);
+		$rqtCmp = $oDB->Query($sqlCmp);
 		
 		$status[] = NULL;
 		if(mysql_num_rows($rqtCmp) > 0){
@@ -440,6 +439,8 @@ class personnage{
 	}
 	
 	public function EquiperPerso($numObject, $typeObject){
+		Global $oDB;
+		
 		$chk = true;
 		switch($typeObject){
 			case objArmement::TYPE_ARME:
@@ -469,7 +470,7 @@ class personnage{
 					$this->LstSorts[] = $numObject.'='.strtotime('now');
 				}else{
 					$sql = "SELECT objet_nb FROM table_objets WHERE objet_code='".strval($this->LivreSorts)."';";
-					$requete = $this->DB->Query($sql);
+					$requete = $oDB->Query($sql);
 					$row = mysql_fetch_array($requete, MYSQL_ASSOC);
 					if(count($this->LstSorts) < $row['objet_nb']){
 						$this->LstSorts[] = $numObject.'='.strtotime('now');
@@ -585,11 +586,13 @@ class personnage{
 	 * @return integer
 	 */
 	public function QuelCapaciteMonBolga() {
+		Global $oDB;
+		
 	    //Est ce que le joueur possède un sac?
 	    if (!is_null($this->code_sac)) {
 
 	        $sql = "SELECT objet_attaque FROM table_objets WHERE objet_code='" . strval($this->code_sac) . "';";
-	        $requete = $this->DB->Query($sql);
+	        $requete = $oDB->Query($sql);
 	        $result = mysql_fetch_array($requete, MYSQL_ASSOC);
 	        
 	        return $result['objet_attaque'];
@@ -752,13 +755,15 @@ class personnage{
 		return true;
 	}
 	private function CheckIfCaseMer($position){
+		Global $oDB;
+		
 		$sql = "SELECT id_case_carte
 				FROM table_carte 
 				WHERE 
 					coordonnee = '".$position."' 
 					AND id_type_batiment = 11;";
 		
-		$requete = $this->DB->Query($sql);
+		$requete = $oDB->Query($sql);
 		
 		if(mysql_num_rows($requete) > 0){
 			return true;
@@ -772,6 +777,8 @@ class personnage{
 		return false;
 	}
 	Private function chkIfBatimentBloquant($position){
+		Global $oDB;
+		
 		$TypeBatimentBloquant = array(mur::ID_BATIMENT, tour::ID_BATIMENT);
 		$sql = "SELECT id_case_carte 
 				FROM table_carte 
@@ -781,7 +788,7 @@ class personnage{
 					AND id_type_batiment IN (".implode(', ', $TypeBatimentBloquant).") 
 					AND detruit IS NULL;";
 		
-		$requete = $this->DB->Query($sql);
+		$requete = $oDB->Query($sql);
 		
 		if(mysql_num_rows($requete) > 0){
 			
@@ -797,7 +804,7 @@ class personnage{
 	}
 	//Ressuscite le joueur
 	private function Ressuscite(){
-		global $lstPoints;
+		Global $oDB;
 		
 		$this->position = $this->maison_installe;
 		$this->vie = 100;
@@ -831,7 +838,7 @@ class personnage{
 		
 		ResetListeQuetes($this->GetLogin());
 		
-		$this->DB->InsertHistory($this->GetLogin(), $this->GetCarte(), $this->GetPosition(), 'ressucite', '', NULL, 'Vous êtes mort. Retour à la maison.');
+		$oDB->InsertHistory($this->GetLogin(), $this->GetCarte(), $this->GetPosition(), 'ressucite', '', NULL, 'Vous êtes mort. Retour à la maison.');
 	}
 	
 	Private function ListeCodesEquipement(){
@@ -847,6 +854,7 @@ class personnage{
 		return $tmp;
 	}
 	Private function ValeurDesSorts($type){
+		Global $oDB;
 			//on initialise la valeur des équipements
 		$ValSort = 0;
 		
@@ -857,7 +865,7 @@ class personnage{
 				$arSort = explode('=', $Sort);
 		
 				$sql = "SELECT ".$type." FROM table_objets WHERE objet_code='".$arSort[0]."';";
-				$requete = $this->DB->Query($sql);
+				$requete = $oDB->Query($sql);
 		
 				while($row = mysql_fetch_array($requete, MYSQL_ASSOC))
 				{
@@ -868,6 +876,7 @@ class personnage{
 		return $ValSort;
 	}
 	Private function ValeurEquipements($type){
+		Global $oDB;
 			//on crée la liste des codes des équipements
 		$lstCodes = $this->ListeCodesEquipement();
 		
@@ -876,7 +885,7 @@ class personnage{
 		
 		if(count($lstCodes) > 0){
 			$sql = "SELECT ".$type." FROM table_objets WHERE objet_code IN ('".implode("', '", $lstCodes)."');";
-			$requete = $this->DB->Query($sql);
+			$requete = $oDB->Query($sql);
 				
 			while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
 				$ValeurEquipement += intval($row[$type]);

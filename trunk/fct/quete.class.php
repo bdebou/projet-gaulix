@@ -29,8 +29,6 @@ abstract class quete{
 	private $Visibilite;
 	private $chkCartes;
 	
-	Protected $DB;
-	
 	const NB_QUETE_MAX			= 3;					// Nombre maximum de quete autorisée en  meme temp
 	Const MAX_DEPLACEMENT		= 20;					// Nombre maximum de déplacement pour les quetes ROMAIN
 	
@@ -46,8 +44,6 @@ abstract class quete{
 		date_default_timezone_set('Europe/Brussels');
 		
 		$this->hydrate($Quete, $InfoQuete);
-		
-		$this->DB = new DBManage();
 		
 		if(in_array($this->Type, array('romains'))){$this->UpdateQueteRomains();}
 		
@@ -125,6 +121,7 @@ abstract class quete{
 	}
 	Private function checkIfBatiment($position){
 		Global $lstBatimentConstructible, $lstNonBatiment;
+		Global $oDB;
 		
 		$arListBatiments = array_merge($lstBatimentConstructible, $lstNonBatiment);
 		//$arListBatiments[] = mur::ID_BATIMENT;
@@ -135,7 +132,7 @@ abstract class quete{
 				WHERE id_type_batiment NOT IN ('".implode("', '", $arListBatiments)."') 
 					AND detruit IS NULL;";
 		
-		$requete = $this->DB->Query($sql);
+		$requete = $oDB->Query($sql);
 		
 		while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
 			if($row['coordonnee'] == $position){
