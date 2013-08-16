@@ -191,13 +191,15 @@ class InscriptionStepB{
 		$sql = "SELECT villages_citoyen FROM table_villages WHERE villages_civilisation='".$_SESSION['inscription']['civilisation']."' AND villages_nom='".$strVillage."';";
 		$rqtVillage = mysql_query($sql) or die ( mysql_error() );
 		
+		Global $objManager;
+		
 		$nbVillageois = 0;
 		$txtListVillageois = '<ul class="liste_villageois">';
 		while($row = mysql_fetch_array($rqtVillage, MYSQL_ASSOC)){
-			global $objManager;
-			$oJoueur = $objManager->GetPersoLogin($row['villages_citoyen']);
 			
-			$txtListVillageois .= '<li>'.$row['villages_citoyen'].' ('.GetInfoCarriere($oJoueur->GetCodeCarriere(), 'carriere_nom').').</li>';
+			$oVillageois = $objManager->GetPersoLogin($row['villages_citoyen']);
+			
+			$txtListVillageois .= '<li>'.$row['villages_citoyen'].' ('.GetInfoCarriere($oVillageois->GetCodeCarriere(), 'carriere_nom').').</li>';
 			
 			$nbVillageois++;
 			
