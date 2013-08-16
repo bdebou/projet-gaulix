@@ -41,6 +41,8 @@ class personnage{
 	private $nb_points;
 	Private $ListQuetesTerminees;
 	Private $ListQuetesEnCours;
+	
+	Protected $DB;
 			
 	Const TAILLE_MINIMUM_BOLGA		= 20;			//La taille minimum du bolga
 	Const DUREE_SORT				= 432000;		// Limite de temp pour l'utilisation d'un sort (3600 * 24 *5).
@@ -79,6 +81,8 @@ class personnage{
 	public function __construct(array $donnees){
 		$this->hydrate($donnees);
 		
+		$this->DB = new DBManage();
+		
 		//on vérifie si il a droit à des déplacements
 		if(	intval((strtotime('now') - $this->last_action) / self::TEMP_DEPLACEMENT_SUP) >= 1
 			AND $this->deplacement < self::DEPLACEMENT_MAX){
@@ -106,7 +110,7 @@ class personnage{
 		//on vérifie si on passee à la carrière suivante
 		if($this->CheckCarriere())
 		{
-			AddHistory($this->GetLogin(), $this->GetCarte(), $this->GetPosition(), 'Carrière', NULL, NULL, 'Vous êtes passé à la carrière: '.GetInfoCarriere($this->carriere, 'carriere_nom'));
+			$this->DB->InsertHistory($this->GetLogin(), $this->GetCarte(), $this->GetPosition(), 'Carrière', NULL, NULL, 'Vous êtes passé à la carrière: '.GetInfoCarriere($this->carriere, 'carriere_nom'));
 		}
 	}
 	
@@ -118,7 +122,7 @@ class personnage{
 						FROM `table_quetes`
 						WHERE quete_login='".$this->GetLogin()."'
 							AND quete_reussi IS NOT NULL;";
-		$rqtLst = mysql_query($sqlLst) or die (mysql_error().'<br />'.$sqlLst);
+		$rqtLst = $this->DB->Query($sqlLst);
 		
 		if(mysql_num_rows($rqtLst) > 0){
 			while($arQuete = mysql_fetch_array($rqtLst, MYSQL_ASSOC)){
@@ -393,7 +397,7 @@ class personnage{
 										WHERE (cmp_lst_acces IN ('".$CarriereClass."', 'Tous') 
 												OR cmp_lst_acces LIKE '%".$CarriereClass."%')  
 										ORDER BY cmp_lst_type, cmp_lst_code ASC;";
-		$rqtLstCmp = mysql_query($sqlLstCmp) or die (mysql_error().'<br />'.$sqlLstCmp);
+		$rqtLstCmp = $this->DB->Query($sqlLstCmp);
 		
 		if(mysql_num_rows($rqtLstCmp) > 0){
 			while($item = mysql_fetch_array($rqtLstCmp, MYSQL_ASSOC)){
@@ -405,7 +409,7 @@ class personnage{
 		$sqlCmp = "SELECT cmp_code
 									FROM table_competence 
 									WHERE cmp_login='".$this->login."' AND cmp_finish=1;";
-		$rqtCmp = mysql_query($sqlCmp) or die (mysql_error().'<br />'.$sqlCmp);
+		$rqtCmp = $this->DB->Query($sqlCmp);
 		
 		$status[] = NULL;
 		if(mysql_num_rows($rqtCmp) > 0){
@@ -465,7 +469,7 @@ class personnage{
 					$this->LstSorts[] = $numObject.'='.strtotime('now');
 				}else{
 					$sql = "SELECT objet_nb FROM table_objets WHERE objet_code='".strval($this->LivreSorts)."';";
-					$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
+					$requete = $this->DB->Query($sql);
 					$row = mysql_fetch_array($requete, MYSQL_ASSOC);
 					if(count($this->LstSorts) < $row['objet_nb']){
 						$this->LstSorts[] = $numObject.'='.strtotime('now');
@@ -585,7 +589,7 @@ class personnage{
 	    if (!is_null($this->code_sac)) {
 
 	        $sql = "SELECT objet_attaque FROM table_objets WHERE objet_code='" . strval($this->code_sac) . "';";
-	        $requete = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
+	        $requete = $this->DB->Query($sql);
 	        $result = mysql_fetch_array($requete, MYSQL_ASSOC);
 	        
 	        return $result['objet_attaque'];
@@ -754,7 +758,7 @@ class personnage{
 					coordonnee = '".$position."' 
 					AND id_type_batiment = 11;";
 		
-		$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
+		$requete = $this->DB->Query($sql);
 		
 		if(mysql_num_rows($requete) > 0){
 			return true;
@@ -777,7 +781,7 @@ class personnage{
 					AND id_type_batiment IN (".implode(', ', $TypeBatimentBloquant).") 
 					AND detruit IS NULL;";
 		
-		$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
+		$requete = $this->DB->Query($sql);
 		
 		if(mysql_num_rows($requete) > 0){
 			
@@ -827,7 +831,7 @@ class personnage{
 		
 		ResetListeQuetes($this->GetLogin());
 		
-		AddHistory($this->GetLogin(), $this->GetCarte(), $this->GetPosition(), 'ressucite', '', NULL, 'Vous êtes mort. Retour à la maison.');
+		$this->DB->InsertHistory($this->GetLogin(), $this->GetCarte(), $this->GetPosition(), 'ressucite', '', NULL, 'Vous êtes mort. Retour à la maison.');
 	}
 	
 	Private function ListeCodesEquipement(){
@@ -853,7 +857,7 @@ class personnage{
 				$arSort = explode('=', $Sort);
 		
 				$sql = "SELECT ".$type." FROM table_objets WHERE objet_code='".$arSort[0]."';";
-				$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
+				$requete = $this->DB->Query($sql);
 		
 				while($row = mysql_fetch_array($requete, MYSQL_ASSOC))
 				{
@@ -872,7 +876,7 @@ class personnage{
 		
 		if(count($lstCodes) > 0){
 			$sql = "SELECT ".$type." FROM table_objets WHERE objet_code IN ('".implode("', '", $lstCodes)."');";
-			$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
+			$requete = $this->DB->Query($sql);
 				
 			while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
 				$ValeurEquipement += intval($row[$type]);
