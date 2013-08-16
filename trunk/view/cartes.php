@@ -9,7 +9,7 @@ for($i=0; $i <= (count($arCartes) - 1); $i++){
 		echo '
 	<tr>';
 	}
-	echo '<td>'.AfficheCarte($arCartes[$i], true, array($nbLigneCarte, $nbColonneCarte)).'</td>';
+	echo '<td>'.AfficheCarte($arCartes[$i], true, $arTailleCarte).'</td>';
 	
 	$numCol++;
 	

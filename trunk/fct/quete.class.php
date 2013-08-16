@@ -56,7 +56,7 @@ abstract class quete{
 	
 	//La quete se deplace de 1 case dans n'importe direction MAIS jamais sur un batiment
 	Private function QueteSeDeplaceUneCase(){
-		global $nbLigneCarte, $nbColonneCarte;
+		Global $arTailleCarte;
 		$arCarteNum = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y');
 		
 		foreach(array('up', 'down', 'left', 'right') as $direction){
@@ -66,24 +66,24 @@ abstract class quete{
 		switch($arDirection[array_rand($arDirection)]){
 			case 'up':
 				if($this->Position['1'] == 0){
-					$this->Position['1'] = $nbLigneCarte;
+					$this->Position['1'] = $arTailleCarte['NbLigne'];
 					$this->Position['0'] = $arCarteNum[(array_search($this->Position['0'], $arCarteNum) - 5)];
 				}else{$this->Position['1']--;}
 				break;
 			case 'left':
 				if($this->Position['2'] == 0){
-					$this->Position['2'] = $nbColonneCarte;
+					$this->Position['2'] = $arTailleCarte['NbColonne'];
 					$this->Position['0'] = $arCarteNum[(array_search($this->Position['0'], $arCarteNum) - 1)];
 				}else{$this->Position['2']--;}
 				break;
 			case 'down':
-				if($this->Position['1'] == $nbLigneCarte){
+				if($this->Position['1'] == $arTailleCarte['NbLigne']){
 					$this->Position['1'] = 0;
 					$this->Position['0'] = $arCarteNum[(array_search($this->Position['0'], $arCarteNum) + 5)];
 				}else{$this->Position['1']++;}
 				break;
 			case 'right':
-				if($this->Position['2'] == $nbColonneCarte){
+				if($this->Position['2'] == $arTailleCarte['NbColonne']){
 					$this->Position['2'] = 0;
 					$this->Position['0'] = $arCarteNum[(array_search($this->Position['0'], $arCarteNum) + 1)];
 				}else{$this->Position['2']++;}
@@ -91,7 +91,7 @@ abstract class quete{
 		}
 	}
 	Private function CheckMove($direction){
-		global $nbLigneCarte, $nbColonneCarte;
+		Global $arTailleCarte;
 		$arCoteCarte = array(	'up'	=>array('a','b','c','d','e'),
 								'down'	=>array('u','v','w','x','y'),
 								'left'	=>array('a','f','k','p','u'),
@@ -102,16 +102,16 @@ abstract class quete{
 								'right'	=>array('x'=>$this->Position[1], 'y'=>($this->Position[2]) + 1));
 		
 		if(		($direction == 'up'		AND $this->Position[1] == 0)
-			OR	($direction == 'down'	AND $this->Position[1] == $nbLigneCarte)
+			OR	($direction == 'down'	AND $this->Position[1] == $arTailleCarte['NbLigne'])
 			OR	($direction == 'left'	AND $this->Position[2] == 0)
-			OR	($direction == 'right'	AND $this->Position[2] == $nbColonneCarte)){
+			OR	($direction == 'right'	AND $this->Position[2] == $arTailleCarte['NbColonne'])){
 			if(	(in_array($direction, array('up', 'down'))
 					AND ($this->Position[2] == 0
-						OR $this->Position[2] == $nbColonneCarte)
+						OR $this->Position[2] == $arTailleCarte['NbColonne'])
 				) OR (
 				in_array($direction, array('left', 'right'))
 					AND ($this->Position[1] == 0
-						OR $this->Position[1] == $nbLigneCarte))){
+						OR $this->Position[1] == $arTailleCarte['NbLigne']))){
 						if(in_array($this->GetCarte(), $arCoteCarte[$direction])){return false;}
 			}else{return false;}
 		}

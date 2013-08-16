@@ -1,7 +1,6 @@
 <?php
-function AfficheCarte($numCarte, $AllCartes = false){
-	global $nbLigneCarte, $nbColonneCarte;
-
+function AfficheCarte($numCarte, $AllCartes = false, $arTailleCarte){
+	
 	$txt = null;
 
 	//On ajoute les joueurs
@@ -28,11 +27,11 @@ function AfficheCarte($numCarte, $AllCartes = false){
 		$size = 29;
 	}
 	
-	for($i=0;$i<=$nbLigneCarte;$i++){
+	for($i=0;$i<=$arTailleCarte['NbLigne'];$i++){
 		$txt .= '
 				<tr>
 					';
-		for($j=0;$j<=$nbColonneCarte;$j++){
+		for($j=0;$j<=$arTailleCarte['NbColonne'];$j++){
 			$txt .= '<td'.(isset($grille[$i][$j]['batiment'])?$grille[$i][$j]['batiment']:'').'>';
 			if(isset($grille[$i][$j]['login'])){
 				$txt .= '<img alt="Perso '.$grille[$i][$j]['login'].'" 
