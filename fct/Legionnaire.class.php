@@ -1,9 +1,11 @@
 <?php
 class Legionnaire{
 	
-	Private $Attaque,
-			$Defense,
-			$ValeurCombat;
+	Private $Attaque;
+	Private $Defense;
+	Private $ValeurCombat;
+	
+	Protected $DB;
 	
 	//Const ;
 	
@@ -12,6 +14,8 @@ class Legionnaire{
 		$this->Defense = (10 * $Niveau) + mt_rand(1,15);
 		
 		$this->ValeurCombat = intval($this->Attaque * 1.35) + $this->Defense;
+		
+		$this->DB = new DBManage();
 	}
 	public function CombatLegionnaire(personnage &$Joueur){
 		global $lstPoints;
@@ -34,7 +38,7 @@ class Legionnaire{
 		}
 		$Joueur->AddExperience(5);
 		
-		AddHistory($Joueur->GetLogin(), $Joueur->GetCarte(), $Joueur->GetPosition(), 'combat', 'Légionnaire', NULL, $txtMessage);
+		$this->DB->InsertHistory($Joueur->GetLogin(), $Joueur->GetCarte(), $Joueur->GetPosition(), 'combat', 'Légionnaire', NULL, $txtMessage);
 		
 		return $txtMessage;
 	}
