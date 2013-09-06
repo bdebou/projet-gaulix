@@ -1,86 +1,43 @@
 <?php
-// On prolonge la session
-function chargerClasse($classname){
-	require './fct/'.$classname.'.class.php';
-}
-spl_autoload_register('chargerClasse');
+/**
+ * Requests collector.
+ *
+ *  This file collects requests if:
+ *	- no mod_rewrite is available or .htaccess files are not supported
+ *  - requires App.baseUrl to be uncommented in app/Config/core.php
+ *	- app/webroot is not set as a document root.
+ *
+ * PHP 5
+ *
+ * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
+ * Copyright (c), Cake Software Foundation, Inc. (http://cakefoundation.org)
+ *
+ * Licensed under The MIT License
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * @link          http://cakephp.org CakePHP(tm) Project
+ * @since         CakePHP(tm) v 0.2.9
+ * @license       http://www.opensource.org/licenses/mit-license.php MIT License
+ */
 
-session_start();
+/**
+ *  Get Cake's root directory
+ */
+define('APP_DIR', 'app');
+define('DS', DIRECTORY_SEPARATOR);
+define('ROOT', dirname(__FILE__));
+define('WEBROOT_DIR', 'webroot');
+define('WWW_ROOT', ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS);
 
-include('fct/config.php');
-include('model/common.php');
-include('view/header.php');
-
-$oDB = new DBManage();
-
-if(!isset($_SESSION['joueur'])){
-
-	if (isset($_GET['page']) && in_array($_GET['page'], array('inscription_a', 'inscription_b', 'mp_oublie', 'unconnect'))){
-		include('control/'.$_GET['page'].'.php');
-	}else{
-
-		if(isset($_POST['login']) and !empty($_POST['login']) and isset($_POST['motdepasse']) and !empty($_POST['motdepasse'])){
-			include('model/login.php');
-			$ResultCode = CheckIfLoginMPCorrect($_POST['login'], $_POST['motdepasse']);
-			
-			if (!is_null($ResultCode)){
-				if(is_file('view/error/'.$ResultCode.'.php')){
-					include('view/error/'.$ResultCode.'.php');
-				}else{
-					include('view/error/inconnu.php');
-				}
-			}else{
-				//header('Location: ./');
-				echo '<script type="text/javascript">window.location="./";</script>';
-			}
-		}else{
-			include('view/forms/login.php');
-		}
-		include('model/regles.php');
-		
-		include('view/regles/statistiques.php');
-			
-		include('view/regles.php');
-	}
-}else{
-	
-	$oJoueur = $objManager->GetPersoLogin($_SESSION['joueur']);
-	$oMaison = $oJoueur->GetObjSaMaison();
-	
-	$_SESSION['main']['deplacement']	= 'new';
-
-		//On créé la liste des quêtes
-	$_SESSION['QueteEnCours'] = ListQueteEnCours();
-	
-	if(!empty($_GET['page']) && is_file('control/'.$_GET['page'].'.php')){
-		include('control/'.$_GET['page'].'.php');
-	}else{
-		include('control/main.php');
-	}
-		//on affiche la barre de status
-	include('control/loginstatus.php');
-		
-		//on affiche la barre de menu
-	include('control/menu.php');
-	
-	if (!empty($_GET['page']) && is_file('view/'.$_GET['page'].'.php')){
-		include('view/'.$_GET['page'].'.php');
-	}else{
-		include('view/main.php');
-	}
-	
-	if(!is_null($oMaison))
-	{
-		$objManager->UpdateBatiment($oMaison);
-		unset($oMaison);
-	}
-	
-	$objManager->update($oJoueur);
-	unset($oJoueur);
-	
+/**
+ * This only needs to be changed if the "cake" directory is located
+ * outside of the distributed structure.
+ * Full path to the directory containing "cake". Do not add trailing directory separator
+ */
+if (!defined('CAKE_CORE_INCLUDE_PATH')) {
+	define('CAKE_CORE_INCLUDE_PATH', ROOT . DS . 'lib');
 }
 
-unset($oDB);
-
-include('view/footer.php');
-?>
+require APP_DIR . DS . WEBROOT_DIR . DS . 'index.php';
