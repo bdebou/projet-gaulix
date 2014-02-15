@@ -18,19 +18,21 @@ class MailMP{
 		return ($var==$_SESSION['captchaResult'])?$var:null;
 	}
 	private function verif_login($var){
-		require('config.php'); // On réclame le fichier
+		//require('config.php'); // On réclame le fichier
+		Global $oDB;
 		if($var=='login existant'){
 			return null;
 		}else{
 			$sql = "SELECT * FROM table_joueurs WHERE login='".$var."'";
 			// On vérifie si ce login existe
-			$requete_1 = mysql_query($sql) or die ( mysql_error() );
-			return (mysql_num_rows($requete_1)==0)?$var:null;
+			return ($oDB->NbLigne($sql) == 0)?$var:null;
 		}
 	}
 	private function Found_Password(){
+		Global $oDB;
 		$sql = "SELECT login, password FROM table_joueurs WHERE mail='".$this->mail."'";
-		$requete = mysql_query($sql) or die ( mysql_error().'<br />'.$sql);
+		$requete = $oDB->Query($sql);
+		
 		if(mysql_num_rows($requete) > 0){
 			$result = mysql_fetch_array($requete, MYSQL_ASSOC);
 			$this->password = $result['password'];

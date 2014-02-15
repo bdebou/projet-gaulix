@@ -110,7 +110,7 @@ function ActionAnnulerQuete(&$check, $numQuete) {
 	}
 	
 }
-function ActionValiderQuete(&$check, $numQuete, personnage &$oJoueur, maison &$oMaison = NULL){
+function ActionValiderQuete(DBManage &$db, &$check, $numQuete, personnage &$oJoueur, maison &$oMaison = NULL){
 	if(	isset($_SESSION['quete'][$numQuete])
 	AND $_SESSION['quete'][$numQuete])
 	{
@@ -118,7 +118,7 @@ function ActionValiderQuete(&$check, $numQuete, personnage &$oJoueur, maison &$o
 		{
 			if($oQuete->GetIDTypeQuete() == $numQuete)
 			{
-				$oQuete->ValiderQuete($oJoueur, $oMaison);
+				$oQuete->ValiderQuete($db, $oJoueur, $oMaison);
 				
 				global $objManager;
 				$objManager->UpdateQuete($oQuete);

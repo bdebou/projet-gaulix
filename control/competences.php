@@ -1,7 +1,7 @@
 <?php
 include_once('model/competences.php');
 
-FinishAllCompetenceEnCours($oJoueur);
+FinishAllCompetenceEnCours($oDB, $oJoueur);
 
 $ChkDebugVar = false;
 

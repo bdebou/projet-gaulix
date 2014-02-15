@@ -14,6 +14,7 @@ function AfficheAutreCompetences(personnage &$oJoueur, maison &$oMaison = NULL){
 				WHERE (cmp_lst_acces IN ('".$CarriereClass."', 'Tous') 
 					OR cmp_lst_acces LIKE '%".$CarriereClass."%') 
 				ORDER BY cmp_lst_code ASC;";
+
 	$rqtLstCmp = mysql_query($sqlLstCmp) or die (mysql_error().'<br />'.$sqlLstCmp);
 
 	while($cmp = mysql_fetch_array($rqtLstCmp, MYSQL_ASSOC)){
@@ -87,11 +88,12 @@ function AfficheAutreCompetences(personnage &$oJoueur, maison &$oMaison = NULL){
 		$txt .= '<td>
 	<div class="systeme_onglets">
 		<div class="onglets">';
-	
+		
 		foreach($data as $Niveau => $span){
 			//on récupère les info de la première compétence
 			if($chkPremier){
 				if(!$oJoueur->CheckCompetence($span['code'])){
+					
 					$chkPremier = false;
 					$NomPremier = $onglet;
 					$NiveauPremier = $Niveau;

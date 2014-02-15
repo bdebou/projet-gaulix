@@ -1,7 +1,7 @@
 <?php 
 global 	$arTailleCarte, $db, $temp_combat, $lstBatimentConstructionUnique, $MAX_essai, $lstPoints,
 		$objManager, $CodeCouleurQuete, $lstNonBatiment, $lstBatimentsNonConstructible, $lstTypeObjets, $lstRessources, $LstBatimentMultiConstruction,
-		$lstBatimentConstructible, $arCartes;
+		$lstBatimentConstructible, $arCartes, $oDB;
 
 date_default_timezone_set('Europe/Brussels');
 
@@ -21,6 +21,8 @@ $temp_combat		= 3600 * 1;					// Temp entre chaque combat
 $chkDebug			= false;
 
 require_once 'arColor.config.php';
+
+//$oDB = new DBManage();
 
 $arCartes = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y');
 

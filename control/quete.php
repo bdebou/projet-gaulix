@@ -17,7 +17,7 @@ if(isset($_GET['action'])){
 	switch($_GET['action']){
 		case 'inscription':		ActionInscriptionQuete($chkErr, $_GET['num_quete'], $oJoueur, $oMaison);	break;
 		//case 'annule':			ActionAnnulerQuete($chkErr, $_GET['num_quete']);		break;
-		case 'valider':			ActionValiderQuete($chkErr, $_GET['num_quete'], $oJoueur, $oMaison);		break;
+		case 'valider':			ActionValiderQuete($oDB, $chkErr, $_GET['num_quete'], $oJoueur, $oMaison);		break;
 	}
 	
 	unset($_GET['action']);

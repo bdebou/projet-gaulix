@@ -7,8 +7,10 @@ class DebatDeClan{
 	const COLOR_LIGNE		= '#C0C0C0';
 	
 	public function __construct($clan){
+		Global $oDB;
+		
 		$sql = "SELECT * FROM table_chat WHERE clan_chat='".htmlspecialchars($clan, ENT_QUOTES)."' ORDER BY date_chat DESC;";
-		$requete = mysql_query($sql) or die (mysql_error());
+		$requete = $oDB->Query($sql);
 		
 		if(mysql_num_rows($requete)>0){
 			while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){

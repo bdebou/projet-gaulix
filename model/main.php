@@ -231,7 +231,7 @@ function AfficheActions(personnage &$oJoueur, maison &$oMaison = NULL) {
 
 		//=== On affiche la liste des batiment attaquables
 		$SQLCarte = "SELECT * FROM table_carte WHERE detruit IS NULL 
-		AND login IN ('".implode("', '", array_merge(ListeMembreClan($oJoueur->GetClan()), ListMembreVillage($oJoueur->GetVillage())))."') 
+		AND login NOT IN ('".implode("', '", array_merge(ListeMembreClan($oJoueur->GetClan()), ListMembreVillage($oJoueur->GetVillage())))."') 
 		AND coordonnee IN ('".implode("', '", $arSQLPosition)."');";
 		echo AfficheListeBatimentAttaquable($SQLCarte, $chkConstruction = true);
 
@@ -680,14 +680,24 @@ function AfficheQueteAPorteeDeTire(&$lstMonstre) {
 	}
 	return $txt;
 }
-function AttaqueTour(personnage &$oJoueur){
+/**
+ * Retourne le nombre de point perdu suite à une attaque de tour.
+ * @param DBManage $db
+ * @param personnage $oJoueur
+ * @return number
+ */
+function AttaqueTour(DBManage &$db, personnage &$oJoueur){
 	global $lstPoints;
 
-	$ptsViePerduTour=null;
+	$ptsViePerduTour=0;
 	$arDef = $oJoueur->GetDefPerso();
+	
 	$DefenseJoueur = intval($arDef['0'] + $arDef['1']);
+	
 	$sql = "SELECT coordonnee, login, niveau_batiment FROM table_carte WHERE login NOT IN('".implode("', '", ListeMembreClan($oJoueur->GetClan()))."') AND detruit IS NULL AND id_type_batiment=3;";
-	$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
+	//$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
+	$requete = $db->Query($sql);
+	
 	if(mysql_num_rows($requete) > 0){
 		while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
 			if($row['login'] == 'romain'){
@@ -706,7 +716,7 @@ function AttaqueTour(personnage &$oJoueur){
 					$oJoueur->PerdreVie($ptsDegat, 'tour');
 					$oJoueur->UpdatePoints((abs(tour::POINT_TOUR_ATTAQUE) * -1));
 					$ptsViePerduTour += $ptsDegat;
-					AddHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'attaque', $row['login'], NULL, 'La Tour de '.$row['login'].' vous a attaqué et blessé de '.$ptsDegat.'pts de vie.');
+					$db->InsertHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'attaque', $row['login'], NULL, 'La Tour de '.$row['login'].' vous a attaqué et blessé de '.$ptsDegat.'pts de vie.');
 				}
 			}
 		}
@@ -1052,7 +1062,7 @@ function ActionStock(&$check, personnage &$oJoueur){
 		echo 'Erreur GLX0002: Fonction ActionStock';
 	}
 }
-function ActionMove(&$check, personnage &$oJoueur, &$objManager){
+function ActionMove(DBManage &$db, &$check, personnage &$oJoueur, &$objManager){
 	//on reset la variable MESSAGE
 	unset($_SESSION['message']);
 
@@ -1094,13 +1104,13 @@ function ActionMove(&$check, personnage &$oJoueur, &$objManager){
 		$oJoueur->ArgentVole();
 		$msg = '<p>Un voleur vous a dérobé tout votre argent.</p>';
 		$_SESSION['message'][] = $msg;
-		AddHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'voleur', 'Voleur', NULL, $msg);
+		$db->InsertHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'voleur', 'Voleur', NULL, $msg);
 	}
 
 	//on se fait attaquer par une tour
 	if(!$oJoueur->GetAttaqueTour()){
-		$tmp = AttaqueTour($oJoueur);
-		if(!is_null($tmp)){
+		$tmp = AttaqueTour($db, $oJoueur);
+		if($tmp > 0){
 			$_SESSION['message'][] = '<p>Vous avez été attaqué par une ou des tours. Vous êtes blessé de '.$tmp.'pts de vie.</p>';
  		}
 	}
@@ -1131,7 +1141,7 @@ function ActionChasser(&$check, personnage &$oJoueur){
 		echo 'Erreur GLX0002: Fonction ActionChasser';
 	}
 }
-function ActionFrapper(&$check, $id, personnage &$oJoueur, &$objManager){
+function ActionFrapper(DBManage &$db, &$check, $id, personnage &$oJoueur, &$objManager){
 	if(isset($_SESSION['main']['frapper'][$id])){
 		$PersoAFrapper = $objManager->get(intval($_SESSION['main']['frapper'][$id]));
 		$_SESSION['retour_combat'][] = $PersoAFrapper->GetLogin();
@@ -1143,8 +1153,8 @@ function ActionFrapper(&$check, $id, personnage &$oJoueur, &$objManager){
 			NotificationMail($PersoAFrapper->GetMail(), 'combat', $oJoueur->GetLogin(), $info['1']);
 		}
 		//on ajoute un historique
-		AddHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'combat', $PersoAFrapper->GetLogin(), NULL, $info['0']);
-		AddHistory($PersoAFrapper->GetLogin(), $PersoAFrapper->GetCarte(), $PersoAFrapper->GetPosition(), 'combat', $oJoueur->GetLogin(), NULL, $info['1']);
+		$db->InsertHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'combat', $PersoAFrapper->GetLogin(), NULL, $info['0']);
+		$db->InsertHistory($PersoAFrapper->GetLogin(), $PersoAFrapper->GetCarte(), $PersoAFrapper->GetPosition(), 'combat', $oJoueur->GetLogin(), NULL, $info['1']);
 		unset($_SESSION['main']['frapper'][$id]);
 	}else{
 		$check = false;
@@ -1187,7 +1197,7 @@ function ActionLegionnaire(&$check, personnage &$oJoueur){
 		echo 'Erreur GLX0002: Fonction ActionLegionnaire';
 	}
 }
-function ActionConstruire(&$check, $id, personnage &$oJoueur, maison &$maison = NULL){
+function ActionConstruire(DBManage &$db, &$check, $id, personnage &$oJoueur, maison &$maison = NULL){
 	if(ChkIfBatimentDejaConstruit($_SESSION['main'][$id]['construire']))
 	{
 		$check = false;
@@ -1201,7 +1211,8 @@ function ActionConstruire(&$check, $id, personnage &$oJoueur, maison &$maison = 
 		$oJoueur->SetMaisonInstalle($oJoueur->GetCoordonnee());
 		// on recupère les info du batiment
 		$sql = "SELECT * FROM table_batiment WHERE id_batiment=".maison::ID_BATIMENT." AND batiment_niveau=1;";
-		$requete = mysql_query($sql) or die ( mysql_error() );
+		//$requete = mysql_query($sql) or die ( mysql_error() );
+		$requete = $db->Query($sql);
 		$batiment = mysql_fetch_array($requete, MYSQL_ASSOC);
 
 		// on ajoute le batiment à la carte
@@ -1225,7 +1236,8 @@ function ActionConstruire(&$check, $id, personnage &$oJoueur, maison &$maison = 
 								
 				// on recupère les info du batiment
 				$sql = "SELECT * FROM table_batiment WHERE id_type=".$_SESSION['main'][$id]['construire']." AND batiment_niveau=1;";
-				$requete = mysql_query($sql) or die ( mysql_error() );
+				//$requete = mysql_query($sql) or die ( mysql_error() );
+				$requete = $db->Query($sql);
 				$batiment = mysql_fetch_array($requete, MYSQL_ASSOC);
 				
 				// on ajoute le batiment à la carte
@@ -1235,7 +1247,7 @@ function ActionConstruire(&$check, $id, personnage &$oJoueur, maison &$maison = 
 				$oJoueur->UpdatePoints($batiment['batiment_points']);
 				
 				//on ajoute un historique que le batiment est construit
-				AddHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'Construction', NULL, NULL, 'Batiment construit. ID du batiment = '.$_SESSION['main'][$id]['construire']);
+				$db->InsertHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'Construction', NULL, NULL, 'Batiment construit. ID du batiment = '.$_SESSION['main'][$id]['construire']);
 			}else{
 				$check = false;
 				echo 'Erreur GLX0003: Fonction ActionConstruire - Pas assez de ressource pour payer';

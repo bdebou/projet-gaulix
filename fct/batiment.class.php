@@ -37,10 +37,12 @@ abstract class batiment{
 	//--- fonction qui est lancer lors de la création de l'objet. ---
 	public function __construct(array $carte = NULL, array $batiment){
 		$this->Hydrate($carte, $batiment);
+				
 	}
 	
 	//--- L'attaque du batiment de $persoCible par $persoAttaquant ---
 	public function AttaquerBatiment(personnage $persoCible, personnage $persoAttaquant){
+		Global $oDB;
 			//on initialise la valeur de retour attaque pour persoAttaquant
 		$txt[0] = null;
 			//on initialise la valeur de retour attaque pour persoCible
@@ -91,8 +93,8 @@ abstract class batiment{
 		//on envoie un mail
 		if($persoCible->GetNotifAttaque()){NotificationMail($persoCible->GetMail(), 'attaque', $this->Nom, $txt[1]);}
 		//on ajoute un historique
-		AddHistory($persoAttaquant->GetLogin(), $this->GetCarte(), $this->GetPosition(), 'attaque', $this->Login, NULL, $txt[0]);
-		AddHistory($this->Login, $this->GetCarte(), $this->GetPosition(), 'attaque', $persoAttaquant->GetLogin(), NULL, $txt[1]);
+		$oDB->InsertHistory($persoAttaquant->GetLogin(), $this->GetCarte(), $this->GetPosition(), 'attaque', $this->Login, NULL, $txt[0]);
+		$oDB->InsertHistory($this->Login, $this->GetCarte(), $this->GetPosition(), 'attaque', $persoAttaquant->GetLogin(), NULL, $txt[1]);
 		return $txt;
 	}
 		
@@ -110,6 +112,8 @@ abstract class batiment{
 	
 	//--- Destruction du batiment ---
 	private function BatimentDetruit(personnage &$persoCible, personnage &$persoAttaquant){
+		Global $oDB;
+		Global $objManager;
 			//le batiment est détruit donc on le supprime.
 		$this->Detruit = true;
 			//on gère les points gagnés et perdus
@@ -129,23 +133,16 @@ abstract class batiment{
 				//Quand la banque est détruite, l'attaquant récupère l'or
 			case 'bank': $persoAttaquant->AddOr(intval($this->Contenu)); break;
 			case 'ferme': 
-			case 'mine':
-				global $objManager;
-				//$objManager = new PersonnagesManager($db);
-				
+			case 'mine':				
 				$arContenu = explode(',', $this->Contenu);
 				$nomClass = get_class($this);
 				$this->AddStock($persoCible->GetNiveauCompetence());
 				$arContenu = explode(',', $this->Contenu);
-				//$maison = FoundBatiment(1, $persoAttaquant->GetLogin());
 				$this->ViderStock($arContenu['1'], $persoAttaquant);
-				//$objManager->UpdateBatiment($maison);
-				//unset($maison);
-				//unset($objManager);
 				break;
 		}
-		AddHistory($persoAttaquant->GetLogin(), $this->GetCarte(), $this->GetPosition(), 'attaque', $this->Login, strtotime('now') +3, $this->Nom.' détruit');
-		AddHistory($this->Login, $this->GetCarte(), $this->GetPosition(), 'attaque', $persoAttaquant->GetLogin(), strtotime('now') +3, $this->Nom.' détruit');
+		$oDB->InsertHistory($persoAttaquant->GetLogin(), $this->GetCarte(), $this->GetPosition(), 'attaque', $this->Login, strtotime('now') +3, $this->Nom.' détruit');
+		$oDB->InsertHistory($this->Login, $this->GetCarte(), $this->GetPosition(), 'attaque', $persoAttaquant->GetLogin(), strtotime('now') +3, $this->Nom.' détruit');
 	}
 	
 	
@@ -283,7 +280,7 @@ abstract class batiment{
 			return '<br /><a href="index.php?page=village&action=ameliorer&id='.$id.'&anchor='.$id.'" title="Or = '.$prixAmelioration['Or'].'&#13;Bois = '.$prixAmelioration['Bois'].'&#13;Pierre = '.$prixAmelioration['Pierre'].'&#13;Nourriture = '.$prixAmelioration['Nourriture'].'&#13;'.AfficheTempPhrase(DecoupeTemp(intval(3600*exp($this->Niveau)))).'">Améliorer</a> pour '.AfficheListePrix($prixAmelioration, $oJoueur, $maison);
 		}
 	}
-	public function AfficheOptionReparer(personnage &$oJoueur, maison &$oMaison){
+	public function AfficheOptionReparer(personnage &$oJoueur, maison &$oMaison = NULL){
 		
 		$txt = 'Coût par point de réparation : </br>'.AfficheListePrix($this->GetCoutReparation(), $oJoueur, $oMaison).'</br>';
 		$chkA = true;
@@ -374,19 +371,12 @@ abstract class batiment{
 		}
 	}
 	public function GetCoutAmelioration(){
-		/* $classBatiment = get_class($this);
-		
-		switch(self::GetNiveau() + 1)
-		{
-			case 2:		return explode(',', $classBatiment::COUT_AMELIORATION_NIVEAU_2);
-			case 3:		return explode(',', $classBatiment::COUT_AMELIORATION_NIVEAU_3);
-			case 4:		return explode(',', $classBatiment::COUT_AMELIORATION_NIVEAU_4);
-		} */
+		Global $oDB;
 		
 		$sql = "SELECT batiment_prix FROM table_batiment 
 				WHERE id_type=".$this->GetIDType()." 
 					AND batiment_niveau=".($this->GetNiveau() +1).";";
-		$rqt = mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
+		$rqt = $oDB->Query($sql);
 		
 		if (mysql_num_rows($rqt) > 0)
 		{

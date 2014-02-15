@@ -1,0 +1,1 @@
+on verra ici les scores des personnes de son équipe et autre.

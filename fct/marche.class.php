@@ -17,7 +17,7 @@ class marche extends batiment{
 		$txt = null;
 		
 		$sql = "SELECT contenu_vendeur FROM table_marche WHERE type_vendeur='marchant'";
-		$requete = mysql_query($sql) or die (mysql_error());
+		$requete = $this->DB->Query($sql);
 		
 		if(mysql_num_rows($requete) == 0){
 			$txt .= '
@@ -42,7 +42,7 @@ class marche extends batiment{
 					
 				$sql = "SELECT * FROM table_objets WHERE objet_code='".strval($arMarchandise[0])."';";
 					
-				$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
+				$requete = $this->DB->Query($sql);
 				$result = mysql_fetch_array($requete, MYSQL_ASSOC);
 					
 				if(substr($arMarchandise[0],0,3) != 'Res' AND !in_array($result['objet_type'], array('objet', 'sac'))){
@@ -157,7 +157,7 @@ class marche extends batiment{
 		$txt = null;
 		
 		$sql = "SELECT * FROM table_marche WHERE status_vente IS NULL AND vendeur IS NOT NULL AND vendeur IN ('".implode("', '", ListeMembreClan($oJoueur->GetClan()))."')";
-		$requete = mysql_query($sql) or die (mysql_error());
+		$requete = $this->DB->Query($sql);
 		
 		if(mysql_num_rows($requete) == 0){
 			$txt .='
