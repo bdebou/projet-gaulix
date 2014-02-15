@@ -26,7 +26,7 @@ for($i=0; $i <= (count($arCartes) - 1); $i++):?>
 	<?php 
             $numCol = 0;
         endif;?>
-            
+<?php endfor;?>
 	</table>
     </div><!-- /.col-md-12 -->
 </div><!-- /.row -->

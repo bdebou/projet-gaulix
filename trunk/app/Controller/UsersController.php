@@ -12,7 +12,8 @@
  */
 class UsersController extends AppController {
     
-    public $components = array('Session', 'Auth');
+    public $components  = array('Session', 'Auth', 'Cartes');
+    public $uses        = array('User', 'Carte');
     
     public function beforeFilter() {
         parent::beforeFilter();
@@ -153,17 +154,25 @@ class UsersController extends AppController {
         }
     }
     public function SecondStep(){
+        
         if ($this->request->is('post')) {
             
             $this->request->data['User']['id']                  = $this->Session->read('Auth.User.id');
             $this->request->data['Village']['civilisation_id']  = $this->Session->read('Auth.User.civilisation_id');
+                 
             
-            if($this->request->data['User']['village_id'] != 0)
+            if($this->request->data['User']['village_id'] != 0){
+                $this->User->Village->id = $this->request->data['User']['village_id'];
+                $arCarte = $this->User->Village->read('carte');
+                
+                $this->request->data['User']['position'] = $this->PositionAleatoire($arCarte['Village']['carte'], $this->Session->read('Auth.User.civilisation_id'));
                 unset($this->request->data['Village']);
-            else
+            }else{
+                $this->request->data['User']['position'] = $this->PositionAleatoire(NULL, $this->Session->read('Auth.User.civilisation_id'));
+                $arCarte = explode(',', $this->request->data['User']['position']);
+                $this->request->data['Village']['carte'] = $arCarte[0];
                 unset($this->request->data['User']['village_id']);
-            
-            //var_dump($this->Session->read());die();            
+            }
             
             if ($this->User->saveAssociated($this->request->data)) {
                 
@@ -241,6 +250,25 @@ class UsersController extends AppController {
         
 //        return $db->NbLigne("SELECT id FROM table_joueurs WHERE civilisation='".$civilisation."';");
     }
+    private function PositionAleatoire($chrCarte = NULL, $idCivilisation){
+        if(is_null($chrCarte)){
+                switch($idCivilisation){
+                        case PersonnageComponent::ID_CIVILISATION_GAULOIS:
+                                $Cartes = array('a','b','c','d','e','f','g','h','i','j','m','n','o');
+                                break;
+                        case PersonnageComponent::ID_CIVILISATION_ROMAIN:
+                                $Cartes = array('k','l','p','q','r','s','t','u','v','w','x','y');
+                                break;
+                }
+        }else{
+                $Cartes = array($chrCarte);
+        }
+
+        $arCaseLibre = $this->Cartes->FreeCaseCarte($Cartes[array_rand($Cartes)]);
+
+        return $arCaseLibre[array_rand($arCaseLibre)];
+    }
+    
 }
 
 ?>
