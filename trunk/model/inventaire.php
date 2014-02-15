@@ -288,7 +288,13 @@ function ActionEquiper(&$check, $id, &$oJoueur){
 		echo 'Erreur GLX0002: Fonction ActionEquiper';
 	}
 }
-function ActionSorts(&$check, personnage &$oJoueur){
+/**
+ * On utilise un sort.
+ * @param DBManage $db
+ * @param boolean $check
+ * @param personnage $oJoueur
+ */
+function ActionSorts(DBManage &$db, &$check, personnage &$oJoueur){
 	switch($_SESSION['main'][$_GET['id']]['code']){
 		case 'SrtMaison':
 			$oJoueur->UpdatePosition($oJoueur->GetMaisonInstalle());
@@ -304,7 +310,8 @@ function ActionSorts(&$check, personnage &$oJoueur){
 			break;
 		case 'SrtQuete':
 			$sqlQ = "SELECT quete_position FROM table_quetes WHERE  quete_login='".$oJoueur->GetLogin()."' AND quete_reussi IS NULL;";
-			$rqtLstQuete = mysql_query($sqlQ) or die (mysql_error().'<br />'.$sqlQ);
+			//$rqtLstQuete = mysql_query($sqlQ) or die (mysql_error().'<br />'.$sqlQ);
+			$rqtLstQuete = $db->Query($sqlQ);
 			if(mysql_num_rows($rqtLstQuete) == 0){
 				$txtMessage = '<p>Vous n\'avez aucune quête en cours.</p>';
 			}else{
@@ -317,14 +324,14 @@ function ActionSorts(&$check, personnage &$oJoueur){
 				}
 			}
 			$_SESSION['message'][] = $txtMessage;
-			AddHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'Sort', 'Votre Druide', NULL, $txtMessage);
+			$db->InsertHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'Sort', 'Votre Druide', NULL, $txtMessage);
 			//on supprime le sort du bolga
 			$oJoueur->CleanInventaire($_SESSION['main'][$_GET['id']]['code']);
 			break;
 		default:
 			$check = false;
 			echo 'Erreur GLX0003: Pas d\'action correcte <br />';
-			print_r($_SESSION['main']);
+			var_dump($_SESSION['main']);
 	}
 }
 function ActionConvertir(&$check, $id, personnage &$oJoueur, maison &$maison, $Qte){

@@ -1,5 +1,5 @@
 <div class="main">
-	<div class="carte"><?php echo AfficheCarte($oJoueur->GetCarte(), false, $arTailleCarte);?></div>
+	<div class="carte"><?php echo AfficheCarte($oDB, $oJoueur->GetCarte(), false, $arTailleCarte);?></div>
 	<div class="mouvements"><?php echo AfficheMouvements($oJoueur);?></div>
 	<div class="module_social">
 		<table class="module_social">

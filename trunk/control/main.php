@@ -4,7 +4,7 @@ include_once('model/carte.php');
 include_once('model/village.php');
 //include_once('model/quete.php');
 
-FinishAllCompetenceEnCours($oJoueur);
+FinishAllCompetenceEnCours($oDB, $oJoueur);
 
 $ChkDebugVar = false;
 
@@ -19,17 +19,17 @@ $chkErr = true;
 $CheckRetour = false;
 
 if(isset($_GET['move']) AND $oJoueur->GetDepDispo() > 0){
-	ActionMove($chkErr, $oJoueur, $objManager);
+	ActionMove($oDB, $chkErr, $oJoueur, $objManager);
 	$CheckRetour = true;
 }elseif(isset($_GET['action'])){
 	switch($_GET['action']){
 		case 'stock':				ActionStock($chkErr, $oJoueur); break;
 		case 'ressource':			ActionRessource($chkErr, $oJoueur, $objManager, (isset($_GET['id'])?$_GET['id']:NULL)); break;
 		case 'chasser':				ActionChasser($chkErr, $oJoueur); break;
-		case 'frapper':				ActionFrapper($chkErr, $_GET['id'], $oJoueur, $objManager); break;
+		case 'frapper':				ActionFrapper($oDB, $chkErr, $_GET['id'], $oJoueur, $objManager); break;
 		case 'attaquer':			ActionAttaquer($chkErr, $_GET['id'], $oJoueur, $objManager); break;
 		case 'legionnaire':			ActionLegionnaire($chkErr, $oJoueur); break;
-		case 'construire':			ActionConstruire($chkErr, $_GET['id'], $oJoueur, $oMaison); break;
+		case 'construire':			ActionConstruire($oDB, $chkErr, $_GET['id'], $oJoueur, $oMaison); break;
 		case 'quete':				ActionQuete($chkErr, $_GET['id'], $oJoueur, $objManager); break;
 		case 'utiliser':			ActionUtiliser($chkErr, $_SESSION['main']['objet']['code'], $oJoueur); break;
 		case 'laisser':				ActionLaisser($chkErr, $oJoueur); break;

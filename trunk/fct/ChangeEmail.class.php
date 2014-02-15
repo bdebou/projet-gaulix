@@ -21,9 +21,11 @@ class ChangeEmail{
 		}
 	}
 	function envoi_sql(){ //fonction qui envoie la requete SQL
-		require('config.php'); // On réclame le fichier
+		//require('config.php'); // On réclame le fichier
+		global $oDB;
+		
 		$sql = "UPDATE table_joueurs SET mail='".$this->email."' WHERE login='".$_SESSION['joueur']."';";
-		mysql_query($sql) or die ( mysql_error() );
+		$oDB->Query($sql);
 	}
 	public function loadForm($data){
 		extract($data);

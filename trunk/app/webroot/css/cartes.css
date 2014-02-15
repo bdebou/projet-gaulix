@@ -1,0 +1,43 @@
+table.all_cartes{
+	margin-left: auto;
+	margin-right: auto;
+	border-spacing: 0px;
+	background-image: url('../img/carte/mini/gaule.png');
+	border-collapse: collapse;
+	border: 1px solid black;
+}
+table.all_cartes td{
+	padding: 0px;
+	border-collapse: collapse;
+	border: 1px solid black;
+}
+table.carte_petite,
+table.carte{
+	margin: 0px;
+	border-collapse: collapse;
+	border: none;
+}
+table.carte td{
+	width: 32px;
+	height: 32px;
+	padding: 0px;
+	border: 1px solid black;
+}
+table.carte_petite td{
+	padding: 0px;
+	
+	/*AVEC le cadrillage*/
+	
+/*	width: 10px;
+	height: 10px;
+	border: 1px solid black;
+	line-height:10px;*/
+	
+	/*SANS le cadrillage*/
+	
+	width: 10px;
+	height: 10px;
+	line-height: 10px;
+	border: none;
+	
+}

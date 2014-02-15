@@ -619,16 +619,14 @@ function FreeCaseCarte($carte = NULL) {
 		}
 	}
 
-	global $nbLigneCarte, $nbColonneCarte;
-	
-	$arCartes = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y');
+	global $arCartes, $arTailleCarte;
 
 	if (is_null($carte)) {
 		$carte = $arCartes[array_rand($arCartes)];
 	}
 
-	for ($i = 0; $i <= $nbLigneCarte; $i++) {
-		for ($j = 0; $j <= $nbColonneCarte; $j++) {
+	for ($i = 0; $i <= $arTailleCarte['NbLigne']; $i++) {
+		for ($j = 0; $j <= $arTailleCarte['NbColonne']; $j++) {
 			if (!isset($arBusy[$carte][$i][$j])) {
 				$arFree[] = implode(',', array($carte, $i, $j));
 			}
@@ -694,28 +692,27 @@ function ListMembreVillage($Village){
 	
 	return array();
 }
-function AddHistory($Login, $Carte, $Position, $Type, $Adversaire, $Date, $Info) {
-	if(is_null($Date)){
-		$Date = strtotime('now');
-	}
-	$sql = "INSERT INTO `table_history` (`history_id`, `history_login`, `history_position`, `history_type`, `history_adversaire`, `history_date`, `history_info`)
-			VALUES (NULL, '$Login', '" . implode(',', array_merge(array($Carte), $Position)) . "', '$Type', '$Adversaire', '".date('Y-m-d H:i:s', $Date)."', '" . htmlentities($Info, ENT_QUOTES) . "');";
-	mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
-}
-function FinishAllCompetenceEnCours(personnage &$oJoueur) {
+/**
+ * Fonction qui vérifie si une compétence en cours d'apprentissage n'est pas terminée. Si oui, elle la met en Finish.
+ * @param DBManage $db
+ * @param personnage $oJoueur
+ */
+function FinishAllCompetenceEnCours(DBManage &$db, personnage &$oJoueur) {
 	$sqlCmp = "SELECT * FROM table_competence WHERE cmp_login='" . $oJoueur->GetLogin() . "' AND cmp_finish IS NULL";
-	$rqtCmp = mysql_query($sqlCmp) or die(mysql_error() . '<br />' . $sqlCmp);
+	//$rqtCmp = mysql_query($sqlCmp) or die(mysql_error() . '<br />' . $sqlCmp);
+	$rqtCmp = $db->Query($sqlCmp);
 	
 	while ($cmp = mysql_fetch_array($rqtCmp, MYSQL_ASSOC))
 	{
 		if ((strtotime('now') - strtotime($cmp['cmp_date'])) >= $cmp['cmp_temp'])
 		{
 			$sql = "UPDATE  `table_competence` SET  `cmp_finish` =  TRUE WHERE `table_competence`.`cmp_id` =" . $cmp['cmp_id'] . ";";
-			mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
+			//mysql_query($sql) or die(mysql_error() . '<br />' . $sql);
+			$db->Query($sql);
 			
 			$oJoueur->UpdatePoints(personnage::POINT_COMPETENCE_TERMINE);
 			
-			AddHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'Competence', NULL, NULL, 'Compétence terminée');
+			$db->InsertHistory($oJoueur->GetLogin(), $oJoueur->GetCarte(), $oJoueur->GetPosition(), 'Competence', NULL, NULL, 'Compétence terminée');
 		}
 	}
 }
@@ -809,16 +806,14 @@ function ActionDeplacement(&$check, &$oJoueur){
 		echo 'Erreur GLX0002: Fonction ActionDeplacement';
 	}
 }
-function ActionUtiliser(&$check, &$code = null, personnage &$oJoueur, &$objManager, $Qte = 1){
+function ActionUtiliser(&$check, &$code = null, personnage &$oJoueur, $Qte = 1){
 	if(!is_null($code)){
 		if(!isset($_GET['page']) OR $_GET['page'] == 'main'){
 			$oJoueur->AddInventaire($code);
 		}
 
 		$objObjet = FoundObjet($code);
-		
-		//$maison = $oJoueur->GetObjSaMaison();
-	
+			
 		for($i=1; $i <= $Qte; $i++)
 		{
 			foreach($objObjet->GetRessource() as $Ressource)
@@ -848,12 +843,6 @@ function ActionUtiliser(&$check, &$code = null, personnage &$oJoueur, &$objManag
 			$oJoueur->CleanInventaire($code);
 		}
 		
-
-		/* if(!is_null($maison)){
-			$objManager->UpdateBatiment($maison);
-			unset($maison);
-		} */
-
 		unset($code);
 	}else{
 		$check = false;
@@ -880,5 +869,15 @@ function ResetListeQuetes($login) {
 		$sqlRemove = "DELETE FROM table_quetes WHERE id_quete_en_cours=" . intval($row['id_quete_en_cours']) . ";";
 		mysql_query($sqlRemove) or die(mysql_error() . '<br />' . $sqlRemove);
 	}
+}
+/**
+ * Echappement de caractères
+ * @param string $str
+ * @return string
+ */
+function KillHack($str){
+	return str_replace(	array("\\", "\0", "\n", "\r", "\xla", "'", '"'), 
+						array("\\\\", "\\0", "\\r", "\\xla", "\'", '\"'),
+						strval($str));
 }
 ?>

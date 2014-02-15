@@ -110,6 +110,10 @@ class personnage{
 		}
 	}
 	
+	public static function Cast(personnage &$object=NULL){
+		return $object;
+	}
+	
 	/**
 	 * Crée la liste des quêtes terminées
 	 */

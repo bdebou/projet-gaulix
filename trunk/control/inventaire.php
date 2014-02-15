@@ -15,7 +15,7 @@ $CheckRetour = false;
 
 if(isset($_GET['action'])){
 	switch($_GET['action']){
-		case 'sort':				ActionSorts($chkErr, $oJoueur); break;
+		case 'sort':				ActionSorts($oDB, $chkErr, $oJoueur); break;
 	}
 	unset($_GET['action']);
 	$CheckRetour = true;
@@ -28,7 +28,7 @@ if(isset($_GET['action'])){
 		case 'Utiliser':			ActionUtiliser($chkErr, $_SESSION['inventaire'][$_POST['id']]['code'], $oJoueur, abs($_POST['qte'])); break;
 		case 'Abandonner':			ActionAbandonner($chkErr, $oJoueur, $_POST['id'], abs($_POST['qte'])); break;
 		case 'Equiper':				ActionEquiper($chkErr, $_POST['id'], $oJoueur); break;
-		case 'Sort':				ActionSorts($chkErr, $oJoueur); break;
+		case 'Sort':				ActionSorts($oDB, $chkErr, $oJoueur); break;
 		//case 'MettreBolga':			ActionMettreDansBolga($chkErr, $_POST['type'], $oJoueur, $objManager); break;
 	}
 	unset($_POST['action']);

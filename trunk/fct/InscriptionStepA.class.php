@@ -92,6 +92,8 @@ class InscriptionStepA{
 			// On réclame le fichier
 		require_once('./fct/config.php');
 		
+		$oDB=DBManage::Cast($oDB);
+		
 		if(isset($_POST['next'])){
 			if(empty($this->Login)){
 				
@@ -119,8 +121,8 @@ class InscriptionStepA{
 			}else{
 				
 				$sql = "SELECT id FROM table_joueurs WHERE login='".$this->Login."'";
-				// On vérifie si ce login existe
-				$requete = mysql_query($sql) or die ( mysql_error() );
+				// On v�rifie si ce login existe
+				$requete = $oDB->Select('table_joueurs', array('id'), array("login='".$this->Login."'"));
 				
 				if(mysql_num_rows($requete) == 0){
 					return true;
@@ -221,13 +223,16 @@ class InscriptionStepA{
 		return self::STYLE_BLANC;
 	}
 	public function GetSelectCivilisation($civilisation){
+		Global $oDB;
+		
 		$sqlG = "SELECT id FROM table_joueurs WHERE civilisation='".personnage::CIVILISATION_GAULOIS."';";
-		$rqtG = mysql_query($sqlG) or die ( mysql_error() );
+		//$rqtG = $oDB->Select('table_joueurs', array('id'), array("civilisation='".personnage::CIVILISATION_GAULOIS."'"));
 		
 		$sqlR = "SELECT id FROM table_joueurs WHERE civilisation='".personnage::CIVILISATION_ROMAIN."';";
-		$rqtR = mysql_query($sqlR) or die ( mysql_error() );
+		//$rqtR =$oDB->Select('table_joueurs', array('id'), array("civilisation='".personnage::CIVILISATION_ROMAIN."'"));
 		
-		if(mysql_num_rows($rqtG) >= mysql_num_rows($rqtR)){
+		//if(mysql_num_rows($rqtG) >= mysql_num_rows($rqtR)){
+		if($oDB->NbLigne($sqlG) >= $oDB->NbLigne($sqlR)){
 			switch($civilisation){
 				case personnage::CIVILISATION_GAULOIS:	return NULL;
 				case personnage::CIVILISATION_ROMAIN:	return ' selected="selected"';

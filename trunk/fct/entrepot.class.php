@@ -92,7 +92,7 @@ class entrepot extends batiment{
 				
 				//on récupère les info de l'objet
 				$sql = "SELECT * FROM table_objets WHERE objet_code='".strval($arObjet[0])."';";
-				$requete = mysql_query($sql) or die (mysql_error().'<br />'.$sql);
+				$requete = $this->DB->Query($sql);
 				$result = mysql_fetch_array($requete, MYSQL_ASSOC);
 
 				//on stocke le code de l'objet à reprendre dans $_SESSION

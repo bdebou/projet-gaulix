@@ -23,6 +23,10 @@ class DBManage{
 	
 	}
 	
+	public static function Cast(DBManage &$object=NULL){
+		return $object;
+	}
+	
 	Public function Query($strQuery){
 		if($returns = mysql_query($strQuery)) return $returns;
 		
@@ -110,26 +114,26 @@ class DBManage{
 	 * Retourne la ressource correspondante à la requete SELECT sur le table $strTable.
 	 * @param string $strTable <p>Nom de la table</p>
 	 * @param array $arFields <p>Liste des fields à retourner dans une array. Structure: (Name, Surname, &lt;Field3&gt;, ...)</p>
-	 * @param array $arCondition <p>Liste des conditions. Structure: (Name='Coucou', ID<>50, Name IN('test', 'test2'),  &lt;Condition4&gt;, ...)</p>
+	 * @param array $arCondition <p>Liste des conditions lié avec AND. Structure: (Name='Coucou', ID<>50, Name IN('test', 'test2'),  &lt;Condition4&gt;, ...)</p>
 	 */
 	Public function Select($strTable, $arFields = self::ALL_FIELDS, $arCondition = NULL){
 		$sql = "SELECT %1 FROM %2 %3;";
 		
 		//on insère le nom de la table
-		str_replace('%2', $strTable, $sql);
+		$sql = str_replace('%2', $strTable, $sql);
 		
 		//on insère le ou les champs désirés en retour
-		if($arFields == self::ALL_FIELDS)
+		if($arFields == self::ALL_FIELDS Or is_null($arFields))
 		{
-			str_replace('%1', self::ALL_FIELDS, $sql);
+			$sql = str_replace('%1', self::ALL_FIELDS, $sql);
 		}else{
-			str_replace('%1', implode(', ', $arFields), $sql);
+			$sql = str_replace('%1', implode(', ', $arFields), $sql);
 		}
 		
-		//On insère un ou des conditions
+		//On insère une ou des conditions
 		if(!is_null($arCondition))
 		{
-			str_replace('%3', 'WHERE '.implode(', ', $arCondition), $sql);
+			$sql = str_replace('%3', 'WHERE '.implode(' AND ', $arCondition), $sql);
 		}
 		
 		//on exécute la requete SQL

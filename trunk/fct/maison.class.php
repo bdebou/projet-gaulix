@@ -71,7 +71,7 @@ class maison extends batiment{
 			<table class="options_maison">';
 		
 		$sqlLstDruide = "SELECT * FROM table_competence_lst WHERE cmp_lst_type='druide' ORDER BY cmp_lst_niveau ASC;";
-		$rqtLstDruide = mysql_query($sqlLstDruide) or die (mysql_error().'<br />'.$sqlLstDruide);
+		$rqtLstDruide = $this->DB->Query($sqlLstDruide);
 		
 		if(mysql_num_rows($rqtLstDruide) == 0){return null;}
 		

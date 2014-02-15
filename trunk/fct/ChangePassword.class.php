@@ -10,12 +10,20 @@ class ChangePassword{
     private function verif_new_password($pass1,$pass2){return($pass1==$pass2)?$pass1:null;}
 	
 	private function verif_old_password($old){
-		require('config.php'); // On réclame le fichier
+		//require('config.php'); // On réclame le fichier
+		Global $oDB;
+		
 		$sql = "SELECT password FROM table_joueurs WHERE login='".$_SESSION['joueur']."'";
-		$requete = mysql_query($sql) or die ( mysql_error() );
+		$requete = $oDB->Query($sql);
+		
 		$result = mysql_fetch_array($requete, MYSQL_ASSOC);
-		if($result['password'] == $old){return $old;}
-		else{return null;}
+		
+		if($result['password'] == $old)
+		{
+			return $old;
+		}else{
+			return null;
+		}
 	}
 	
 	public function inputTrue($input, $type = '1'){
@@ -35,9 +43,10 @@ class ChangePassword{
 		}
 	}
 	function envoi_sql(){ //fonction qui envoie la requete SQL
-		require('config.php'); // On réclame le fichier
+		//require('config.php'); // On réclame le fichier
+		Global $oDB;
 		$sql = "UPDATE table_joueurs SET password='".$this->password_1."' WHERE login='".$_SESSION['joueur']."';";
-		mysql_query($sql) or die ( mysql_error() );
+		$oDB->Query($sql);
 	}
 	public function loadForm($data){
 		extract($data);

@@ -35,6 +35,8 @@ class InscriptionStepB{
 		return true;
 	}
 	public function CheckNewVillage(){
+		Global $oDB;
+		
 		if(strlen($this->NewVillage) > self::SIZE_MAX_VILLAGE){
 			$this->Message .= '<li>Nom de village trop long (max '.self::SIZE_MAX_VILLAGE.' caractères)</li>';
 			return false;
@@ -42,11 +44,9 @@ class InscriptionStepB{
 			$this->Message .= '<li>Veuillez introduire un nom de village</li>';
 			return false;
 		}else{
-			$sql = "SELECT id FROM table_joueurs WHERE village='".$this->NewVillage."'";
 			// On vérifie si ce login existe
-			$requete = mysql_query($sql) or die ( mysql_error() );
-			
-			if(mysql_num_rows($requete) != 0){
+			$sql = "SELECT id FROM table_joueurs WHERE village='".$this->NewVillage."'";
+			if($oDB->NbLigne($sql) != 0){
 				$this->Message .= '<li>Le village "'.$this->NewVillage.'" existe déjà.</li>';
 				return false;
 			}
@@ -60,7 +60,8 @@ class InscriptionStepB{
 		return true;
 	}
 	private function envoi_sql(){ //fonction qui envoie la requete SQL
-		require('./fct/config.php'); // On réclame le fichier
+		//require('./fct/config.php'); // On réclame le fichier
+		Global $oDB;
 		
 		$sql = 	"INSERT INTO table_joueurs (
 					`id`, 
@@ -86,7 +87,7 @@ class InscriptionStepB{
 					'".$this->Carriere."', 
 					'".date('Y-m-d H:i:s')."', 
 					'".date('Y-m-d H:i:s')."');";
-		mysql_query($sql) or die ( mysql_error().'<br />'.$sql);
+		$oDB->Query($sql);
 		
 		$sql = "INSERT INTO table_villages (
 					`villages_nom`, 
@@ -96,7 +97,7 @@ class InscriptionStepB{
 					'".$this->Village."', 
 					'".$_SESSION['inscription']['civilisation']."', 
 					'".$_SESSION['inscription']['login']."');";
-		mysql_query($sql) or die ( mysql_error().'<br />'.$sql);
+		$oDB->Query($sql);
 		
 		
 	}
@@ -179,11 +180,11 @@ class InscriptionStepB{
 	public function GetSendCheck(){			return $this->SendCheck;}
 	public function GetMessage(){			return $this->Message;}
 	private function GetInfoVillage($strVillage){
-		//$sql = "SELECT login, niveau, carriere FROM table_joueurs WHERE civilisation='".$_SESSION['inscription']['civilisation']."' AND village='".$strVillage."';";
-		$sql = "SELECT villages_citoyen FROM table_villages WHERE villages_civilisation='".$_SESSION['inscription']['civilisation']."' AND villages_nom='".$strVillage."';";
-		$rqtVillage = mysql_query($sql) or die ( mysql_error() );
-		
+		Global $oDB;
 		Global $objManager;
+		
+		$sql = "SELECT villages_citoyen FROM table_villages WHERE villages_civilisation='".$_SESSION['inscription']['civilisation']."' AND villages_nom='".$strVillage."';";
+		$rqtVillage = $oDB->Query($sql);
 		
 		$nbVillageois = 0;
 		$txtListVillageois = '<ul class="liste_villageois">';
@@ -207,61 +208,66 @@ class InscriptionStepB{
 		return $txt;
 	}
 	public function GetListeVillages(){
-		//$sql = "SELECT village FROM table_joueurs WHERE civilisation='".$_SESSION['inscription']['civilisation']."' ORDER BY village ASC;";
-		$sql = "SELECT villages_nom FROM table_villages WHERE villages_civilisation='".$_SESSION['inscription']['civilisation']."' ORDER BY villages_nom ASC;";
-		$rqtVillage = mysql_query($sql) or die ( mysql_error() );
+		Global $oDB;
 		
-		if(mysql_num_rows($rqtVillage) > 0){
-			$nbVillageois = 0;
-			$precedent = NULL;
-			$info = NULL;
-			
-			while($row = mysql_fetch_array($rqtVillage, MYSQL_ASSOC)){
-				if($row['villages_nom'] != $precedent){
-					$info[] = '<tr>
-								<td>
-									<input required="required" type="radio" name="village" value="'.strtolower($row['villages_nom']).'" />
-								</td>
-								<td>'
-									.$this->GetInfoVillage($row['villages_nom'])
-								.'</td>
-							</tr>';
-					$precedent = $row['villages_nom'];
-				}
-				
-			}
-			if(!is_null($info)){
-				return $info;
-			}
+		$sql = "SELECT villages_nom FROM table_villages WHERE villages_civilisation='".$_SESSION['inscription']['civilisation']."' ORDER BY villages_nom ASC;";
+		$rqtVillage = $oDB->Query($sql);
+		
+		//Si le village n'existe pas
+		if(mysql_num_rows($rqtVillage) <= 0){
+			return '<tr><td colspan="2">Aucun Village n\'existe</td></tr>';
 		}
 		
-		return '<tr><td colspan="2">Aucun Village n\'existe</td></tr>';
+		//Si le village existe, on liste les villageois
+		$nbVillageois = 0;
+		$precedent = NULL;
+		$info = NULL;
 		
-	}
-	public function GetListeCarrieres(){
-		$sql = "SELECT carriere_nom, carriere_debouchees, carriere_code FROM table_carrieres_lst WHERE carriere_niveau=0 AND carriere_civilisation='".$_SESSION['inscription']['civilisation']."' ORDER BY carriere_nom ASC;";
-		$rqtMetier = mysql_query($sql) or die ( mysql_error() );
-		
-		if(mysql_num_rows($rqtMetier) > 0){
-			$info = null;
-			while($row = mysql_fetch_array($rqtMetier, MYSQL_ASSOC)){
-				$temp  = '<tr>
+		while($row = mysql_fetch_array($rqtVillage, MYSQL_ASSOC)){
+			if($row['villages_nom'] != $precedent){
+				$info[] = '<tr>
 							<td>
-								<input required="required" type="radio" name="carriere" value="'.strtolower($row['carriere_code']).'" />
+								<input required="required" type="radio" name="village" value="'.strtolower($row['villages_nom']).'" />
 							</td>
 							<td>'
-								.$this->GetDeboucheeCarrire($row['carriere_code'])
+								.$this->GetInfoVillage($row['villages_nom'])
 							.'</td>
 						</tr>';
-				
-				$info[] = $temp;
+				$precedent = $row['villages_nom'];
 			}
-			if(!is_null($info)){
-				return $info;
-			}
+			
+		}
+		if(!is_null($info)){
+			return $info;
+		}
+	}
+	public function GetListeCarrieres(){
+		Global $oDB;
+		$sql = "SELECT carriere_nom, carriere_debouchees, carriere_code FROM table_carrieres_lst WHERE carriere_niveau=0 AND carriere_civilisation='".$_SESSION['inscription']['civilisation']."' ORDER BY carriere_nom ASC;";
+		$rqtMetier = $oDB->Query($sql);
+		
+		//Si aucune carrière n'est disponible
+		if(mysql_num_rows($rqtMetier) <= 0){
+			return '<tr><td colspan="2">Aucune carrière disponnible.</td></tr>';
 		}
 		
-		return '<tr><td colspan="2">Aucune carrière disponnible.</td></tr>';
+		//si la carrière est disponible, on liste les débouchées.
+		$info = null;
+		while($row = mysql_fetch_array($rqtMetier, MYSQL_ASSOC)){
+			$temp  = '<tr>
+						<td>
+							<input required="required" type="radio" name="carriere" value="'.strtolower($row['carriere_code']).'" />
+						</td>
+						<td>'
+							.$this->GetDeboucheeCarrire($row['carriere_code'])
+						.'</td>
+					</tr>';
+			
+			$info[] = $temp;
+		}
+		if(!is_null($info)){
+			return $info;
+		}
 	}
 	private function GetDeboucheeCarrire($CarriereCode){
 		$txt = '<ul>';
@@ -283,8 +289,10 @@ class InscriptionStepB{
 		return '<h2 onmouseover="montre(\''.CorrectDataInfoBulle($txt).'\');" onmouseout="cache();">'.ucfirst(GetInfoCarriere($CarriereCode, 'carriere_nom')).'</h2>';
 	}
 	private function GetCarteVillage($Village){
+		Global $oDB;
+		
 		$sql = "SELECT maison_installe FROM table_joueurs WHERE civilisation='".$_SESSION['inscription']['civilisation']."' AND village='".$Village."';";
-		$rqt = mysql_query($sql) or die ( mysql_error() );
+		$rqt = $oDB->Query($sql);
 		
 		while($row = mysql_fetch_array($rqt, MYSQL_ASSOC)){
 			if(!is_null($row['maison_installe'])){
