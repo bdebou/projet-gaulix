@@ -29,7 +29,9 @@ class PersonnageComponent extends Component{
     Const TYPE_VIE			= 'Vie';                        //
 
     const CIVILISATION_ROMAIN		= 'Romains';                    //
+    Const ID_CIVILISATION_ROMAIN        = 3;
     const CIVILISATION_GAULOIS		= 'Gaulois';                    //
+    const ID_CIVILISATION_GAULOIS       = 2;
 
     Const CARRIERE_CLASS_GUERRIER	= 'Guerrier';                   //
     Const CARRIERE_CLASS_DRUIDE		= 'Druide';                     //
