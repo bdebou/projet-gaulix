@@ -6,6 +6,7 @@
               <li><a href="#general" data-toggle="tab">Général</a></li>
               <li><a href="#competences" data-toggle="tab">Compétences</a></li>
               <li><a href="#scores" data-toggle="tab">Scores</a></li>
+              <li><a href="#credits" data-toggle="tab">Crédits</a></li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane fade in active" id="presentation">
@@ -15,7 +16,7 @@
                           array(),
                           array(
                               'cache'=>true
-                          )
+                             )
                           );
                   ?>
                 </div><!-- /#presentation -->
@@ -26,7 +27,7 @@
                           array(),
                           array(
                               'cache'=>true
-                          )
+                            )
                           );
                   ?>
                 </div><!-- /#general -->
@@ -37,7 +38,7 @@
                           array(),
                           array(
                               'cache'=>true
-                          )
+                            )
                           );
                   ?>
                 </div><!-- /#competences -->
@@ -48,10 +49,21 @@
                         array(),
                         array(
                             'cache'=>true
-                        )
+                            )
                         );
                 ?>
                 </div><!-- /#scores -->
+                <div class="tab-pane fade" id="credits">
+                    <?php
+                    echo $this->Element(
+                            'eCredits',
+                            array(),
+                            array(
+                                'cache'=>true
+                                )
+                            );
+                    ?>
+                </div><!-- /#credits -->
             </div><!-- /tab-content -->
         </div><!-- /tabbable -->
     </div><!-- /col-md-12 -->
