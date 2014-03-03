@@ -10,7 +10,7 @@
  *
  * @author bdebou
  */
-class ObjetComponent extends Component{
+class ObjComponent extends Component{
     
     private $ID;
     private $Quantite;
