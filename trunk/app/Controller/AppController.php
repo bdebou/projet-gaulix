@@ -41,7 +41,7 @@ class AppController extends Controller {
         'Personnage',
         'Batiment',
         'Tour',
-        'Objet',
+        'Obj',
         'ObjArmement'
         );
     
