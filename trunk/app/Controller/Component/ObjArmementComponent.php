@@ -21,7 +21,7 @@ class ObjArmementComponent extends Component{
     const TYPE_DISTANCE		= 'Distance';
 
     const TYPE_BOUCLIER		= 'Bouclier';
-    const TYPE_JAMBIERE		= 'Jambiere';
+    const TYPE_JAMBIERE		= 'Jambière';
     const TYPE_ARME		= 'Arme';
     const TYPE_CASQUE		= 'Casque';
     const TYPE_CUIRASSE		= 'Cuirasse';
