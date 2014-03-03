@@ -12,7 +12,7 @@
  */
 class Civilisation extends AppModel{
     
-    public $hasMany = array('User', 'Object', 'Village');
+    public $hasMany = array('User', 'Objet', 'Village');
 }
 
 ?>
