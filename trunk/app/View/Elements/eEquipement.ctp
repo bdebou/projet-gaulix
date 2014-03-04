@@ -2,7 +2,7 @@
 
 $LstEquipement = $this->requestAction(
         array(
-            'controller'=>'Objets',
+            'controller'=>'Equipements',
             'action'=>'listEquipement'
             )
         );

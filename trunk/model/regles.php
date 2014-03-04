@@ -1,51 +1,5 @@
 <?php
-/**
- * Retourne une liste de DIV de tous les objets sélectionnés
- * @param DBManage <p>Instance de la Class de gestion de DB</p>
- * @param string <p>String du type d'élément</p>
- * @return <NULL, string>
- */
-function ReglesAfficheTableauEquipements(DBManage $db, $equipement){
-	$bckColor='#c8c8c8';
-	$txt=null;
 
-	$sql="SELECT objet_code
-			FROM table_objets 
-			WHERE objet_type='".($equipement==objRessource::TYPE_RESSOURCE?$equipement:"Armement")."'
-			AND objet_quete IS NULL;";
-
-	$requete = $db->Query($sql);
-	
-	while($row = mysql_fetch_array($requete, MYSQL_ASSOC)){
-		if($bckColor=='#c8c8c8')
-		{
-			$bckColor='white';
-		}else{
-			$bckColor='#c8c8c8';
-		}
-		
-		$oEquipement = FoundObjet($row['objet_code']);
-		
-		if(	$equipement == objRessource::TYPE_RESSOURCE
-			OR (	$equipement != objRessource::TYPE_RESSOURCE
-					AND $oEquipement->GetType() == $equipement
-				)
-			)
-		{
-			
-			$txt .= '
-						<div class="equipements" style="background:'.$bckColor.';">
-							<table>
-								<tr><td>'.$oEquipement->AfficheInfoObjet(100).'</td></tr>
-								<tr><td>'.$oEquipement->GetNom().'</td></tr>
-							</table>
-						</div>';
-		}
-		
-	}
-
-	return $txt;
-}
 /**
  * Retourne un tableau (class = points)avec la liste des points. 
  * @return string
@@ -62,7 +16,7 @@ function AfficheTableauGainScores($lstPoints){
 	return $txt;
 }
 /**
- * Crée une liste de DIV pour chaque compétence de niveau 1. La class de ces DIV est <strong>regles_competences</strong>
+ * Crï¿½e une liste de DIV pour chaque compï¿½tence de niveau 1. La class de ces DIV est <strong>regles_competences</strong>
  * @param DBManage <p>Instance de la Class de gestion de DB</p>
  * @return string  <i>Liste des DIV</i> 
  */
@@ -84,7 +38,7 @@ function AfficheListeCompetences(DBManage &$db){
 				<tr><th colspan="2">'.$cmp['cmp_lst_type'].' - '.ucfirst($cmp['cmp_lst_nom']).'</th></tr>
 				<tr><td rowspan="3"><img src="" alt="'.$cmp['cmp_lst_type'].'" title="'.$cmp['cmp_lst_type'].'" width="100px" /></td></tr>
 				<tr><td>'.$cmp['cmp_lst_description'].'</td></tr>
-				<tr><td>Compétence pour '.ListCarriere($cmp['cmp_lst_acces']).'</td></tr>
+				<tr><td>Compï¿½tence pour '.ListCarriere($cmp['cmp_lst_acces']).'</td></tr>
 			</table>
 		</div>';
 		
@@ -104,14 +58,14 @@ function ListCarriere($strAcces){
 	return 'les '.strtolower(implode('s et les ', $arAcces)).'s';
 }
 /**
- * Retourne le nombre de joueur faisant partie d'une civilisation donnée
+ * Retourne le nombre de joueur faisant partie d'une civilisation donnï¿½e
  * @param DBManage $db
  * @param string $civilisation
  * @return number
  */
 function NombreDeJoueurs(DBManage &$db, $civilisation){
 	
-	//On exécute sa query
+	//On exï¿½cute sa query
 	return $db->NbLigne("SELECT id FROM table_joueurs WHERE civilisation='".$civilisation."';");
 }
 
