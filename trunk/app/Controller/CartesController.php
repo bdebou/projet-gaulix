@@ -72,7 +72,7 @@ class CartesController extends AppController{
                 'all',
                 array(
                     'recursive'=>0,
-                    'fields'=>array('User.vie', 'User.position', 'User.username', 'Civilisation.name'),
+                    'fields'=>array('User.vie', 'User.position', 'User.name', 'Civilisation.name'),
                     'conditions'=>array('User.id >'=>1)
                     )
                 );
@@ -84,16 +84,16 @@ class CartesController extends AppController{
             
             if( $numCarte == $position[0]
                 or strtolower($numCarte) == 'all'){
-                if( empty($grille[$position[0]][$position[1]][$position[2]]['username'])
-                    OR $User['User']['username'] == $this->Session->read('Auth.User.id')){
+                if( empty($grille[$position[0]][$position[1]][$position[2]]['name'])
+                    OR $User['User']['name'] == $this->Session->read('Auth.User.id')){
 
-                    $grille[$position[0]][$position[1]][$position[2]]['username']     = $User['User']['username'];
+                    $grille[$position[0]][$position[1]][$position[2]]['name']         = $User['User']['name'];
                     $grille[$position[0]][$position[1]][$position[2]]['vie']          = $User['User']['vie'];
                     $grille[$position[0]][$position[1]][$position[2]]['civilisation'] = $User['Civilisation']['name'];
 
 //                }elseif(){
 //
-//                    $grille[$position[1]][$position[2]]['username']     = $User['User']['username'];
+//                    $grille[$position[1]][$position[2]]['name']     = $User['User']['name'];
 //                    $grille[$position[1]][$position[2]]['vie']          = $User['User']['vie'];
 //                    $grille[$position[1]][$position[2]]['civilisation'] = $User['Civilisation']['name'];
 

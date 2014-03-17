@@ -19,7 +19,7 @@ echo $this->Form->create(
             )
         );
 echo $this->Form->input(
-        'username',
+        'name',
         array(
             'label'=>'Nom du personnage',
             'class'=>'form-control'

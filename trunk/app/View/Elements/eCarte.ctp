@@ -14,12 +14,12 @@
     <?php for($j = 0; $j <= $nbColonnes; $j++):?>
             <td <?php echo (isset($ArGrilles[$numCarte][$i][$j]['batiment'])?$ArGrilles[$numCarte][$i][$j]['batiment']:'');?>>
 	<?php 
-        if(isset($ArGrilles[$numCarte][$i][$j]['username'])){
+        if(isset($ArGrilles[$numCarte][$i][$j]['name'])){
             echo $this->Html->image(
-                    'carte/'.$ArGrilles[$numCarte][$i][$j]['civilisation'].'-'.($this->Session->read('Auth.User.username')==$ArGrilles[$numCarte][$i][$j]['username']?'a':'b').'.png',
+                    'carte/'.$ArGrilles[$numCarte][$i][$j]['civilisation'].'-'.($this->Session->read('Auth.User.name')==$ArGrilles[$numCarte][$i][$j]['name']?'a':'b').'.png',
                     array(
-                        'alt'=>'Perso '.$ArGrilles[$numCarte][$i][$j]['username'],
-                        'title'=>$ArGrilles[$numCarte][$i][$j]['username'],
+                        'alt'=>'Perso '.$ArGrilles[$numCarte][$i][$j]['name'],
+                        'title'=>$ArGrilles[$numCarte][$i][$j]['name'],
                         'height'=>$size.'px'
                         )
                     );
