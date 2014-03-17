@@ -15,7 +15,7 @@ App::uses('SimplePasswordHasher', 'Controller/Component/Auth');
 class User extends AppModel{
     //put your code here
     public $validate = array(
-        'username' => array(
+        'name' => array(
             'unique'=>array(
                 'rule'=>'isUnique',
                 'message'=>'Ce personnage existe déjà.'
