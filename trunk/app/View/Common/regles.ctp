@@ -6,6 +6,7 @@
               <li><a href="#general" data-toggle="tab">Général</a></li>
               <li><a href="#competences" data-toggle="tab">Compétences</a></li>
               <li><a href="#scores" data-toggle="tab">Scores</a></li>
+              <li><a href="#inventaire" data-toggle="tab">Inventaire</a></li>
               <li><a href="#equipements" data-toggle="tab">Equipements</a></li>
               <li><a href="#credits" data-toggle="tab">Crédits</a></li>
             </ul>
@@ -54,14 +55,25 @@
                         );
                 ?>
                 </div><!-- /#scores -->
-				<div class="tab-pane fade" id="equipements">
+                <div class="tab-pane fade" id="inventaire">
+                    <?php
+                    echo $this->Element(
+                            'eInventaire',
+                        array(),
+                        array(
+                            'cache'=>true
+                            )
+                            );
+                    ?>
+                </div><!-- /#inventaire -->
+                <div class="tab-pane fade" id="equipements">
                     <?php
                     echo $this->Element(
                             'eEquipement',
-                            array(),
-                            array(
-                                'cache'=>true
-                                )
+                        array(),
+                        array(
+                            'cache'=>true
+                            )
                             );
                     ?>
                 </div><!-- /#equipements -->

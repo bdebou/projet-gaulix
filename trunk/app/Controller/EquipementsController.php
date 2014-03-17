@@ -21,12 +21,12 @@ class EquipementsController extends AppController{
     }
     /**
     * Retourne la liste des équipementes
-    * @param Array <p>Array du ou des types d'équipement</p>
+    * @param String <p>Array du ou des types d'équipement</p>
     * @return <array>
     */
-    public function listEquipement(array $arType = NULL){
-        if(is_null($arType))
-            $arType=array(
+    public function listEquipement($strType = NULL){
+        if(is_null($strType))
+            $strType=array(
                 ObjArmementComponent::TYPE_ARME, 
                 ObjArmementComponent::TYPE_BOUCLIER,
                 ObjArmementComponent::TYPE_CASQUE,
@@ -37,7 +37,7 @@ class EquipementsController extends AppController{
                 'all',
                 array(
                     'conditions'=>array(
-                        'Objtype.name'=>$arType
+                        'Objtype.name'=>$strType
                         ),
                     'recursive'=>-1,
                     'fields'=>array(
