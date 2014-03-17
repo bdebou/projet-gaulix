@@ -14,7 +14,7 @@ echo $this->Form->create(
             )
         );
 echo $this->Form->input(
-        'name',
+        'username',
         array(
             'placeholder'=>'Nom perso'
             )

@@ -26,7 +26,7 @@ echo $this->Form->end();
 
 echo $this->Html->para(
         'navbar-text navbar-right',
-        'Logged in as '.$this->Session->read('Auth.User.name')
+        'Logged in as '.$this->Session->read('Auth.User.username')
         );
 ?>
 
